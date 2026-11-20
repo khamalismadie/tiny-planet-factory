@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#0d1117" />
+    <meta name="description" content="Bangun planet mini, atur ekosistem, dan jaga tetap hidup." />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
+    <title>Tiny Planet Factory</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0d1117;
+        --panel: rgba(16, 22, 30, 0.88);
+        --border: #2c3948;
+        --text: #e8eef6;
+        --muted: #9fb0c2;
+        --accent: #6fd39b;
+        --warn: #ffb454;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+      button { font: inherit; color: inherit; background: #1b2836; border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; cursor: pointer; min-height: 40px; }
+      button:hover { border-color: var(--accent); }
+      button.active { background: #244a38; border-color: var(--accent); }
+      button:disabled { opacity: .4; cursor: not-allowed; }
+      #app { position: fixed; inset: 0; }
+      .panel { position: fixed; z-index: 10; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; backdrop-filter: blur(8px); }
+      #topbar { top: 10px; left: 10px; right: 10px; display: flex; align-items: center; gap: 12px; padding: 8px 12px; }
+      #topbar strong { letter-spacing: .02em; }
+      #planet-name { color: var(--muted); margin-left: 8px; font-size: 13px; }
+      #stage-label { margin-left: auto; color: var(--accent); font-size: 13px; }
+      #topbar .actions { display: flex; gap: 6px; }
+      #build-panel, #stats-panel { top: 70px; bottom: 96px; width: 210px; padding: 12px; overflow-y: auto; }
+      #build-panel { left: 10px; }
+      #stats-panel { right: 10px; }
+      #build-panel h2, #stats-panel h2 { margin: 0 0 10px; font-size: 14px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+      .category { margin-bottom: 12px; }
+      .category > span { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+      .category .items { display: flex; flex-wrap: wrap; gap: 6px; }
+      .category button { flex: 1 1 44%; font-size: 12px; padding: 6px; min-height: 36px; }
+      .stat { margin-bottom: 8px; }
+      .stat .row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 3px; }
+      .bar { height: 6px; border-radius: 4px; background: #1e2b38; overflow: hidden; }
+      .bar > i { display: block; height: 100%; background: var(--accent); transition: width .4s ease; }
+      #mission { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 10px; font-size: 13px; line-height: 1.5; }
+      #mission strong, #weather strong, #events strong { color: var(--accent); }
+      #ecosystem { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; font-size: 12px; color: var(--muted); line-height: 1.5; }
+      #weather { margin-top: 10px; font-size: 12px; color: var(--muted); line-height: 1.5; }
+      #events { margin-top: 10px; font-size: 12px; line-height: 1.4; }
+      .event { margin-bottom: 6px; }
+      .event.done { color: var(--accent); }
+      .event span { color: var(--muted); }
+      #inventory { left: 50%; transform: translateX(-50%); bottom: 10px; max-width: min(720px, calc(100% - 20px)); padding: 8px 10px; text-align: center; }
+      #object-list { display: flex; gap: 6px; overflow-x: auto; }
+      #object-list button { white-space: nowrap; font-size: 12px; }
+      #telemetry-modal label { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 13px; }
+      #hint { position: fixed; z-index: 5; bottom: 76px; left: 50%; transform: translateX(-50%); font-size: 12px; color: var(--muted); pointer-events: none; text-align: center; }
+      #perf { position: fixed; z-index: 20; left: 10px; bottom: 96px; display: none; padding: 8px 10px; border-radius: 8px; background: rgba(5, 10, 16, .86); border: 1px solid var(--border); color: var(--accent); font: 11px/1.5 ui-monospace, monospace; white-space: pre-line; pointer-events: none; }
+      #perf.show { display: block; }
+      #qa { position: fixed; z-index: 25; inset: 12px; display: none; flex-direction: column; gap: 8px; padding: 14px; border-radius: 12px; background: rgba(8, 13, 20, .96); border: 1px solid var(--border); }
+      #qa.show { display: flex; }
+      #qa h2 { margin: 0; font-size: 15px; color: var(--accent); }
+      #qa-status { font-size: 12px; color: var(--muted); }
+      #qa-output { flex: 1; overflow: auto; margin: 0; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: #0c141d; color: var(--text); font: 11px/1.5 ui-monospace, monospace; white-space: pre; resize: none; }
+      #qa-actions { display: flex; gap: 8px; justify-content: flex-end; }
+      #toast { position: fixed; z-index: 30; top: 72px; left: 50%; transform: translateX(-50%); background: #243447; border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; max-width: 80%; display: none; }
+      #toast.show { display: block; }
+      #toast.warn { border-color: var(--warn); color: var(--warn); }
+      .modal { position: fixed; z-index: 40; inset: 0; display: grid; place-items: center; background: rgba(5, 8, 12, .72); }
+      .modal.hidden, .hidden { display: none !important; }
+      .modal .card { background: #111a24; border: 1px solid var(--border); border-radius: 14px; padding: 18px; width: min(480px, 92vw); }
+      .modal h2 { margin-top: 0; font-size: 16px; }
+      .modal input, .modal textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: #0c141d; color: var(--text); font-family: ui-monospace, monospace; box-sizing: border-box; }
+      .modal textarea { resize: vertical; min-height: 64px; font-size: 11px; line-height: 1.4; word-break: break-all; }
+      .modal .dna-label { display: block; margin-top: 10px; font-size: 12px; color: var(--muted); }
+      .modal .dna-status { margin-top: 10px; font-size: 12px; color: #ffd479; }
+      .modal .row { display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end; flex-wrap: wrap; }
+      #error { position: fixed; z-index: 50; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; background: var(--bg); }
+      @media (max-width: 820px) {
+        #topbar { gap: 6px; padding: 6px 8px; }
+        #topbar strong { font-size: 13px; }
+        #planet-name, #hint { display: none; }
+        #stage-label { font-size: 11px; }
+        #build-panel { left: 8px; right: 8px; top: 60px; bottom: auto; width: auto; padding: 8px; max-height: 112px; }
+        #build-panel .category > span { display: none; }
+        #build-panel .category { margin-bottom: 6px; }
+        #build-panel h2 { display: none; }
+        #stats-panel { right: 8px; top: 182px; bottom: 92px; width: 160px; padding: 8px; }
+        #stats-panel h2 { font-size: 11px; }
+        .stat .row { font-size: 10px; }
+        #object-list button { min-height: 40px; }
+        #topbar .actions { margin-left: auto; gap: 4px; }
+        #topbar .actions button { font-size: 11px; padding: 6px 7px; min-height: 36px; white-space: nowrap; }
+        #toast { top: 108px; max-width: calc(100% - 24px); }
+      }
+      @media (max-width: 480px) {
+        #topbar strong, #stage-label { display: none; }
+        #topbar .actions { width: 100%; justify-content: space-between; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <header id="topbar" class="panel">
+      <strong>TINY PLANET FACTORY</strong>
+      <span id="planet-name"></span>
+      <span id="stage-label"></span>
+      <div class="actions">
+        <button id="level-label" disabled>Level 1</button>
+        <button id="pause-btn">Jeda</button>
+        <button id="telemetry-btn">Telemetri</button>
+        <button id="dna-btn">Planet DNA</button>
+        <button id="new-btn">Baru</button>
+      </div>
+    </header>
+    <aside id="build-panel" class="panel">
+      <h2>Kategori</h2>
+      <div id="categories"></div>
+    </aside>
+    <aside id="stats-panel" class="panel">
+      <h2>Ekosistem</h2>
+      <div id="stats"></div>
+      <div id="ecosystem"></div>
+      <div id="weather"></div>
+      <div id="events"></div>
+      <div id="mission"></div>
+    </aside>
+    <footer id="inventory" class="panel">
+      <div id="object-list"></div>
+    </footer>
+    <div id="hint">Geser: putar · Scroll/pinch: zoom · Ketuk permukaan: letakkan objek · Tahan lama: info</div>
+    <div id="perf"></div>
+    <div id="qa">
+      <h2>Hasil QA Perangkat</h2>
+      <div id="qa-status">Mengukur frame time...</div>
+      <textarea id="qa-output" readonly aria-label="Laporan QA"></textarea>
+      <div id="qa-actions">
+        <button id="qa-copy">Salin hasil QA</button>
+        <button id="qa-close">Tutup</button>
+      </div>
+    </div>
+    <div id="toast"></div>
+    <div id="telemetry-modal" class="modal hidden">
+      <div class="card">
+        <h2>Telemetri (opsional)</h2>
+        <p style="font-size:13px;color:var(--muted)">Data tetap di perangkat ini. Tidak ada pengiriman ke server. Catat waktu muat, frame time, penempatan objek, misi, dan perubahan kualitas.</p>
+        <label><input id="telemetry-optin" type="checkbox" /> Aktifkan pencatatan telemetri</label>
+        <div class="row">
+          <button id="telemetry-export">Salin data</button>
+          <button id="telemetry-clear">Hapus data</button>
+          <button id="telemetry-close">Tutup</button>
+        </div>
+      </div>
+    </div>
+    <div id="dna-modal" class="modal hidden">
+      <div class="card">
+        <h2>Planet DNA</h2>
+        <p style="font-size:13px;color:var(--muted)">Kode pendek berisi seed. Kode lengkap menyimpan semua objek, environment, biome, dan konfigurasi permukaan.</p>
+        <label class="dna-label" for="dna-input">Kode pendek / tempel kode DNA di sini</label>
+        <input id="dna-input" aria-label="Kode Planet DNA pendek" />
+        <label class="dna-label" for="dna-full">Kode lengkap</label>
+        <textarea id="dna-full" readonly aria-label="Kode Planet DNA lengkap"></textarea>
+        <div id="dna-status" class="dna-status hidden"></div>
+        <div class="row">
+          <button id="dna-copy">Salin pendek</button>
+          <button id="dna-copy-full">Salin lengkap</button>
+          <button id="dna-share">Bagikan</button>
+        </div>
+        <div class="row">
+          <button id="dna-preview">Pratinjau</button>
+          <button id="dna-load">Impor</button>
+          <button id="dna-duplicate">Duplikat</button>
+          <button id="dna-remix">Remix</button>
+        </div>
+        <div class="row">
+          <button id="dna-close">Tutup</button>
+        </div>
+      </div>
+    </div>
+    <div id="error" class="hidden"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "name": "tiny-planet-factory",
+  "private": true,
+  "version": "0.3.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc --noEmit && NODE_OPTIONS=--max-old-space-size=4096 vite build",
+    "test:sim": "esbuild scripts/sim-test.ts --bundle --platform=node --format=esm --outfile=/tmp/opencode/sim-test.mjs >/dev/null && node /tmp/opencode/sim-test.mjs",
+    "test:smoke": "node scripts/smoke.mjs",
+    "test:device": "node scripts/device-check.mjs",
+    "capture:visual": "node scripts/capture-visual.mjs",
+    "audit:layout": "node scripts/layout-audit.mjs",
+    "test": "npm run test:sim && npm run test:smoke && npm run test:device",
+    "preview": "vite preview --host 0.0.0.0"
+  },
+  "dependencies": {
+    "@pixi/3d": "0.1.0",
+    "pixi.js": "8.23.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.65.1",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1"
+  }
+}

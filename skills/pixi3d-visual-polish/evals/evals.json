@@ -1,0 +1,41 @@
+{
+  "skill_name": "pixi3d-visual-polish",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Audit the visuals of my PixiJS + @pixi/3D game in /root/GAMEDEV and polish it for mid-range Android. Preserve gameplay.",
+      "expected_output": "A skill-driven run: discovery, baseline screenshot, evidence-backed defect list, art direction, prioritized incremental changes, build/tests, before/after comparison, three quality scores, and clearly separated facts/estimates.",
+      "files": [],
+      "expectations": [
+        "uses the skill",
+        "inspects before coding",
+        "does not invent measurements",
+        "preserves save/input",
+        "runs validation"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Review my 3D scene visuals and tell me what looks wrong before I ship.",
+      "expected_output": "A prioritized visual audit with evidence, severity, root cause, gameplay impact, correction and acceptance criteria for each defect; no fabricated screenshots or metrics.",
+      "files": [],
+      "expectations": [
+        "visual audit structure",
+        "acceptance criteria",
+        "no invented defects"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "My p95 frame time is 45ms on mobile. Optimize the PixiJS renderer but do not break the game.",
+      "expected_output": "Profile-first investigation, CPU/GPU/memory classification, evidence-supported optimization only, quality/fallback settings, regression testing, and measured before/after numbers with stated device limitations.",
+      "files": [],
+      "expectations": [
+        "profile first",
+        "no blanket optimization",
+        "measured evidence",
+        "preserved gameplay"
+      ]
+    }
+  ]
+}

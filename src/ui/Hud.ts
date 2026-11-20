@@ -1,0 +1,263 @@
+import { EVENT_DEFS } from '../content/missions';
+import { CATEGORY_LABELS, OBJECT_DEFS, OBJECT_ORDER, UNLOCK_LEVEL } from '../content/objects';
+import { SPECIES_DEFS } from '../content/species';
+import { WEATHER_DEFS } from '../content/weather';
+import { STAGE_NAMES } from '../sim/engine';
+import type { EnvKey, ObjectType, PlanetState } from '../sim/types';
+
+export interface HudCallbacks {
+  onSelect: (type: ObjectType) => void;
+  onPause: (paused: boolean) => void;
+  onCopyDna: () => { short: string; full: string };
+  onLoadDna: (code: string) => void;
+  onPreviewDna: (code: string) => void;
+  onCloseDna: () => void;
+  onDuplicateDna: () => void;
+  onRemixDna: () => void;
+  onNewPlanet: () => void;
+  onTelemetryChange: (enabled: boolean) => void;
+  onTelemetryExport: () => string;
+  onTelemetryClear: () => void;
+}
+
+const ENV_LABELS: Record<EnvKey, string> = {
+  temperature: 'Suhu',
+  water: 'Air',
+  humidity: 'Kelembapan',
+  oxygen: 'Oksigen',
+  fertility: 'Kesuburan',
+  biodiversity: 'Biodiversitas',
+  energy: 'Energi',
+  stability: 'Stabilitas',
+};
+
+const ENV_KEYS = Object.keys(ENV_LABELS) as EnvKey[];
+const CATEGORIES = Object.keys(CATEGORY_LABELS) as Array<keyof typeof CATEGORY_LABELS>;
+
+export class Hud {
+  private readonly callbacks: HudCallbacks;
+  private readonly categoryRoot = document.getElementById('categories')!;
+  private readonly objectList = document.getElementById('object-list')!;
+  private readonly statsRoot = document.getElementById('stats')!;
+  private readonly ecosystem = document.getElementById('ecosystem')!;
+  private readonly weatherRoot = document.getElementById('weather')!;
+  private readonly eventsRoot = document.getElementById('events')!;
+  private readonly mission = document.getElementById('mission')!;
+  private readonly nameLabel = document.getElementById('planet-name')!;
+  private readonly stageLabel = document.getElementById('stage-label')!;
+  private readonly levelLabel = document.getElementById('level-label')!;
+  private readonly pauseButton = document.getElementById('pause-btn') as HTMLButtonElement;
+  private readonly toast = document.getElementById('toast')!;
+  private readonly modal = document.getElementById('dna-modal')!;
+  private readonly dnaInput = document.getElementById('dna-input') as HTMLInputElement;
+  private readonly dnaFull = document.getElementById('dna-full') as HTMLTextAreaElement;
+  private readonly dnaStatus = document.getElementById('dna-status')!;
+  private readonly telemetryModal = document.getElementById('telemetry-modal')!;
+  private readonly telemetryCheckbox = document.getElementById('telemetry-optin') as HTMLInputElement;
+  private toastTimer = 0;
+
+  constructor(callbacks: HudCallbacks) {
+    this.callbacks = callbacks;
+    this.buildBuildPanel();
+    this.buildStats();
+    this.bindTopBar();
+  }
+
+  private buildBuildPanel(): void {
+    for (const category of CATEGORIES) {
+      const section = document.createElement('div');
+      section.className = 'category';
+      const title = document.createElement('span');
+      title.textContent = CATEGORY_LABELS[category];
+      section.appendChild(title);
+      const items = document.createElement('div');
+      items.className = 'items';
+      for (const type of OBJECT_ORDER.filter((candidate) => OBJECT_DEFS[candidate].category === category)) {
+        const button = document.createElement('button');
+        button.dataset.type = type;
+        button.textContent = OBJECT_DEFS[type].label;
+        button.addEventListener('click', () => this.callbacks.onSelect(type));
+        items.appendChild(button);
+      }
+      section.appendChild(items);
+      this.categoryRoot.appendChild(section);
+    }
+    for (const type of OBJECT_ORDER) {
+      const button = document.createElement('button');
+      button.dataset.object = type;
+      button.textContent = OBJECT_DEFS[type].label;
+      button.addEventListener('click', () => this.callbacks.onSelect(type));
+      this.objectList.appendChild(button);
+    }
+  }
+
+  private buildStats(): void {
+    for (const key of ENV_KEYS) {
+      const row = document.createElement('div');
+      row.className = 'stat';
+      row.innerHTML = `<div class="row"><span>${ENV_LABELS[key]}</span><span data-value="${key}">0</span></div><div class="bar"><i data-bar="${key}"></i></div>`;
+      this.statsRoot.appendChild(row);
+    }
+  }
+
+  private bindTopBar(): void {
+    this.pauseButton.addEventListener('click', () => {
+      const paused = this.pauseButton.textContent === 'Jeda';
+      this.callbacks.onPause(paused);
+      this.pauseButton.textContent = paused ? 'Lanjut' : 'Jeda';
+    });
+    document.getElementById('dna-btn')!.addEventListener('click', () => {
+      const codes = this.callbacks.onCopyDna();
+      this.dnaInput.value = codes.short;
+      this.dnaFull.value = codes.full;
+      this.setPreviewing(false);
+      this.modal.classList.remove('hidden');
+      this.dnaInput.focus();
+      this.dnaInput.select();
+    });
+    document.getElementById('dna-close')!.addEventListener('click', () => {
+      this.callbacks.onCloseDna();
+      this.modal.classList.add('hidden');
+    });
+    const copy = async (text: string, label: string): Promise<void> => {
+      try {
+        await navigator.clipboard.writeText(text);
+        this.notify(`${label} disalin.`);
+      } catch {
+        this.notify('Gagal menyalin; pilih teks secara manual.', true);
+      }
+    };
+    document.getElementById('dna-copy')!.addEventListener('click', () => void copy(this.dnaInput.value, 'Kode pendek'));
+    document.getElementById('dna-copy-full')!.addEventListener('click', () => void copy(this.dnaFull.value, 'Kode lengkap'));
+    document.getElementById('dna-share')!.addEventListener('click', async () => {
+      const share = (navigator as Navigator & {
+        share?: (data: { title: string; text: string }) => Promise<void>;
+      }).share;
+      if (share) {
+        try {
+          await share.call(navigator, { title: 'Planet DNA', text: this.dnaInput.value });
+          return;
+        } catch {
+          // User cancelled or the browser denied sharing; fall back to clipboard.
+        }
+      }
+      await copy(this.dnaInput.value, 'Kode DNA');
+    });
+    const inputCode = (): string => this.dnaInput.value.trim() || this.dnaFull.value.trim();
+    document.getElementById('dna-load')!.addEventListener('click', () => {
+      this.callbacks.onLoadDna(inputCode());
+      this.modal.classList.add('hidden');
+    });
+    document.getElementById('dna-preview')!.addEventListener('click', () => {
+      this.callbacks.onPreviewDna(inputCode());
+      this.setPreviewing(true);
+    });
+    document.getElementById('dna-duplicate')!.addEventListener('click', () => {
+      this.callbacks.onDuplicateDna();
+      this.modal.classList.add('hidden');
+    });
+    document.getElementById('dna-remix')!.addEventListener('click', () => {
+      this.callbacks.onRemixDna();
+      this.modal.classList.add('hidden');
+    });
+    document.getElementById('new-btn')!.addEventListener('click', () => this.callbacks.onNewPlanet());
+
+    document.getElementById('telemetry-btn')!.addEventListener('click', () => {
+      this.telemetryModal.classList.remove('hidden');
+    });
+    this.telemetryCheckbox.addEventListener('change', () => {
+      this.callbacks.onTelemetryChange(this.telemetryCheckbox.checked);
+      this.notify(this.telemetryCheckbox.checked ? 'Telemetri diaktifkan.' : 'Telemetri dimatikan.');
+    });
+    document.getElementById('telemetry-export')!.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(this.callbacks.onTelemetryExport());
+        this.notify('Data telemetri disalin.');
+      } catch {
+        this.notify('Gagal menyalin; periksa izin clipboard.', true);
+      }
+    });
+    document.getElementById('telemetry-clear')!.addEventListener('click', () => {
+      this.callbacks.onTelemetryClear();
+      this.notify('Data telemetri dihapus.');
+    });
+    document.getElementById('telemetry-close')!.addEventListener('click', () => this.telemetryModal.classList.add('hidden'));
+  }
+
+  setTelemetryEnabled(enabled: boolean): void {
+    this.telemetryCheckbox.checked = enabled;
+  }
+
+  setPreviewing(active: boolean): void {
+    this.dnaStatus.textContent = active
+      ? 'Pratinjau aktif — planet asli belum berubah. Tutup panel untuk kembali.'
+      : '';
+    this.dnaStatus.classList.toggle('hidden', !active);
+  }
+
+  update(planet: PlanetState, selected: ObjectType | null): void {
+    this.nameLabel.textContent = planet.name;
+    this.stageLabel.textContent = `Tahap ${planet.stage} — ${STAGE_NAMES[planet.stage]}`;
+    this.levelLabel.textContent = `Level ${planet.progression.level} · ${Math.floor(planet.progression.xp)} XP`;
+
+    for (const key of ENV_KEYS) {
+      const value = planet.environment[key];
+      const display = key === 'temperature' ? `${value.toFixed(1)}°` : Math.round(value).toString();
+      (this.statsRoot.querySelector(`[data-value="${key}"]`) as HTMLElement).textContent = display;
+      (this.statsRoot.querySelector(`[data-bar="${key}"]`) as HTMLElement).style.width = `${Math.max(0, Math.min(100, value))}%`;
+    }
+
+    const eco = planet.ecosystem;
+    const fauna = planet.fauna;
+    const extinctLabels = (fauna?.extinct ?? []).map((id) => SPECIES_DEFS[id].label).join(', ');
+    this.ecosystem.innerHTML =
+      `<strong>Ekosistem</strong><br>` +
+      `Vegetasi ${Math.round(eco.vegetation)} · Satwa ${Math.round(eco.wildlife)}<br>` +
+      `Populasi ${eco.population} · Kesehatan ${eco.health}<br>` +
+      `Fauna ${fauna?.agents.length ?? 0} agen · ${fauna?.discovered.length ?? 0} spesies ditemukan` +
+      (extinctLabels ? `<br>Punah: ${extinctLabels}` : '');
+
+    const weather = WEATHER_DEFS[planet.weather.type];
+    this.weatherRoot.innerHTML =
+      `<strong>Cuaca: ${weather.label}</strong><br>` +
+      `Intensitas ${Math.round(planet.weather.intensity * 100)}% · ${planet.weather.remainingTicks} tick lagi`;
+
+    if (!planet.events) planet.events = {};
+    this.eventsRoot.innerHTML =
+      '<strong>Event Opsional</strong>' +
+      EVENT_DEFS.map((event) => {
+        const progress = planet.events[event.id] ?? { status: 'active', progress: 0 };
+        const done = progress.status === 'complete';
+        return `<div class="event${done ? ' done' : ''}" data-event="${event.id}">${done ? '✓' : '○'} ${event.title} <span>${event.progressLabel(progress.progress, event.target)}</span></div>`;
+      }).join('');
+
+    const e = planet.environment;
+    const missionDone = planet.mission.status === 'complete';
+    this.mission.innerHTML = missionDone
+      ? '<strong>Misi selesai</strong><br>Hijaukan Planet ✓'
+      : `<strong>Misi: Hijaukan Planet</strong><br>Oksigen ≥ 45 (${Math.round(e.oxygen)}) · Air ≥ 40 (${Math.round(e.water)}) · Stabilitas ≥ 60 (${Math.round(e.stability)})<br>Tahan ${planet.mission.holdTicks}/3 tick`;
+
+    for (const button of this.categoryRoot.querySelectorAll<HTMLButtonElement>('[data-type]')) {
+      const type = button.dataset.type as ObjectType;
+      const locked = !planet.progression.unlockedObjects.includes(type);
+      button.disabled = locked;
+      button.title = locked ? `Terbuka di level ${UNLOCK_LEVEL[type]}` : OBJECT_DEFS[type].label;
+      button.classList.toggle('active', !locked && selected === type);
+    }
+    for (const button of this.objectList.querySelectorAll<HTMLButtonElement>('[data-object]')) {
+      const type = button.dataset.object as ObjectType;
+      const locked = !planet.progression.unlockedObjects.includes(type);
+      button.disabled = locked;
+      button.title = locked ? `Terbuka di level ${UNLOCK_LEVEL[type]}` : OBJECT_DEFS[type].label;
+      button.classList.toggle('active', !locked && selected === type);
+    }
+  }
+
+  notify(message: string, warn = false): void {
+    window.clearTimeout(this.toastTimer);
+    this.toast.textContent = message;
+    this.toast.classList.toggle('warn', warn);
+    this.toast.classList.add('show');
+    this.toastTimer = window.setTimeout(() => this.toast.classList.remove('show'), 3200);
+  }
+}

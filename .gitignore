@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.zip
+*.log
+core
+core.*
+.DS_Store
+.env
+.env.*
+!.env.example
