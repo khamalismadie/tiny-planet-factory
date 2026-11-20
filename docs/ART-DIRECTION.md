@@ -28,17 +28,19 @@ Aturan: warna vegetasi berubah **bertahap** mengikuti `oxygen`/`water`, bukan XO
 ## 3. Shape language
 
 - Planet: bola icosahedron terdisplasi, **flat shading**, siluet tidak simetris sempurna.
-- Props: primitif sederhana (cone, sphere, icosahedron, cylinder) dengan `flatShading: true`.
-- Vegetasi: cone/sphere bulat pendek; batu: icosahedron tajam; air: cylinder tipis.
-- Satwa: ringkas, dapat dikenali lewat proporsi (deer memanjang, fox tegak, bird pipih) tanpa tekstur.
+- Props: **gabungan primitif** (cone, sphere, icosahedron, cylinder) yang di-merge menjadi satu geometri per tipe, bukan satu primitif placeholder. Semua memakai `flatShading: true`.
+- Vegetasi: pohon berbatang + 3 lapis kanopi; semak 3 bola; bunga 5 kelopak + titik serbuk; rumput 3 helai.
+- Batu/gunung: cluster icosahedron/cone dengan puncak salju untuk gunung; air: cakram tipis + permukaan lebih terang.
+- Satwa: siluet majemuk — kijang bertubuh panjang + leher/kepala/kaki/telinga; rubah berekor dan telinga runcing; burung bersayap + paruh; ikan berekor/sirip; serangga bersayap + antena.
 - Hindari detail kecil yang hilang pada 390px lebar layar.
 
 ## 4. Standar geometri & material
 
 - Semua prop memakai `BatchedMesh3D` dengan geometri/material yang **dibagi** per tipe.
 - Radius planet dasar ≈ 1; prop skala ±0.03–0.30 relatif terhadap radius.
-- **Ground contact wajib**: dasar geometri harus menyentuh permukaan planet, tidak melayang dan tidak tenggelam. Offset penempatan dihitung dari ekstent geometri (`height/2` untuk cone/cylinder, `radius` untuk sphere/icosahedron), dikalikan skala dan `SHAPE_SCALE.y`.
-- Material: `roughness` tinggi (0.9–1.0) untuk benda alami; tanpa logam mengkilap.
+- **Ground contact wajib**: setiap aset komposit dinormalisasi sehingga local `minY = 0`. Renderer hanya menambahkan `baseLift * scale` (0.004 untuk daratan, 0.012 untuk air) untuk menghindari z-fighting. Tidak ada lagi `GROUND_OFFSET`/`SHAPE_SCALE` per tipe.
+- Material: `roughness` tinggi (0.9–1.0) untuk benda alami; tanpa logam mengkilap. Warna per bagian disimpan sebagai **vertex colors** linear, sehingga satu batch tetap satu material, satu draw call.
+- `src/render/assetGeometry.ts` adalah satu-satunya sumber bentuk aset. `PropRenderer` dan `WildlifeRenderer` hanya mengonsumsi `ASSET_GEOMETRY` / `SPECIES_GEOMETRY`.
 
 ## 5. Pencahayaan
 
