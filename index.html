@@ -118,8 +118,8 @@
 
       .main-menu {
         position: fixed; z-index: 38; inset: 0; display: grid; place-items: center; padding: 24px;
-        background: radial-gradient(circle at 72% 34%, rgba(169, 154, 232, .14), transparent 42%),
-          radial-gradient(circle at 24% 78%, rgba(127, 224, 173, .11), transparent 46%), rgba(5, 9, 15, .84);
+        background: radial-gradient(circle at 72% 34%, rgba(169, 154, 232, .16), transparent 42%),
+          radial-gradient(circle at 24% 78%, rgba(127, 224, 173, .12), transparent 46%), rgba(5, 9, 15, .86);
         backdrop-filter: blur(9px);
       }
       .main-menu.hidden { display: none; }
@@ -127,32 +127,72 @@
       .menu-orbit.outer { width: min(88vmin, 760px); aspect-ratio: 1; transform: rotate(-21deg) scaleY(.42); }
       .menu-orbit.inner { width: min(58vmin, 500px); aspect-ratio: 1; transform: rotate(32deg) scaleY(.55); border-color: rgba(127, 224, 173, .16); }
       .menu-sheet {
-        position: relative; z-index: 1; width: min(460px, 100%); padding: 26px;
+        --planet-primary: #67c997; --planet-water: #2f6d73; --planet-accent: #f4bd72;
+        position: relative; z-index: 1; width: min(660px, 100%); padding: 22px;
+        display: grid; grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr); gap: 20px;
         background: linear-gradient(155deg, rgba(17, 29, 42, .98), rgba(9, 16, 24, .98));
         border: 1px solid var(--line); border-radius: 18px 18px 6px 18px;
         box-shadow: 0 30px 90px rgba(0, 0, 0, .45);
+        animation: menu-in .32s ease-out both;
       }
+      @keyframes menu-in { from { opacity: 0; transform: translateY(8px) scale(.985); } }
+      .menu-hero { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
       .menu-planet {
-        position: relative; width: 68px; height: 68px; border-radius: 50%;
-        background: radial-gradient(circle at 32% 28%, #d4f8e0 0 7%, #67c997 8% 40%, #2f6d73 41% 70%, #172d3d 71%);
-        box-shadow: 0 0 34px rgba(127, 224, 173, .24), inset -8px -10px 18px rgba(0, 0, 0, .35);
+        position: relative; width: 112px; height: 112px; border-radius: 50%;
+        background: radial-gradient(circle at 32% 27%, var(--planet-accent) 0 6%, var(--planet-primary) 9% 43%, var(--planet-water) 44% 72%, #172d3d 73%);
+        box-shadow: 0 0 38px rgba(127, 224, 173, .2), inset -10px -12px 20px rgba(0, 0, 0, .38);
+      }
+      .menu-planet::before {
+        content: ""; position: absolute; inset: 16% 7%; border: 1px solid rgba(255, 255, 255, .2);
+        border-radius: 50%; transform: rotate(-18deg);
       }
       .menu-planet::after {
         content: ""; position: absolute; inset: -9px -17px; border: 1px solid rgba(244, 189, 114, .45);
         border-radius: 50%; transform: rotate(-24deg);
       }
-      .menu-sheet h1 { margin: 17px 0 8px; font-size: clamp(29px, 6vw, 41px); line-height: 1.03; letter-spacing: -.035em; font-weight: 700; }
-      .menu-lede { margin: 0; max-width: 38ch; color: var(--muted); font-size: 13px; line-height: 1.55; }
-      .menu-actions { display: grid; gap: 8px; margin-top: 21px; }
-      .menu-action { display: flex; flex-direction: column; align-items: flex-start; text-align: left; padding: 11px 14px; min-height: 56px; border-radius: 12px; }
-      .menu-action.primary { background: linear-gradient(100deg, rgba(127, 224, 173, .18), rgba(244, 189, 114, .07)); border-color: rgba(127, 224, 173, .55); }
-      .menu-action-title { font-size: 15px; }
-      .menu-action-note { margin-top: 2px; font: 10px/1.4 var(--mono); color: var(--muted); }
-      .menu-quality { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+      .menu-sheet h1 { margin: 0; font-size: clamp(29px, 5vw, 40px); line-height: 1.04; letter-spacing: -.035em; font-weight: 700; }
+      .menu-lede { margin: 0; max-width: 34ch; color: var(--muted); font-size: 12px; line-height: 1.5; }
+      .menu-quality { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--line); display: grid; gap: 7px; font-size: 12px; color: var(--muted); }
       .quality-switch { display: flex; gap: 4px; }
-      .quality-switch button { min-height: 48px; padding: 6px 9px; font-size: 11px; }
-      .menu-close { width: 100%; margin-top: 10px; background: transparent; border-color: transparent; color: var(--muted); }
+      .quality-switch button { flex: 1; min-height: 48px; padding: 6px 7px; font-size: 11px; }
+      .menu-console { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+      .menu-section-head { display: grid; gap: 2px; }
+      .menu-section-head > span { font-size: 13px; font-weight: 600; }
+      #menu-planet-caption { min-height: 2.7em; font-size: 11px; line-height: 1.35; color: var(--muted); }
+      .planet-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+      .planet-chip {
+        --chip-primary: #67c997; --chip-water: #2f6d73; --chip-accent: #f4bd72;
+        min-height: 48px; display: flex; align-items: center; gap: 7px; padding: 6px 8px;
+        border-radius: 10px; text-align: left; font-size: 11px;
+        background: rgba(20, 32, 45, .72);
+      }
+      .planet-chip .planet-dot {
+        width: 18px; height: 18px; flex: none; border-radius: 50%;
+        background: radial-gradient(circle at 32% 28%, var(--chip-accent) 0 12%, var(--chip-primary) 13% 60%, var(--chip-water) 61%);
+        box-shadow: inset -2px -3px 5px rgba(0, 0, 0, .35);
+      }
+      .planet-chip.active { border-color: var(--mint); background: rgba(48, 103, 78, .35); color: var(--mint); }
+      .planet-chip.active::after { content: "✓"; margin-left: auto; }
+      .menu-guide-strip {
+        padding: 8px 10px; border: 1px dashed rgba(244, 189, 114, .35); border-radius: 9px;
+        background: rgba(244, 189, 114, .06); font-size: 11px; line-height: 1.45; color: #dccbae;
+      }
+      .menu-actions { display: grid; gap: 7px; }
+      .menu-action { display: flex; flex-direction: column; align-items: flex-start; text-align: left; padding: 9px 13px; min-height: 48px; border-radius: 11px; }
+      .menu-action.primary { background: linear-gradient(100deg, rgba(127, 224, 173, .18), rgba(244, 189, 114, .07)); border-color: rgba(127, 224, 173, .55); }
+      .menu-action.quiet { background: transparent; border-color: rgba(169, 154, 232, .38); color: var(--violet); }
+      .menu-action-title { font-size: 14px; }
+      .menu-action-note { margin-top: 2px; font: 10px/1.4 var(--mono); color: var(--muted); }
+      .menu-close { width: 100%; margin-top: 0; background: transparent; border-color: transparent; color: var(--muted); }
       .menu-corner { position: absolute; right: 18px; bottom: 16px; font: 10px var(--mono); color: var(--muted); }
+      .guide-card { width: min(560px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; }
+      .guide-steps { margin: 12px 0 0; padding-left: 21px; font-size: 12px; line-height: 1.55; color: var(--muted); }
+      .guide-steps li + li { margin-top: 8px; }
+      .guide-steps strong { color: var(--text); }
+      .guide-map { display: grid; gap: 6px; margin-top: 14px; }
+      .guide-map > div { display: grid; grid-template-columns: 92px 1fr; gap: 8px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 9px; background: rgba(12, 20, 30, .7); }
+      .guide-map span { color: var(--mint); font-size: 11px; }
+      .guide-map p { margin: 0; font-size: 11px; line-height: 1.45; color: var(--muted); }
       body.menu-open #topbar, body.menu-open #objective-strip, body.menu-open #build-panel, body.menu-open #stats-panel, body.menu-open #inventory, body.menu-open #hint { opacity: .22; pointer-events: none; filter: blur(2px); }
       #error { position: fixed; z-index: 70; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; background: var(--void); }
       @media (prefers-reduced-motion: reduce) { .bar > i { transition: none; } }
@@ -178,11 +218,19 @@
         #topbar strong, #stage-label { display: none; }
         #topbar .actions { width: 100%; justify-content: space-between; }
         #stats-panel { top: 196px; width: 144px; }
-        .main-menu { padding: 14px; }
-        .menu-sheet { padding: 20px; border-radius: 15px 15px 5px 15px; }
+        .main-menu { padding: 12px; }
+        .menu-sheet { grid-template-columns: 1fr; gap: 14px; padding: 18px; max-height: calc(100vh - 24px); overflow-y: auto; border-radius: 15px 15px 5px 15px; }
         .menu-planet { width: 58px; height: 58px; }
-        .menu-corner { display: none; }
-        .menu-orbit { display: none; }
+        .menu-sheet h1 { font-size: 28px; }
+        .menu-lede { font-size: 11px; line-height: 1.4; }
+        .menu-quality { margin-top: 0; }
+        .menu-guide-strip { display: none; }
+        .planet-chip { justify-content: center; padding: 5px; font-size: 10px; }
+        .planet-chip.active::after { display: none; }
+        .planet-chip .planet-dot { width: 16px; height: 16px; }
+        .menu-action { min-height: 48px; padding: 8px 11px; }
+        .menu-corner, .menu-orbit { display: none; }
+        .guide-map > div { grid-template-columns: 1fr; gap: 2px; }
         .objective-mission { margin-left: 0; width: 100%; text-align: left; }
       }
     </style>
@@ -272,34 +320,67 @@
       <div class="menu-orbit outer" aria-hidden="true"></div>
       <div class="menu-orbit inner" aria-hidden="true"></div>
       <section class="menu-sheet">
-        <div class="menu-planet" aria-hidden="true"></div>
-        <h1 id="menu-title">Tiny Planet Factory</h1>
-        <p class="menu-lede">Rakit dunia kecil. Atur air, oksigen, dan penghuninya sampai ekosistemnya bisa berjalan sendiri.</p>
-        <div class="menu-actions">
-          <button id="menu-continue" class="menu-action primary">
-            <span class="menu-action-title">Lanjutkan</span>
-            <span id="menu-save-note" class="menu-action-note">Memeriksa planet tersimpan…</span>
-          </button>
-          <button id="menu-new" class="menu-action">
-            <span class="menu-action-title">Planet baru</span>
-            <span class="menu-action-note">Mulai dari seed baru di biome yang sama.</span>
-          </button>
-          <button id="menu-dna" class="menu-action">
-            <span class="menu-action-title">Buka Planet DNA</span>
-            <span class="menu-action-note">Impor kode atau salin planet yang sedang berjalan.</span>
-          </button>
-        </div>
-        <div class="menu-quality">
-          <span>Kualitas grafis</span>
-          <div class="quality-switch" role="group" aria-label="Kualitas grafis">
-            <button type="button" data-quality="low">Hemat</button>
-            <button type="button" data-quality="medium">Menengah</button>
-            <button type="button" data-quality="high">Tinggi</button>
+        <div class="menu-hero">
+          <div id="menu-planet-orb" class="menu-planet" aria-hidden="true"></div>
+          <h1 id="menu-title">Tiny Planet Factory</h1>
+          <p class="menu-lede">Rakit dunia kecil. Atur air, oksigen, dan penghuninya sampai ekosistemnya bisa berjalan sendiri.</p>
+          <div class="menu-quality">
+            <span>Kualitas grafis</span>
+            <div class="quality-switch" role="group" aria-label="Kualitas grafis">
+              <button type="button" data-quality="low">Hemat</button>
+              <button type="button" data-quality="medium">Menengah</button>
+              <button type="button" data-quality="high">Tinggi</button>
+            </div>
           </div>
         </div>
-        <button id="menu-close" class="menu-close">Kembali ke planet</button>
+        <div class="menu-console">
+          <div class="menu-section-head">
+            <span>Pilih dunia</span>
+            <small id="menu-planet-caption">Terra · Dunia hutan hijau dan danau tenang</small>
+          </div>
+          <div id="planet-grid" class="planet-grid" role="group" aria-label="Pilih planet"></div>
+          <div class="menu-guide-strip">Mulai dari pilih dunia, ketuk permukaan untuk menanam, lalu jaga angka ekosistem tetap hijau.</div>
+          <div class="menu-actions">
+            <button id="menu-continue" class="menu-action primary">
+              <span class="menu-action-title">Lanjutkan</span>
+              <span id="menu-save-note" class="menu-action-note">Memeriksa planet tersimpan…</span>
+            </button>
+            <button id="menu-new" class="menu-action">
+              <span class="menu-action-title">Planet baru</span>
+              <span class="menu-action-note">Seed baru di planet yang sedang dipilih.</span>
+            </button>
+            <button id="menu-dna" class="menu-action">
+              <span class="menu-action-title">Buka Planet DNA</span>
+              <span class="menu-action-note">Impor kode atau salin planet yang sedang berjalan.</span>
+            </button>
+            <button id="menu-guide" class="menu-action quiet">
+              <span class="menu-action-title">Cara pakai UI</span>
+              <span class="menu-action-note">Peta layar dan 4 langkah singkat.</span>
+            </button>
+          </div>
+          <button id="menu-close" class="menu-close">Kembali ke planet</button>
+        </div>
       </section>
       <div class="menu-corner">Tiny Planet Factory · <span id="menu-quality-note">Menengah</span></div>
+    </div>
+    <div id="guide-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="guide-title">
+      <div class="card guide-card">
+        <h2 id="guide-title">Cara pakai Tiny Planet Factory</h2>
+        <ol class="guide-steps">
+          <li><strong>Pilih dunia.</strong> Gunakan deretan planet di menu. Setiap planet punya iklim, musim, dan spesies berbeda.</li>
+          <li><strong>Letakkan objek.</strong> Pilih alat di panel kiri atau bawah, lalu ketuk permukaan planet. Geser untuk memutar, pinch untuk zoom, tahan lama untuk info.</li>
+          <li><strong>Jaga ekosistem.</strong> Panel kanan menampilkan air, oksigen, suhu, dan stabilitas. Strip di bawah layar memberi tahap dan sasaran berikutnya.</li>
+          <li><strong>Eksperimen.</strong> “Baru” mengacak seed di planet yang sama. Planet DNA menyimpan dan memuat hasilnya; telemetri opsional tetap di perangkat.</li>
+        </ol>
+        <div class="guide-map" aria-label="Peta antarmuka">
+          <div><span>Kiri / atas</span><p>Kategori objek dan tombol menu, jeda, DNA, serta kualitas.</p></div>
+          <div><span>Kanan</span><p>Nilai ekosistem, cuaca, event, dan misi saat ini.</p></div>
+          <div><span>Bawah</span><p>Alat yang dipilih, sasaran misi, dan petunjuk gestur.</p></div>
+        </div>
+        <div class="row">
+          <button id="guide-close">Mengerti</button>
+        </div>
+      </div>
     </div>
     <div id="error" class="hidden"></div>
     <script type="module" src="/src/main.ts"></script>

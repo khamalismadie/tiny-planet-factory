@@ -257,6 +257,14 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [x] Gate `test:terrain` mengunci normalisasi, rentang radius, dan determinisme untuk 9 planet + default.
 - [ ] Ulang QA perangkat karena skala kontak prop berubah setelah perbaikan bentuk.
 
+## 2x. Menu & Tutorial (v0.15.7)
+
+- [x] Menu utama direka ulang sebagai panel observatorium dua kolom dengan planet pilihan yang mengikuti palet tiap bioma.
+- [x] Pemilih planet menampilkan 9 planet yang sudah ada dan langsung memuat planet yang dipilih tanpa menambah konten baru.
+- [x] Deeplink QA (`debug`, `qa`, `planet`, `menu=0`) tetap melewati menu.
+- [x] Modal “Cara pakai UI” berisi 4 langkah dan peta layar; dibuka dari menu dan bisa ditutup dengan Escape.
+- [x] `test:menu` mengunci jumlah planet, status aktif, caption, perpindahan planet, panduan, dan layout desktop/mobile.
+
 ## 3. QA perangkat nyata
 
 Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:

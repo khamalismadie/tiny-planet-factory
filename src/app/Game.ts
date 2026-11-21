@@ -4,7 +4,7 @@ import { OBJECT_DEFS, OBJECT_ORDER, UNLOCK_LEVEL } from '../content/objects';
 import { SPECIES_ORDER } from '../content/species';
 import { WEATHER_DEFS } from '../content/weather';
 import { scoreHabitat } from '../sim/eco/habitat';
-import { ecosystemConfigOf, foodWebLinks, guildStatus, isSupportedPlanet } from '../sim/eco/guilds';
+import { ecosystemConfigFor, ecosystemConfigOf, foodWebLinks, guildStatus, isSupportedPlanet, supportedPlanetIds } from '../sim/eco/guilds';
 import { habitatContextFor } from '../sim/eco/manager';
 import { placeObject, createPlanet, planetNameFromSeed, simulateTick, STAGE_NAMES, TICK_MS } from '../sim/engine';
 import { decodePlanetDna, encodePlanetDna, type PlanetDnaCodes } from '../sim/dna';
@@ -14,12 +14,14 @@ import { detectQuality, QUALITY, type QualitySettings, type QualityTier } from '
 import { PerfMonitor } from './PerfMonitor';
 import { QaProbe, type QaReport } from './QaProbe';
 import { Hud } from '../ui/Hud';
-import { MainMenu, type MainMenuInfo } from '../ui/MainMenu';
+import { MainMenu, type MainMenuInfo, type PlanetChoice } from '../ui/MainMenu';
 import { SurfaceInput } from '../input/SurfaceInput';
 import { SaveStore } from '../persistence/SaveStore';
 import { GameScene } from '../render/Scene';
 import { registerPwa } from '../pwa/register';
 import { Telemetry } from '../telemetry';
+
+const colorHex = (value: number): string => `#${value.toString(16).padStart(6, '0')}`;
 
 export class Game {
   private readonly app: Application;
@@ -208,8 +210,30 @@ export class Game {
         this.closeMenu();
         this.hud.openDna();
       },
+      onPlanet: (planetId) => {
+        if (planetId === this.state.planetId) return;
+        this.switchPlanet(planetId);
+        this.menu?.update(this.menuInfo());
+      },
       onQuality: (tier) => this.setQuality(tier),
       onClose: () => this.closeMenu(),
+    });
+  }
+
+  private menuPlanets(): PlanetChoice[] {
+    return supportedPlanetIds().map((id) => {
+      const config = ecosystemConfigFor(id)!;
+      return {
+        id,
+        name: config.name,
+        subtitle: config.subtitle,
+        colors: {
+          primary: colorHex(config.palette.primary),
+          water: colorHex(config.palette.water),
+          accent: colorHex(config.palette.accent),
+        },
+        active: id === this.state.planetId,
+      };
     });
   }
 
@@ -217,6 +241,8 @@ export class Game {
     return {
       hasSave: this.hadSave,
       planetName: this.state.name,
+      planetId: this.state.planetId,
+      planets: this.menuPlanets(),
       stageLabel: `Tahap ${this.state.stage} — ${STAGE_NAMES[this.state.stage]}`,
       objects: this.state.objects.length,
       tick: this.state.tick,

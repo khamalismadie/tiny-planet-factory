@@ -26,7 +26,7 @@ for (const c of [
 
   const menu = await page.evaluate(() => {
     const sheet = document.querySelector('.menu-sheet').getBoundingClientRect();
-    const buttons = [...document.querySelectorAll('.menu-actions button, .menu-close')].map((button) => {
+    const buttons = [...document.querySelectorAll('.planet-chip, .menu-actions button, .menu-close')].map((button) => {
       const r = button.getBoundingClientRect();
       return r.left >= sheet.left - 1 && r.right <= sheet.right + 1 && r.top >= sheet.top - 1 && r.bottom <= sheet.bottom + 1;
     });
@@ -41,6 +41,36 @@ for (const c of [
   check(`${c.name}: menu buttons inside sheet`, menu.buttonsInside);
   check(`${c.name}: continue focused`, menu.focused === 'menu-continue');
   check(`${c.name}: body locked`, menu.bodyLocked);
+
+  const planets = await page.evaluate(() => ({
+    count: document.querySelectorAll('.planet-chip').length,
+    active: document.querySelector('.planet-chip.active')?.dataset.planet,
+    caption: document.getElementById('menu-planet-caption')?.textContent ?? '',
+  }));
+  check(`${c.name}: nine planets`, planets.count === 9);
+  check(`${c.name}: active planet`, planets.active === 'terra');
+  check(`${c.name}: planet caption`, planets.caption.includes('Terra'));
+
+  await page.click('.planet-chip[data-planet="dune"]');
+  const switched = await page.evaluate(() => ({
+    active: document.querySelector('.planet-chip.active')?.dataset.planet,
+    caption: document.getElementById('menu-planet-caption')?.textContent ?? '',
+  }));
+  check(`${c.name}: planet chip switches`, switched.active === 'dune');
+  check(`${c.name}: planet caption updates`, switched.caption.includes('pasir'));
+  await page.click('.planet-chip[data-planet="terra"]');
+
+  await page.click('#menu-guide');
+  const guide = await page.evaluate(() => ({
+    open: !document.getElementById('guide-modal').classList.contains('hidden'),
+    steps: document.querySelectorAll('.guide-steps li').length,
+    focused: document.activeElement?.id,
+  }));
+  check(`${c.name}: guide opens`, guide.open);
+  check(`${c.name}: guide has four steps`, guide.steps === 4);
+  check(`${c.name}: guide focused`, guide.focused === 'guide-close');
+  await page.click('#guide-close');
+  check(`${c.name}: guide closes`, await page.evaluate(() => document.getElementById('guide-modal').classList.contains('hidden')));
 
   await page.click('[data-quality="high"]');
   const quality = await page.evaluate(() => ({
