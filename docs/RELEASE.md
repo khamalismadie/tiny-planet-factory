@@ -265,6 +265,15 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [x] Modal “Cara pakai UI” berisi 4 langkah dan peta layar; dibuka dari menu dan bisa ditutup dengan Escape.
 - [x] `test:menu` mengunci jumlah planet, status aktif, caption, perpindahan planet, panduan, dan layout desktop/mobile.
 
+## 2y. Cuaca & Badai (v0.15.8)
+
+- [x] Awan ellipsoid radius 0.045 planet dan orbit 1.08; tepi dalam awan badai tetap di atas permukaan.
+- [x] Tetes hujan 0.03 (sekitar 2/3 tinggi pohon) dengan radius 0.0011; keping salju 0.003.
+- [x] Presipitasi jatuh dari lapisan awan ke permukaan mengikuti arah radial, bukan menembus planet.
+- [x] Badai memakai awan gelap, tetes lebih padat/cepat/miring; hujan biasa lebih renggang dan cerah hanya sebagian awan.
+- [x] Badai lebih basah dari hujan (`rain` 0.85 vs 0.55) dan lebih gelap; recovery 2 tick cerah tetap utuh.
+- [x] `test:scale` mengunci rasio cuaca terhadap pohon/planet; `test:sim` mengunci urutan logika badai > hujan.
+
 ## 3. QA perangkat nyata
 
 Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:

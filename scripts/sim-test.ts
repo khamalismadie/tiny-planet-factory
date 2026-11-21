@@ -1,5 +1,6 @@
 import { QUALITY, suggestQuality } from '../src/app/quality.ts';
 import { ensureEventState } from '../src/content/missions.ts';
+import { WEATHER_DEFS } from '../src/content/weather.ts';
 import { OBJECT_DEFS, OBJECT_ORDER } from '../src/content/objects.ts';
 import { SPECIES_ORDER } from '../src/content/species.ts';
 import { PLANET_CONFIGS, PLANET_IDS } from '../src/content/planets/index.ts';
@@ -952,6 +953,10 @@ const xpMastery = createPlanet(9001, 'Level Enam');
 xpMastery.progression.xp = 260;
 simulateTick(xpMastery, false);
 assert(xpMastery.progression.level === 6, `threshold 260 XP harus membuka level 6: ${xpMastery.progression.level}`);
+
+assert(WEATHER_DEFS.storm.rain > WEATHER_DEFS.rain.rain, 'badai harus lebih basah dari hujan');
+assert(WEATHER_DEFS.storm.sunlight < WEATHER_DEFS.rain.sunlight, 'badai harus lebih gelap dari hujan');
+assert(WEATHER_DEFS.storm.stabilityDelta < WEATHER_DEFS.rain.stabilityDelta, 'badai harus lebih mengganggu stabilitas');
 
 const recovery = createPlanet(4242, 'Pemulihan');
 recovery.weather = { type: 'storm', intensity: 0.8, remainingTicks: 1 };

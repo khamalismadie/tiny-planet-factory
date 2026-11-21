@@ -45,12 +45,12 @@ export const WEATHER_DEFS: Record<WeatherType, WeatherDef> = {
   storm: {
     type: 'storm',
     label: 'Badai',
-    sunlight: 0.45,
-    rain: 0.35,
+    sunlight: 0.44,
+    rain: 0.85,
     tempDelta: -0.04,
-    stabilityDelta: -0.14,
-    skyColor: 0x50596b,
-    groundColor: 0x2c313d,
+    stabilityDelta: -0.16,
+    skyColor: 0x3f4858,
+    groundColor: 0x202630,
   },
 };
 

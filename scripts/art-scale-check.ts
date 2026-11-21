@@ -2,6 +2,7 @@ import { getAttributeData } from '@pixi/3d';
 import { OBJECT_DEFS, OBJECT_ORDER } from '../src/content/objects';
 import { SPECIES_ORDER } from '../src/content/species';
 import { ASSET_GEOMETRY, SPECIES_GEOMETRY, SPECIES_SCALE } from '../src/render/assetGeometry';
+import { WEATHER_VISUAL } from '../src/render/WeatherFx';
 
 function assert(condition: unknown, message: string): void {
   if (!condition) throw new Error(`FAIL: ${message}`);
@@ -91,6 +92,28 @@ assert(ratios.treePerDeer >= 4 && ratios.treePerDeer <= 5, `pohon/rusa di luar r
 assert(ratios.deerPerFox >= 1.4 && ratios.deerPerFox <= 1.6, `rusa/rubah di luar rentang: ${ratios.deerPerFox.toFixed(2)}`);
 assert(ratios.deerPerBird >= 2.5 && ratios.deerPerBird <= 3, `rusa/burung di luar rentang: ${ratios.deerPerBird.toFixed(2)}`);
 
+const weatherRatios = {
+  cloudPerTree: WEATHER_VISUAL.cloudRadius / props.tree.height,
+  rainPerTree: WEATHER_VISUAL.rainLength / props.tree.height,
+  snowPerRain: WEATHER_VISUAL.snowRadius / WEATHER_VISUAL.rainLength,
+  rainWidthPerLength: WEATHER_VISUAL.rainRadius / WEATHER_VISUAL.rainLength,
+  cloudInnerEdge: WEATHER_VISUAL.cloudOrbit - WEATHER_VISUAL.cloudRadius * WEATHER_VISUAL.cloudStormScale,
+  dropStartPerCloudOuter: (1 + WEATHER_VISUAL.dropAltitude) /
+    (WEATHER_VISUAL.cloudOrbit + WEATHER_VISUAL.cloudRadius * WEATHER_VISUAL.cloudStormScale),
+};
+assert(weatherRatios.cloudPerTree >= 0.7 && weatherRatios.cloudPerTree <= 1.3,
+  `awan/pohon di luar rentang: ${weatherRatios.cloudPerTree.toFixed(2)}`);
+assert(weatherRatios.rainPerTree >= 0.35 && weatherRatios.rainPerTree <= 0.85,
+  `tetes hujan/pohon di luar rentang: ${weatherRatios.rainPerTree.toFixed(2)}`);
+assert(weatherRatios.snowPerRain > 0 && weatherRatios.snowPerRain <= 0.2,
+  `keping salju terlalu besar: ${weatherRatios.snowPerRain.toFixed(2)}`);
+assert(weatherRatios.rainWidthPerLength <= 0.1,
+  `tetes hujan terlalu gemuk: ${weatherRatios.rainWidthPerLength.toFixed(3)}`);
+assert(weatherRatios.cloudInnerEdge > 1.01,
+  `awan badai menembus permukaan planet: ${weatherRatios.cloudInnerEdge.toFixed(3)}`);
+assert(weatherRatios.dropStartPerCloudOuter >= 0.95 && weatherRatios.dropStartPerCloudOuter <= 1.2,
+  `hujan tidak mulai di lapisan awan: ${weatherRatios.dropStartPerCloudOuter.toFixed(2)}`);
+
 for (const species of SPECIES_ORDER) {
   const asset = measure(SPECIES_GEOMETRY[species].geometry);
   const wildlifeHeight = asset.localH * SPECIES_SCALE[species];
@@ -103,5 +126,6 @@ for (const species of SPECIES_ORDER) {
 console.log(JSON.stringify({
   props: Object.fromEntries(Object.entries(props).map(([type, value]) => [type, +value.height.toFixed(4)])),
   ratios: Object.fromEntries(Object.entries(ratios).map(([key, value]) => [key, +value.toFixed(2)])),
+  weather: Object.fromEntries(Object.entries(weatherRatios).map(([key, value]) => [key, +value.toFixed(3)])),
 }, null, 2));
 console.log('PASS: art scale');

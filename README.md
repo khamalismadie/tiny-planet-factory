@@ -119,6 +119,7 @@ Program Nine Worlds menggantikan roadmap lama: Terra diselesaikan lebih dulu, la
 | `v0.15.5` | **Device QA Load Harness** — `qaObjects` untuk mengukur beban 25+ objek di perangkat nyata. *(selesai)* |
 | `v0.15.6` | **Planet Shape Fix** — normalisasi terrain di renderer, silhouette semua planet seukuran kamera dan prop. *(selesai)* |
 | `v0.15.7` | **Menu & Tutorial** — menu observatorium, pemilih 9 planet, panduan UI 4 langkah. *(selesai)* |
+| `v0.15.8` | **Weather Scale Fix** — badai proporsional, lebih basah & gelap dari hujan, gate rasio cuaca. *(selesai)* |
 
 ## Langkah berikutnya
 
