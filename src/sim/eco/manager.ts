@@ -1,3 +1,4 @@
+import { aquariaConfig } from '../../content/planets/aquaria';
 import { duneConfig } from '../../content/planets/dune';
 import { glaciereConfig } from '../../content/planets/glaciera';
 import { infernaConfig } from '../../content/planets/inferna';
@@ -89,7 +90,9 @@ function resourceAvailability(
         available = context.environment.fertility / 55;
         break;
       case 'plankton':
-        available = context.environment.water / 70 + (config.aquatic?.waterQuality ?? 50) / 200;
+        available = eco.ocean.seasonId !== 'none'
+          ? eco.ocean.plankton / 70 + (context.aquatic?.waterQuality ?? 50) / 400
+          : context.environment.water / 70 + (config.aquatic?.waterQuality ?? 50) / 200;
         break;
       case 'nectar':
         available = producerPopulation / Math.max(1, producerCapacity * 0.25) + 0.2;
@@ -204,14 +207,28 @@ export function habitatContextFor(planet: PlanetState, config: PlanetConfig): Ha
               ? 'hujan-abu'
               : (planet.eco.volcano?.heat ?? 0) > 70
                 ? 'gelombang-panas'
-                : planet.environment.water < 25
-                  ? 'kekeringan-musiman'
-                  : null;
+                : (planet.eco.ocean?.bleaching ?? 0) > 55
+                  ? 'pemutihan-karang'
+                  : (planet.eco.ocean?.current ?? 0) > 75
+                    ? 'badai-laut'
+                    : (planet.eco.ocean?.seasonId !== 'none' && planet.environment.temperature > 34)
+                      ? 'gelombang-panas-laut'
+                      : planet.environment.water < 25
+                        ? 'kekeringan-musiman'
+                        : null;
   return {
     environment: planet.environment,
     ecosystem: planet.ecosystem,
     biomeTags: config.biomeTags,
-    aquatic: config.aquatic,
+    aquatic: planet.eco.ocean.seasonId !== 'none' && config.aquatic
+      ? {
+          ...config.aquatic,
+          dissolvedOxygen: planet.eco.ocean.dissolvedOxygen / 10,
+          waterQuality: clamp(50 + planet.eco.ocean.reefHealth * 0.4 - planet.eco.ocean.bleaching * 0.3),
+          current: planet.eco.ocean.current / 100,
+          reefCoverage: planet.eco.ocean.reefHealth,
+        }
+      : config.aquatic,
     hazard,
   };
 }
@@ -283,11 +300,20 @@ export class EcosystemManager {
         trait === 'post-eruption-regrowth',
       );
       const heatMortality = heatStress * (heatAdapted ? 0.003 : 0.015);
+      const bleachingStress = (planet.eco.ocean?.bleaching ?? 0) / 100;
+      const reefAdapted = definition.geneticTraits.some((trait) =>
+        trait === 'reef-building' ||
+        trait === 'salt-filter' ||
+        trait === 'current-anchoring' ||
+        trait === 'nutrient-recycling',
+      );
+      const reefMortality = bleachingStress * (reefAdapted ? 0.003 : 0.012);
       const mortalityRate = definition.mortalityRate * 0.4
         + (1 - score) * 0.02
         + starvation
         + coldMortality
         + heatMortality
+        + reefMortality
         + predationPressure(definition, config, eco, capacity);
       const deaths = Math.min(
         population.estimate,
@@ -342,6 +368,7 @@ const ECOSYSTEM_MANAGERS = new Map<string, EcosystemManager>([
   [duneConfig.id, new EcosystemManager(duneConfig)],
   [glaciereConfig.id, new EcosystemManager(glaciereConfig)],
   [infernaConfig.id, new EcosystemManager(infernaConfig)],
+  [aquariaConfig.id, new EcosystemManager(aquariaConfig)],
 ]);
 
 export function ecosystemFor(planetId: string): EcosystemManager | null {

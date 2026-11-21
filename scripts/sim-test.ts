@@ -131,7 +131,8 @@ assert(legacyRestored?.planetId === 'terra', 'DNA v2 tanpa planet id harus tetap
 const dnaDune = createPlanet(321, 'DNA Dune', 'dune');
 const dnaGlaciere = createPlanet(322, 'DNA Es', 'glaciere');
 const dnaInferna = createPlanet(323, 'DNA Api', 'inferna');
-for (const [source, id] of [[dnaDune, 'dune'], [dnaGlaciere, 'glaciere'], [dnaInferna, 'inferna']] as const) {
+const dnaAquaria = createPlanet(324, 'DNA Laut', 'aquaria');
+for (const [source, id] of [[dnaDune, 'dune'], [dnaGlaciere, 'glaciere'], [dnaInferna, 'inferna'], [dnaAquaria, 'aquaria']] as const) {
   const roundTrip = decodePlanetDna(encodePlanetDna(source).full);
   assert(roundTrip?.planetId === id, `DNA lengkap ${id} harus mempertahankan planetId`);
   assert(
@@ -403,7 +404,7 @@ assert(foxSupplyAfter < foxSupplyBefore, 'runtuhnya mangsa harus menurunkan supl
 assert(agentCount(predatorPlanet, 'fox') <= foxBefore, 'jumlah predator tidak boleh naik saat mangsa habis');
 
 // Dune is the second active ecosystem with its own climate and guild mapping.
-assert(isSupportedPlanet('dune') && isSupportedPlanet('glaciere') && isSupportedPlanet('inferna'), 'Terra, Dune, Glaciera, dan Inferna aktif');
+assert(isSupportedPlanet('dune') && isSupportedPlanet('glaciere') && isSupportedPlanet('inferna') && isSupportedPlanet('aquaria'), 'Terra, Dune, Glaciera, Inferna, dan Aquaria aktif');
 const duneConfig = ecosystemConfigFor('dune');
 assert(duneConfig !== null && duneConfig.species.length === 12, 'Dune harus membawa 12 spesies');
 const dunePlanet = createPlanet(6161, 'Dune Uji', 'dune');
@@ -535,6 +536,63 @@ for (const type of ['grass', 'tree', 'rock', 'mountain', 'bush', 'deer', 'fox', 
 tickN(fireTwin, 235);
 assert(JSON.stringify(firePlanet.fauna) === JSON.stringify(fireTwin.fauna), 'fauna Inferna harus deterministik');
 assert(JSON.stringify(firePlanet.eco) === JSON.stringify(fireTwin.eco), 'ekosistem Inferna harus deterministik');
+
+// Aquaria is the fifth active ecosystem with currents, reefs, plankton, and bleaching.
+const waterConfig = ecosystemConfigFor('aquaria');
+assert(waterConfig !== null && waterConfig.species.length === 12, 'Aquaria harus membawa 12 spesies');
+assert(waterConfig.climate.seasons.length === 4, 'Aquaria harus membawa empat musim');
+assert(waterConfig.aquatic !== undefined && waterConfig.aquatic.depth > 100, 'Aquaria harus membawa profil laut dalam');
+const waterPlanet = createPlanet(9999, 'Aquaria Uji', 'aquaria');
+assert(waterPlanet.planetId === 'aquaria', 'createPlanet harus mempertahankan planetId Aquaria');
+assert(waterPlanet.environment.temperature > 20 && waterPlanet.environment.temperature < 32, 'Aquaria harus mulai dengan suhu tropis');
+assert(waterPlanet.environment.water > 80, 'Aquaria harus mulai dengan laut melimpah');
+assert(waterPlanet.eco.populations.aquaria_kelp, 'populasi Aquaria harus diinisialisasi');
+assert(!waterPlanet.eco.populations.terra_oak && !waterPlanet.eco.populations.inferna_ember_moss, 'tidak boleh ada kebocoran spesies planet lain');
+for (const type of ['ocean', 'lake', 'grass', 'tree', 'rock', 'deer', 'fox', 'bird'] as const) {
+  assert(placeObject(waterPlanet, type, [0.5, 0.4, 0.75]), `${type} harus bisa ditempatkan di Aquaria`);
+}
+tickN(waterPlanet, 50);
+const calmOcean = { ...waterPlanet.eco.ocean };
+assert(calmOcean.seasonId === 'calm-current', '50 tick pertama harus musim arus tenang');
+assert(calmOcean.reefHealth > 50, 'terumbu harus sehat di awal');
+assert(calmOcean.plankton > 50, 'plankton harus tersedia di awal');
+tickN(waterPlanet, 70);
+const warmOcean = { ...waterPlanet.eco.ocean };
+assert(warmOcean.seasonId === 'warm-water', 'tick 120 harus masuk musim air hangat');
+assert(warmOcean.bleaching > calmOcean.bleaching, 'air hangat harus menaikkan pemutihan');
+tickN(waterPlanet, 85);
+const bloomOcean = { ...waterPlanet.eco.ocean };
+assert(bloomOcean.seasonId === 'plankton-bloom', 'tick 205 harus masuk ledakan plankton');
+assert(bloomOcean.plankton > warmOcean.plankton, 'ledakan plankton harus menaikkan plankton');
+assert(bloomOcean.bleaching < warmOcean.bleaching, 'ledakan plankton harus menurunkan pemutihan');
+tickN(waterPlanet, 80);
+const surgeOcean = { ...waterPlanet.eco.ocean };
+assert(surgeOcean.seasonId === 'storm-surge', 'tick 285 harus masuk badai laut');
+assert(surgeOcean.current > calmOcean.current, 'badai laut harus memperkuat arus');
+tickN(waterPlanet, 76);
+assert(waterPlanet.eco.ocean.seasonId === 'calm-current', 'tick 361 harus kembali ke arus tenang');
+assert(waterPlanet.eco.ocean.reefHealth > 0, 'terumbu harus bertahan setelah siklus penuh');
+assert(waterPlanet.eco.metrics.speciesCount === 12, 'ekosistem Aquaria harus tetap memiliki 12 spesies');
+assertBoundedEco(waterPlanet, 'Aquaria');
+const waterFish = guildStatus(waterPlanet, 'fish');
+assert(waterFish !== null && waterFish.speciesIds.includes('aquaria_reef_fish'), 'guild fish Aquaria harus memetakan ikan terumbu');
+assert(guildFoodSourceIds(waterPlanet, 'fox').includes('aquaria_reef_fish'), 'guild predator Aquaria harus berburu ikan dari food web');
+assert(agentCount(waterPlanet, 'fish') > 0, 'Aquaria harus memunculkan agen ikan');
+assert(agentCount(waterPlanet, 'insect') > 0, 'Aquaria harus memunculkan agen mikroba');
+const waterLoaded = deserializePlanet(serializePlanet(waterPlanet));
+assert(
+  waterLoaded?.planetId === 'aquaria' &&
+    waterLoaded.eco.ocean.seasonId === 'calm-current' &&
+    !!waterLoaded.eco.populations.aquaria_shark,
+  'save/load Aquaria harus mempertahankan identitas, musim, dan populasi',
+);
+const waterTwin = createPlanet(9999, 'Aquaria Uji', 'aquaria');
+for (const type of ['ocean', 'lake', 'grass', 'tree', 'rock', 'deer', 'fox', 'bird'] as const) {
+  placeObject(waterTwin, type, [0.5, 0.4, 0.75]);
+}
+tickN(waterTwin, 361);
+assert(JSON.stringify(waterPlanet.fauna) === JSON.stringify(waterTwin.fauna), 'fauna Aquaria harus deterministik');
+assert(JSON.stringify(waterPlanet.eco) === JSON.stringify(waterTwin.eco), 'ekosistem Aquaria harus deterministik');
 
 const rainPlanet = createPlanet(7001, 'Hujan');
 rainPlanet.weather = { type: 'rain', intensity: 0.8, remainingTicks: 5 };

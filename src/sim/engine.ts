@@ -242,6 +242,7 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
   const season = seasonInfo?.season ?? null;
   const cryo = planet.eco.cryo;
   const volcano = planet.eco.volcano;
+  const ocean = planet.eco.ocean;
   const random = mulberry32((planet.seed ^ (planet.tick * 2654435761)) >>> 0);
   const counts = Object.fromEntries(OBJECT_ORDER.map((type) => [type, 0])) as Record<ObjectType, number>;
   for (const object of planet.objects) counts[object.type] += 1;
@@ -337,13 +338,52 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
     volcano.eruptionStress = 0;
   }
 
+  if (planetConfig?.specialSystems.includes('coral-health')) {
+    const currentTarget = season?.id === 'storm-surge' ? 85
+      : season?.id === 'calm-current' ? 30
+        : season?.id === 'warm-water' ? 45 : 60;
+    ocean.current = approach(ocean.current, clamp(currentTarget + counts.ocean * 1.5 + counts.lake), 0.06);
+    const planktonTarget = season?.id === 'plankton-bloom' ? 95
+      : season?.id === 'storm-surge' ? 42
+        : season?.id === 'warm-water' ? 55 : 65;
+    const bacteria = planet.eco.populations.aquaria_marine_bacteria?.estimate ?? 0;
+    ocean.plankton = approach(ocean.plankton, clamp(planktonTarget + e.fertility * 0.06 + bacteria * 0.1), 0.05);
+    const warmBleach = clamp((e.temperature - 30) * 7);
+    const bleachBase = season?.id === 'warm-water' ? 12
+      : season?.id === 'storm-surge' ? 18
+        : season?.id === 'plankton-bloom' ? -10 : 0;
+    ocean.bleaching = approach(ocean.bleaching, clamp(warmBleach + bleachBase + ocean.current * 0.08), 0.05);
+    const coral = planet.eco.populations.aquaria_coral_algae?.estimate ?? 0;
+    const reefTarget = clamp(100 - ocean.bleaching * 0.75 + coral * 0.12 + (planetConfig.aquatic?.reefCoverage ?? 50) * 0.12);
+    ocean.reefHealth = approach(ocean.reefHealth, reefTarget, 0.04);
+    const oxygenTargetOcean = clamp(
+      (planetConfig.aquatic?.dissolvedOxygen ?? 7) * 10 + ocean.plankton * 0.15 - e.temperature * 0.6 - ocean.bleaching * 0.2,
+    );
+    ocean.dissolvedOxygen = approach(ocean.dissolvedOxygen, oxygenTargetOcean, 0.05);
+    ocean.seasonId = season?.id ?? 'none';
+    ocean.seasonName = season?.name ?? '';
+    ocean.phase = seasonInfo?.phase ?? 0;
+  } else if (ocean.seasonId !== 'none' || ocean.current || ocean.reefHealth || ocean.plankton || ocean.bleaching || ocean.dissolvedOxygen) {
+    ocean.seasonId = 'none';
+    ocean.seasonName = '';
+    ocean.phase = 0;
+    ocean.current = 0;
+    ocean.reefHealth = 0;
+    ocean.plankton = 0;
+    ocean.bleaching = 0;
+    ocean.dissolvedOxygen = 0;
+  }
+
   const seasonalVegetation = clamp(1 + (season?.vegetationModifier ?? 0), 0.25, 1.6);
   const volcanicBiome = planetConfig?.specialSystems.includes('volcanic-eruption') ?? false;
+  const aquaticBiome = planetConfig?.specialSystems.includes('coral-health') ?? false;
   const coldFactor = cryo.seasonId !== 'none'
     ? 1 - cryo.freeze / 100 * 0.3
     : volcanicBiome
       ? 1 - volcano.heat / 100 * 0.35
-      : e.temperature < 0 || e.temperature > 40 || e.water < 15 ? 0.5 : 1;
+      : aquaticBiome
+        ? 1 - ocean.bleaching / 100 * 0.25
+        : e.temperature < 0 || e.temperature > 40 || e.water < 15 ? 0.5 : 1;
   const vegetationTarget = clamp(
     Math.min(100, counts.grass * 2 + counts.tree * 4 + counts.bush * 2 + e.water * 0.28 + e.fertility * 0.2) *
       seasonalVegetation * coldFactor,

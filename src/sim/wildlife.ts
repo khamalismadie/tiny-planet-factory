@@ -84,15 +84,17 @@ export function simulateWildlife(
     SPECIES_ORDER.map((species) => [species, guildFoodDirs(planet, species)]),
   ) as Record<SpeciesId, Array<[number, number, number]>>;
 
+  const aquaticBiome = planet.eco.ocean.seasonId !== 'none';
+  const waterObjects = aquaticBiome ? counts.ocean + counts.lake : 0;
   const capacities: Record<SpeciesId, number> = {
     deer: Math.min(12, counts.grass * 0.8 + counts.tree * 0.4 + counts.bush * 0.6 + eco.vegetation * 0.06 + counts.deer * 4)
       * (env.oxygen >= 18 ? 1 : counts.deer > 0 ? 0.8 : 0.2),
     fox: Math.min(6, deerAgents * 0.25 + counts.tree * 0.3 + counts.fox * 3)
       * (deerAgents > 0 || counts.deer > 0 ? 1 : 0.25),
-    bird: Math.min(10, counts.tree * 0.7 + counts.flower * 0.5 + counts.bush * 0.3 + counts.bird * 3)
-      * (env.oxygen >= 22 ? 1 : counts.bird > 0 ? 0.8 : 0.2),
+    bird: Math.min(10, counts.tree * 0.7 + counts.flower * 0.5 + counts.bush * 0.3 + counts.bird * 3 + waterObjects * 0.4)
+      * (env.oxygen >= 22 || aquaticBiome ? 1 : counts.bird > 0 ? 0.8 : 0.2),
     fish: Math.min(10, (counts.ocean * 2 + counts.lake * 2) * (env.water >= 35 ? 1 : 0.2)),
-    insect: Math.min(14, counts.flower * 1.2 + counts.bush * 0.6 + counts.grass * 0.3 + eco.vegetation * 0.04)
+    insect: Math.min(14, counts.flower * 1.2 + counts.bush * 0.6 + counts.grass * 0.3 + eco.vegetation * 0.04 + waterObjects * 0.8)
       * (env.temperature > 4 && env.temperature < 38 ? 1 : 0.2),
   };
   for (const species of SPECIES_ORDER) {

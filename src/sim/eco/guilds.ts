@@ -1,3 +1,4 @@
+import { aquariaConfig } from '../../content/planets/aquaria';
 import { duneConfig } from '../../content/planets/dune';
 import { glaciereConfig } from '../../content/planets/glaciera';
 import { infernaConfig } from '../../content/planets/inferna';
@@ -123,11 +124,39 @@ const INFERNA_PROFILE: GuildProfile = {
   },
 };
 
+const AQUARIA_PROFILE: GuildProfile = {
+  config: aquariaConfig,
+  guilds: {
+    deer: ['aquaria_sea_turtle', 'aquaria_manatee'],
+    fox: ['aquaria_octopus', 'aquaria_shark'],
+    bird: ['aquaria_dolphin'],
+    fish: ['aquaria_reef_fish', 'aquaria_crab'],
+    insect: ['aquaria_marine_bacteria'],
+  },
+  divisors: { deer: 8, fox: 3, bird: 0.5, fish: 5, insect: 12 },
+  prey: { fox: ['fish', 'deer'], bird: ['fish'] },
+  foodObjects: {
+    aquaria_kelp: ['ocean', 'lake'],
+    aquaria_seagrass: ['grass', 'ocean'],
+    aquaria_coral_algae: ['ocean', 'lake', 'rock'],
+    aquaria_mangrove: ['tree', 'ocean'],
+    aquaria_reef_fish: ['ocean', 'lake'],
+    aquaria_sea_turtle: ['ocean', 'lake'],
+    aquaria_manatee: ['ocean', 'lake'],
+    aquaria_crab: ['rock', 'ocean'],
+    aquaria_octopus: ['rock', 'ocean'],
+    aquaria_dolphin: ['ocean', 'lake'],
+    aquaria_shark: ['ocean', 'lake'],
+    aquaria_marine_bacteria: ['rock', 'ocean', 'lake'],
+  },
+};
+
 export const GUILD_PROFILES: Record<string, GuildProfile> = {
   terra: TERRA_PROFILE,
   dune: DUNE_PROFILE,
   glaciere: GLACIERE_PROFILE,
   inferna: INFERNA_PROFILE,
+  aquaria: AQUARIA_PROFILE,
 };
 
 const FOOD_INTERACTIONS = new Set(['grazing', 'hunting', 'scavenging', 'pollination']);

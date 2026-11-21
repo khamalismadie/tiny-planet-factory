@@ -200,6 +200,17 @@ export interface VolcanoState {
   eruptionStress: number;
 }
 
+export interface OceanState {
+  seasonId: string;
+  seasonName: string;
+  phase: number;
+  current: number;
+  reefHealth: number;
+  plankton: number;
+  bleaching: number;
+  dissolvedOxygen: number;
+}
+
 export interface EcoStateV3 {
   planetId: string;
   ecosystemVersion: number;
@@ -211,6 +222,7 @@ export interface EcoStateV3 {
   metrics: EcoMetrics;
   cryo: CryosphereState;
   volcano: VolcanoState;
+  ocean: OceanState;
 }
 
 export interface HabitatContext {

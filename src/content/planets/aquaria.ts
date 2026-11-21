@@ -73,11 +73,13 @@ const SPECIES = [
     [food('aquaria_coral_algae', 0.6, ['grazing']), food('detritus', 0.5, ['scavenging'])], {
       habitatPreferences: [REEF_HABITAT], activitySchedule: 'nocturnal', migrationBehavior: 'none',
       predatorSpecies: ['aquaria_octopus', 'aquaria_sea_turtle'], populationCapacity: 80,
+      geneticTraits: ['current-anchoring'], reproductionRate: 0.09, mortalityRate: 0.012,
     }),
   species(PLANET_ID, 'aquaria_octopus', 'Gurita Karang', 'secondary-consumer', ['coral-reefs', 'deep-ocean'],
     [food('aquaria_crab', 1, ['hunting']), food('aquaria_reef_fish', 0.6, ['hunting'])], {
       habitatPreferences: [REEF_HABITAT], activitySchedule: 'nocturnal', migrationBehavior: 'none',
       preySpecies: ['aquaria_crab', 'aquaria_reef_fish'], populationCapacity: 26,
+      geneticTraits: ['current-anchoring'], reproductionRate: 0.1, mortalityRate: 0.012,
     }),
   species(PLANET_ID, 'aquaria_dolphin', 'Lumba-Lumba', 'tertiary-consumer', ['shallow-water', 'deep-ocean', 'coral-reefs'],
     [food('aquaria_reef_fish', 1, ['hunting']), food('aquaria_octopus', 0.4, ['hunting'])], {

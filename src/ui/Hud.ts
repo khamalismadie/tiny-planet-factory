@@ -298,6 +298,9 @@ export class Hud {
       (planet.eco.volcano.seasonId !== 'none'
         ? `Musim ${planet.eco.volcano.seasonName} · panas ${planet.eco.volcano.heat.toFixed(0)}% · lava ${planet.eco.volcano.lavaFlow.toFixed(0)}% · abu ${planet.eco.volcano.ash.toFixed(0)}% · stres ${planet.eco.volcano.eruptionStress.toFixed(0)}%<br>`
         : '') +
+      (planet.eco.ocean.seasonId !== 'none'
+        ? `Musim ${planet.eco.ocean.seasonName} · arus ${planet.eco.ocean.current.toFixed(0)}% · karang ${planet.eco.ocean.reefHealth.toFixed(0)}% · plankton ${planet.eco.ocean.plankton.toFixed(0)}% · pemutihan ${planet.eco.ocean.bleaching.toFixed(0)}%<br>`
+        : '') +
       `Spesies ${metrics.speciesCount} · Populasi ${metrics.totalPopulation}<br>` +
       `Habitat ${Math.round(metrics.habitatHealth)} · Pangan ${Math.round(metrics.foodAvailability)} · Detritus ${planet.eco.detritus.toFixed(1)}<br>` +
       `<div class="eco-list">${rows}</div>` +

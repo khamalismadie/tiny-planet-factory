@@ -10,7 +10,8 @@ Tujuan: mengaktifkan planet kedua dengan ekosistemnya sendiri tanpa mengubah for
 | Dune | aktif di v0.7 | 12 |
 | Glaciera | aktif di v0.8 | 12 (lihat dokumen sendiri) |
 | Inferna | aktif di v0.9 | 12 (lihat dokumen sendiri) |
-| lima planet lain | config/data saja, belum disimulasikan | — |
+| Aquaria | aktif di v0.10 | 12 (lihat dokumen sendiri) |
+| empat planet lain | config/data saja, belum disimulasikan | — |
 
 Daftar aktif berada di `GUILD_PROFILES`. `isSupportedPlanet()` dipakai oleh `createPlanet()` dan QA hook supaya planet yang belum aktif tidak menghasilkan state ekologis palsu.
 

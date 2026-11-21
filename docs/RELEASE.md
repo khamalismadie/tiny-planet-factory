@@ -119,6 +119,18 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [ ] Terra, Dune, dan Glaciera tidak berubah secara numerik dari gate v0.8.
 - [ ] App chunk <100 kB.
 
+## 2k. Aquaria + Aquatic Biome (v0.10)
+
+- [ ] `?planet=aquaria` dan `setPlanet('aquaria')` menghasilkan 12 populasi Aquaria.
+- [ ] Empat musim berjalan deterministik dari tick: calm-current → warm-water → plankton-bloom → storm-surge.
+- [ ] Plankton naik saat bloom, pemutihan naik saat air hangat, arus naik saat badai laut.
+- [ ] Air >80, terumbu tetap sehat setelah satu siklus 360 tick, dan 12 spesies tetap hidup.
+- [ ] Guild laut memetakan ikan terumbu, kepiting, lumba-lumba, dan bakteri; agen ikan/mikroba muncul.
+- [ ] Save/load mempertahankan `eco.ocean`.
+- [ ] DNA lengkap mempertahankan `planetId` Aquaria.
+- [ ] Terra, Dune, Glaciera, dan Inferna tidak berubah secara numerik dari gate v0.9.
+- [ ] App chunk <100 kB.
+
 ## 3. QA perangkat nyata
 
 Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:

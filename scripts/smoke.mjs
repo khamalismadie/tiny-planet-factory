@@ -167,6 +167,24 @@ const fireProbe = await page.evaluate(() => {
   };
 });
 
+// Aquaria boot + ocean telemetry.
+phase = 'aquaria';
+await page.evaluate(() => {
+  window.__game.setPlanet('aquaria', 9999);
+  window.__game.tick(205);
+});
+const waterProbe = await page.evaluate(() => {
+  const next = window.__game.state();
+  return {
+    planetId: next.planetId,
+    temperature: next.environment.temperature,
+    water: next.environment.water,
+    ecoSpecies: Object.keys(next.eco.populations).length,
+    ocean: window.__game.ocean(),
+    score: window.__game.ecoScore('aquaria_reef_fish'),
+  };
+});
+
 const contextLossErrors = boot.contextLost
   ? errors.filter((message) => /WebGL context may be lost|Could not initialize shader/.test(message))
   : [];
@@ -231,6 +249,14 @@ const checks = {
     fireProbe.volcano.seasonId === 'eruption-phase' &&
     fireProbe.volcano.eruptionStress > 60 &&
     fireProbe.score !== null,
+  aquariaPlanetActive:
+    waterProbe.planetId === 'aquaria' &&
+    waterProbe.water > 80 &&
+    waterProbe.ecoSpecies === 12 &&
+    waterProbe.ocean.seasonId === 'plankton-bloom' &&
+    waterProbe.ocean.plankton > 70 &&
+    waterProbe.ocean.reefHealth > 50 &&
+    waterProbe.score !== null,
 };
 
 console.log(JSON.stringify({ boot, initialTick: initialState.tick, placementActive, contextLossErrors, appErrors, grown: {
@@ -242,7 +268,7 @@ console.log(JSON.stringify({ boot, initialTick: initialState.tick, placementActi
   objects: grown.objects.length,
   fauna: grownFauna,
   eco: ecoProbe,
-}, grownMetrics, reloadedTick: reloaded.tick, reloadedObjects: reloaded.objects.length, sw, dune: duneProbe, glaciere: iceProbe, inferna: fireProbe, errors, checks }, null, 2));
+}, grownMetrics, reloadedTick: reloaded.tick, reloadedObjects: reloaded.objects.length, sw, dune: duneProbe, glaciere: iceProbe, inferna: fireProbe, aquaria: waterProbe, errors, checks }, null, 2));
 
 await browser.close();
 const failed = Object.entries(checks).filter(([, ok]) => !ok).map(([name]) => name);
