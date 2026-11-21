@@ -153,7 +153,7 @@ const iceProbe = await page.evaluate(() => {
 phase = 'inferna';
 await page.evaluate(() => {
   window.__game.setPlanet('inferna', 8888);
-  window.__game.tick(76);
+  window.__game.tick(70);
 });
 const fireProbe = await page.evaluate(() => {
   const next = window.__game.state();
@@ -171,7 +171,7 @@ const fireProbe = await page.evaluate(() => {
 phase = 'aquaria';
 await page.evaluate(() => {
   window.__game.setPlanet('aquaria', 9999);
-  window.__game.tick(205);
+  window.__game.tick(78);
 });
 const waterProbe = await page.evaluate(() => {
   const next = window.__game.state();
@@ -189,7 +189,7 @@ const waterProbe = await page.evaluate(() => {
 phase = 'mycelia';
 await page.evaluate(() => {
   window.__game.setPlanet('mycelia', 4321);
-  window.__game.tick(60);
+  window.__game.tick(45);
 });
 const fungalProbe = await page.evaluate(() => {
   const next = window.__game.state();
@@ -206,7 +206,7 @@ const fungalProbe = await page.evaluate(() => {
 phase = 'sakura';
 await page.evaluate(() => {
   window.__game.setPlanet('sakura', 5678);
-  window.__game.tick(27);
+  window.__game.tick(22);
 });
 const skyProbe = await page.evaluate(() => {
   const next = window.__game.state();
@@ -223,7 +223,7 @@ const skyProbe = await page.evaluate(() => {
 phase = 'aurelia';
 await page.evaluate(() => {
   window.__game.setPlanet('aurelia', 8765);
-  window.__game.tick(210);
+  window.__game.tick(75);
 });
 const forestProbe = await page.evaluate(() => {
   const next = window.__game.state();
