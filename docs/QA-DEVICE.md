@@ -77,18 +77,22 @@ Adaptive quality otomatis menurunkan tier bila p95 > 34 ms selama 120 frame. Tid
 
 > Catatan (v0.14.3): verifikasi localhost secure-context sudah lolos untuk manifest installable shape, service worker control, precache shell + chunk, offline reload, dan tanpa page error. Ini **bukan** pengganti verifikasi HTTPS + Android nyata pada baris 7–8 di atas.
 
-## Hasil perangkat nyata — v0.15.4 (2026-11-21)
+## Hasil perangkat nyata — v0.15.4/0.15.5 (2026-11-21)
 
-Perangkat: **Itel S686LN**, Android 15, 8 core, RAM 8 GB, DPR 3, viewport 360×678. Sumber: produksi `https://tinyplanetfactory.netlify.app/` dengan `?qa=1&qaSeconds=45|60&perf=1`; laporan otomatis tersalin ke clipboard saat selesai.
+Perangkat: **Itel S686LN**, Android 15, 8 core, RAM 8 GB, DPR 3, viewport 360×678. Sumber: produksi `https://tinyplanetfactory.netlify.app/`; laporan otomatis tersalin ke clipboard saat selesai. Run C–E memakai build v0.15.5 dengan beban objek dari `qaObjects`/save lokal.
 
 | Run | Durasi | Frame | p50 | p95 | FPS | Boot | Tier | Draw call | Objek | Context lost | SW | Standalone |
 |---|---:|---:|---:|---:|---:|---:|---|---:|---:|---|---|---|
 | A | 45,0 s | 1777 | 33,20 ms | 33,40 ms | 30,1 | 243 ms | medium | 7 | 15 | false | true | false |
 | B | 60,0 s | 2387 | 16,90 ms | 33,40 ms | 59,2 | 2031 ms | medium | 6 | 4 | false | true | false |
+| C | 10,0 s | 387 | 33,20 ms | 33,40 ms | 30,1 | 653 ms | medium | 18 | 94 | false | true | false |
+| D | 60,0 s | 2389 | 16,90 ms | 33,40 ms | 59,2 | 305 ms | medium | 18 | 94 | false | true | false |
+| E | 180,0 s | 7175 | 33,20 ms | 33,40 ms | 30,1 | 635 ms | medium | 18 | 94 | false | true | false |
 
 Catatan interpretasi:
 
-- Frame rate **30,1–59,2 FPS** memenuhi target minimum 30 FPS. Namun p95 **33,40 ms** masih **0,40 ms di atas** ambang 33 ms, sehingga baris #2 pada matriks di atas **belum dicentang lulus** sampai diulang dengan beban 25+ objek selama 5 menit.
+- Run C–E membawa **94 objek** (jauh di atas target 25+) dan draw call **18**, tanpa adaptive downgrade dan tanpa context loss. `qaSeconds` dibatasi aplikasi ke maksimal **180 s**, sehingga run E adalah pengganti praktis checklist 5 menit.
+- Frame rate **30,1–59,2 FPS** memenuhi target minimum 30 FPS, termasuk pada beban 94 objek. Namun p95 **33,40 ms** konsisten **0,40 ms di atas** ambang 33 ms, sehingga baris #2 pada matriks di atas **belum dicentang lulus penuh**.
 - Boot yang dilaporkan QaProbe adalah **0,24–2,03 s** sejak hook mulai, bukan cold-start 4G penuh dari ikon PWA; baris #1 masih memerlukan pengukuran terpisah.
-- Service worker aktif pada kedua run. `installPromptSeen` terlihat pada run A; `standalone: false` karena aplikasi dibuka dari browser, bukan dari ikon yang sudah dipasang. Baris #7–#8 (install → airplane mode, update) **masih belum terverifikasi**.
-- Tidak ada context loss pada kedua run; ini melengkapi tetapi tidak menggantikan checklist #6 untuk background/GPU reset nyata.
+- Service worker aktif pada semua run. `installPromptSeen` terlihat pada sebagian run; `standalone: false` karena aplikasi dibuka dari browser, bukan dari ikon yang sudah dipasang. Baris #7–#8 (install → airplane mode, update) **masih belum terverifikasi**.
+- Tidak ada context loss pada semua run; ini melengkapi tetapi tidak menggantikan checklist #6 untuk background/GPU reset nyata.

@@ -247,7 +247,7 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 
 - [x] Parameter `?qa=1&qaObjects=N` menanam hingga 96 objek sebelum QaProbe mulai mengukur.
 - [x] Objek mengikuti urutan `OBJECT_ORDER` dan sebaran spiral deterministik, tanpa mengubah sim atau gameplay normal.
-- [x] Dipakai untuk mengulang checklist #2 dengan beban 25+ objek di Android nyata.
+- [x] Dipakai untuk mengulang checklist #2 dengan beban 25+ objek di Android nyata (terukur hingga 94 objek).
 
 ## 3. QA perangkat nyata
 
@@ -263,7 +263,7 @@ Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:
 
 Opsional untuk QA cepat: buka `?qa=1&qaSeconds=45` di perangkat. Panel hasil QA akan muncul dan tombol **Salin hasil QA** menghasilkan JSON berisi p50/p95, boot time, quality tier, device info, status PWA, serta jumlah agen/spesies fauna.
 
-Catatan 2026-11-21: dua run QA nyata di **Itel S686LN / Android 15** menghasilkan p50 **16,90–33,20 ms**, p95 **33,40 ms**, FPS **30,1–59,2**, boot **0,24–2,03 s**, tier medium tanpa downgrade, service worker aktif, dan install prompt terlihat pada run pertama. p95 masih 0,40 ms di atas ambang 33 ms, sehingga checklist #1–#2 belum dicentang lulus penuh; rincian ada di `docs/QA-DEVICE.md`.
+Catatan 2026-11-21: lima run QA nyata di **Itel S686LN / Android 15**, termasuk tiga run dengan **94 objek** dan durasi hingga **180 s**, menghasilkan p50 **16,90–33,20 ms**, p95 **33,40 ms**, FPS **30,1–59,2**, draw call **6–18**, boot **0,24–2,03 s**, tier medium tanpa downgrade, service worker aktif, dan tidak ada context loss. p95 masih 0,40 ms di atas ambang 33 ms, sehingga checklist #1–#2 belum dicentang lulus penuh; rincian ada di `docs/QA-DEVICE.md`.
 
 ## 4. Telemetri
 
