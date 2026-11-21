@@ -1,14 +1,9 @@
-const CACHE = 'tpf-shell-v0-14-1';
+const CACHE = 'tpf-shell-v0-14-3';
+// Replaced at build time by the pwa-precache Vite plugin.
+const PRECACHE = [];
 const SCOPE = new URL('.', self.registration.scope);
 const asset = (path) => new URL(path, SCOPE).href;
-const SHELL = [
-  asset(''),
-  asset('index.html'),
-  asset('manifest.webmanifest'),
-  asset('icons/icon.svg'),
-  asset('icons/icon-192.png'),
-  asset('icons/icon-512.png'),
-];
+const SHELL = PRECACHE.map(asset);
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)).then(() => self.skipWaiting()));
@@ -42,7 +37,7 @@ self.addEventListener('fetch', (event) => {
   }
 
   event.respondWith(
-    caches.match(request).then((cached) => {
+    caches.match(request, { ignoreVary: true }).then((cached) => {
       const network = fetch(request)
         .then((response) => {
           if (response.ok) caches.open(CACHE).then((cache) => cache.put(request, response.clone()));

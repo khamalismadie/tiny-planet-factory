@@ -108,10 +108,11 @@ Program Nine Worlds menggantikan roadmap lama: Terra diselesaikan lebih dulu, la
 | `v0.12` | **Sakura + Floral Biome** — pulau melayang, mekar, angin langit, dan konektivitas vertikal. *(selesai)* |
 | `v0.13` | **Aurelia + Autumn Biome** — serasah, simpanan makanan, hibernasi, dan embun beku. *(selesai)* |
 | `v0.14` | **Cosmos + Crystal Biome** — kristal, radiasi, gravitasi, dan fase meteor; Nine Worlds lengkap. *(selesai)* |
+| `v0.14.1–v0.14.3` | **PWA Portability** — base relatif, manifest/scope relatif, precache seluruh chunk, dan `ignoreVary` untuk offline reload. *(selesai; deploy HTTPS tertunda)* |
 
 ## Langkah berikutnya
 
-1. Selesaikan checklist `docs/QA-DEVICE.md` di Android menengah sungguhan: p50/p95, cold start, pinch, context loss/restore, PWA offline/update.
+1. Selesaikan checklist `docs/QA-DEVICE.md` di Android menengah sungguhan: p50/p95, cold start, pinch, context loss/restore, PWA offline/update. Verifikasi localhost sudah lolos, tapi bukan pengganti perangkat nyata.
 2. Deploy produksi HTTPS mengikuti `docs/RELEASE.md`, lalu jalankan `?qa=1&qaSeconds=45` dari perangkat.
 3. Fokus ke QA HTTPS/perangkat nyata sebelum menambah biome berikutnya.
 4. Baru setelah Nine Worlds selesai, evaluasi ulang Supabase cloud/gallery/social sebagai fase terpisah.

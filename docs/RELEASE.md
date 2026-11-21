@@ -179,14 +179,18 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [ ] Delapan planet sebelumnya tidak berubah secara numerik dari gate v0.13.
 - [ ] App chunk <100 kB.
 
-## 2p. Deploy HTTPS & PWA portability (v0.14.1)
+## 2p. Deploy HTTPS & PWA portability (v0.14.1–v0.14.3)
 
-- [ ] Build memakai `base: './'` sehingga asset bisa di-root LAN maupun subpath GitHub Pages.
-- [ ] Manifest memakai `start_url`/`scope` `./` dan ikon relatif.
-- [ ] `sw.js` menghitung cache path dari `self.registration.scope`.
-- [ ] Registrasi service worker memakai URL relatif terhadap `document.baseURI`.
-- [ ] GitHub Pages aktif di `https://khamalismadie.github.io/tiny-planet-factory/`.
-- [ ] Manifest, service worker, dan chunk bisa dimuat lewat HTTPS.
+- [x] Build memakai `base: './'` sehingga asset bisa di-root LAN maupun subpath host.
+- [x] Manifest memakai `start_url`/`scope` `./` dan ikon relatif.
+- [x] `sw.js` menghitung cache path dari `self.registration.scope`.
+- [x] Registrasi service worker memakai URL relatif terhadap `document.baseURI`.
+- [x] Plugin `pwa-precache` menyuntik seluruh chunk hasil build ke `SHELL`.
+- [x] `caches.match(request, { ignoreVary: true })` menangani header `Vary: Origin` dari Vite preview.
+- [x] Verifikasi localhost secure-context: manifest installable shape, SW control, shell + chunk ter-cache, offline reload sukses, tanpa page error.
+- [ ] GitHub Pages ditunda: repo masih private dan akun free tidak mendukung Pages untuk repo privat.
+- [ ] Host HTTPS produksi: verifikasi manifest dan `sw.js` mengembalikan 200.
+- [ ] Install prompt, offline, dan update di perangkat nyata.
 
 ## 3. QA perangkat nyata
 
