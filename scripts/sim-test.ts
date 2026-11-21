@@ -1,5 +1,6 @@
 import { QUALITY, suggestQuality } from '../src/app/quality.ts';
 import { ensureEventState } from '../src/content/missions.ts';
+import { OBJECT_DEFS, OBJECT_ORDER } from '../src/content/objects.ts';
 import { SPECIES_ORDER } from '../src/content/species.ts';
 import { PLANET_CONFIGS, PLANET_IDS } from '../src/content/planets/index.ts';
 import { decodePlanetDna, encodePlanetDna, encodePlanetDnaLegacy } from '../src/sim/dna.ts';
@@ -843,6 +844,30 @@ assert(droughtPlanet.events['drought-recovery'].status === 'complete', 'event pe
 
 const eventMigration = ensureEventState(undefined);
 assert(eventMigration['first-rain'].status === 'active', 'event state lama harus dimigrasikan');
+
+const spacingPlanet = createPlanet(7004, 'Rapat');
+const stackedTypes = Array.from({ length: OBJECT_ORDER.length * 3 }, (_, index) => OBJECT_ORDER[index % OBJECT_ORDER.length]);
+for (const type of stackedTypes) {
+  assert(placeObject(spacingPlanet, type, [0, 1, 0]), `${type} harus tetap ditempatkan meski menumpuk`);
+}
+let minSpacingMargin = Infinity;
+for (let i = 0; i < spacingPlanet.objects.length; i++) {
+  for (let j = i + 1; j < spacingPlanet.objects.length; j++) {
+    const a = spacingPlanet.objects[i];
+    const b = spacingPlanet.objects[j];
+    const dot = Math.max(-1, Math.min(1, a.dir[0] * b.dir[0] + a.dir[1] * b.dir[1] + a.dir[2] * b.dir[2]));
+    const angle = Math.acos(dot);
+    const footprint = OBJECT_DEFS[a.type].spacingRadius + OBJECT_DEFS[b.type].spacingRadius;
+    minSpacingMargin = Math.min(minSpacingMargin, angle - footprint);
+  }
+}
+assert(minSpacingMargin >= -1e-6, `soft spacing gagal: margin ${minSpacingMargin}`);
+const spacingTwin = createPlanet(7004, 'Rapat');
+for (const type of stackedTypes) placeObject(spacingTwin, type, [0, 1, 0]);
+assert(
+  JSON.stringify(spacingPlanet.objects.map((object) => object.dir)) === JSON.stringify(spacingTwin.objects.map((object) => object.dir)),
+  'soft spacing harus deterministik',
+);
 
 assert(QUALITY.low.planetDetail < QUALITY.medium.planetDetail, 'detail low harus lebih rendah');
 assert(QUALITY.medium.maxDrops < QUALITY.high.maxDrops, 'budget drop medium harus lebih kecil');

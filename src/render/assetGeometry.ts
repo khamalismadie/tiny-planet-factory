@@ -230,26 +230,26 @@ function defineAsset(parts: Part[], baseLift = 0.004): AssetGeometry {
 
 function buildTree(): AssetGeometry {
   return defineAsset([
-    cylinder(0.016, 0.022, 0.11, 6, PALETTE.bark, [0, 0.055, 0]),
-    cone(0.08, 0.14, 6, PALETTE.leafDark, [0, 0.115, 0]),
-    cone(0.065, 0.13, 6, PALETTE.leaf, [0, 0.175, 0]),
-    cone(0.048, 0.11, 6, PALETTE.leafLight, [0, 0.225, 0]),
+    cylinder(0.016, 0.022, 0.09, 6, PALETTE.bark, [0, 0.045, 0]),
+    cone(0.08, 0.12, 6, PALETTE.leafDark, [0, 0.095, 0]),
+    cone(0.065, 0.11, 6, PALETTE.leaf, [0, 0.145, 0]),
+    cone(0.048, 0.095, 6, PALETTE.leafLight, [0, 0.19, 0]),
   ]);
 }
 
 function buildFlower(): AssetGeometry {
-  const parts: Part[] = [cylinder(0.005, 0.006, 0.085, 4, PALETTE.stem, [0, 0.0425, 0])];
+  const parts: Part[] = [cylinder(0.005, 0.006, 0.11, 4, PALETTE.stem, [0, 0.055, 0])];
   for (let i = 0; i < 5; i++) {
     const angle = (i / 5) * Math.PI * 2;
     parts.push(
-      sphere(0.017, 5, 3, i % 2 ? PALETTE.petalLight : PALETTE.petal, [
+      sphere(0.019, 5, 3, i % 2 ? PALETTE.petalLight : PALETTE.petal, [
         Math.cos(angle) * 0.023,
-        0.095,
+        0.125,
         Math.sin(angle) * 0.023,
       ], [1, 0.45, 1]),
     );
   }
-  parts.push(sphere(0.012, 6, 4, PALETTE.pollen, [0, 0.101, 0]));
+  parts.push(sphere(0.012, 6, 4, PALETTE.pollen, [0, 0.132, 0]));
   return defineAsset(parts);
 }
 
@@ -353,10 +353,10 @@ export const ASSET_GEOMETRY: Record<ObjectType, AssetGeometry> = {
     sphere(0.055, 7, 4, PALETTE.leafLight, [0.05, 0.018, -0.02], [1, 0.34, 1]),
   ]),
   mountain: defineAsset([
-    cone(0.1, 0.28, 5, PALETTE.stone, [0, 0.14, 0]),
-    cone(0.068, 0.2, 5, PALETTE.stoneDark, [-0.055, 0.1, 0.02], undefined, undefined, 0.12),
-    cone(0.06, 0.18, 5, PALETTE.stoneLight, [0.055, 0.09, -0.015], undefined, undefined, -0.1),
-    cone(0.045, 0.1, 5, PALETTE.snow, [0, 0.235, 0]),
+    cone(0.1, 0.5, 5, PALETTE.stone, [0, 0.25, 0]),
+    cone(0.068, 0.34, 5, PALETTE.stoneDark, [-0.055, 0.17, 0.02], undefined, undefined, 0.12),
+    cone(0.06, 0.3, 5, PALETTE.stoneLight, [0.055, 0.15, -0.015], undefined, undefined, -0.1),
+    cone(0.045, 0.14, 5, PALETTE.snow, [0, 0.43, 0]),
   ]),
   ocean: defineAsset([
     cylinder(0.22, 0.22, 0.018, 16, PALETTE.water, [0, 0.009, 0]),

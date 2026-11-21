@@ -152,6 +152,40 @@ function refreshProgression(planet: PlanetState): string[] {
   return events;
 }
 
+function normalizeDirection(dir: [number, number, number]): [number, number, number] {
+  const length = Math.hypot(...dir) || 1;
+  return Math.abs(length - 1) < 1e-12 ? [dir[0], dir[1], dir[2]] : [dir[0] / length, dir[1] / length, dir[2] / length];
+}
+
+function crossDirection(a: [number, number, number], b: [number, number, number]): [number, number, number] {
+  return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+}
+
+function shiftDirection(dir: [number, number, number], a: number, b: number): [number, number, number] {
+  const helper: [number, number, number] = Math.abs(dir[1]) < 0.9 ? [0, 1, 0] : [1, 0, 0];
+  const tangentA = normalizeDirection(crossDirection(helper, dir));
+  const tangentB = crossDirection(dir, tangentA);
+  return normalizeDirection([
+    dir[0] + tangentA[0] * a + tangentB[0] * b,
+    dir[1] + tangentA[1] * a + tangentB[1] * b,
+    dir[2] + tangentA[2] * a + tangentB[2] * b,
+  ]);
+}
+
+function requiredSpacing(planet: PlanetState, dir: [number, number, number], radius: number): number {
+  let required = 0;
+  for (const object of planet.objects) {
+    const dot = Math.max(-1, Math.min(1, dir[0] * object.dir[0] + dir[1] * object.dir[1] + dir[2] * object.dir[2]));
+    if (Math.acos(dot) > radius + OBJECT_DEFS[object.type].spacingRadius) continue;
+    required = Math.max(required, (radius + OBJECT_DEFS[object.type].spacingRadius) * 1.05);
+  }
+  return required;
+}
+
+function isCrowded(planet: PlanetState, dir: [number, number, number], radius: number): boolean {
+  return requiredSpacing(planet, dir, radius) > 0;
+}
+
 export function placeObject(
   planet: PlanetState,
   type: ObjectType,
@@ -159,9 +193,23 @@ export function placeObject(
   record = true,
 ): PlacedObject | null {
   if (!planet.progression.unlockedObjects.includes(type)) return null;
-  const length = Math.hypot(...dir) || 1;
-  const normalized: [number, number, number] =
-    Math.abs(length - 1) < 1e-12 ? [dir[0], dir[1], dir[2]] : [dir[0] / length, dir[1] / length, dir[2] / length];
+  const radius = OBJECT_DEFS[type].spacingRadius;
+  let normalized = normalizeDirection(dir);
+  // Soft spacing keeps repeated taps from stacking props into an unreadable wall.
+  // It is deterministic and bounded: the object is always accepted, and the
+  // offset is derived from the same seed/tick/index contract as the other jitter.
+  const spacingRandom = mulberry32(hashString(`${planet.seed}:${planet.tick}:${planet.objects.length}:${type}:spacing`));
+  const required = requiredSpacing(planet, normalized, radius);
+  if (required > 0) {
+    const phase = spacingRandom() * Math.PI * 2;
+    const goldenAngle = Math.PI * (3 - Math.sqrt(5));
+    for (let attempt = 0; attempt < 16; attempt++) {
+      const spread = required * (1.1 + attempt * 0.35);
+      const angle = phase + attempt * goldenAngle;
+      normalized = shiftDirection(normalizeDirection(dir), Math.cos(angle) * spread, Math.sin(angle) * spread);
+      if (!isCrowded(planet, normalized, radius)) break;
+    }
+  }
   const random = mulberry32(hashString(`${planet.seed}:${planet.tick}:${planet.objects.length}:${type}`));
   const object: PlacedObject = {
     id: `obj-${Math.floor(random() * 0xffffffff).toString(36)}`,

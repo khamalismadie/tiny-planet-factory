@@ -110,6 +110,7 @@ Program Nine Worlds menggantikan roadmap lama: Terra diselesaikan lebih dulu, la
 | `v0.14` | **Cosmos + Crystal Biome** — kristal, radiasi, gravitasi, dan fase meteor; Nine Worlds lengkap. *(selesai)* |
 | `v0.14.1–v0.14.3` | **PWA Portability** — base relatif, manifest/scope relatif, precache seluruh chunk, dan `ignoreVary` untuk offline reload. *(selesai; deploy HTTPS tertunda)* |
 | `v0.15` | **Main Menu & Instrument UI** — menu utama, kontrol kualitas, pause-safe, dan bahasa visual peta kebun planet. *(selesai)* |
+| `v0.15.1` | **Habitat Proportion Balance** — hierarki gunung/pohon, silhouette bunga, dan soft spacing deterministik. *(selesai)* |
 
 ## Langkah berikutnya
 

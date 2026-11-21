@@ -202,6 +202,16 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [x] Tidak ada pemilih planet permanen di UI; `?planet=` tetap merupakan hook QA/deeplink.
 - [x] Gate baru `npm run test:menu` untuk desktop + mobile, overflow, fokus, kualitas, pause, dan DNA.
 
+## 2r. Habitat Proportion Balance (v0.15.1)
+
+- [x] Gunung dinaikkan dan pohon dirapikan: minimum gunung ≈1.45× pohon maksimal pada oksigen sehat.
+- [x] Bunga dinaikkan ±29% agar silhouette tidak menyatu dengan rumput.
+- [x] `spacingRadius` ditambahkan ke `OBJECT_DEFS` sebagai data sim renderer-agnostic.
+- [x] `placeObject()` memakai soft spacing deterministik berbasis sudut emas; objek tetap diterima.
+- [x] Event `object.placed` menyimpan arah final hasil spacing agar replay sesuai.
+- [x] Gate `test:sim` memeriksa margin spacing dan determinisme penumpukan 39 objek.
+- [x] Budget tetap lolos: 18–200 triangle per prop, 0 tekstur.
+
 ## 3. QA perangkat nyata
 
 Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:
