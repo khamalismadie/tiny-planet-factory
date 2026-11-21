@@ -88,19 +88,22 @@ Catatan: Chromium headless di lingkungan ini melepaskan konteks WebGL (`CONTEXT_
 
 ## Roadmap pasca-MVP
 
-Keputusan yang sudah disepakati: galeri publik pindah ke v0.4, format DNA diganti ke kode `TPF-...` + checksum, backend tetap Supabase.
+Program Nine Worlds menggantikan roadmap lama: Terra diselesaikan lebih dulu, lalu engine yang sama diperluas ke delapan planet lain. Cloud/Gallery/Social ditunda ke fase setelah Nine Worlds.
 
 | Versi | Fokus |
 |---|---|
-| `v0.1.1` | **Data Foundation** — `schemaVersion`, migrasi, event replay, serialisasi penuh, DNA v2. *(selesai di committed workspace ini)* |
+| `v0.1.1` | **Data Foundation** — `schemaVersion`, migrasi, event replay, serialisasi penuh, DNA v2. *(selesai)* |
 | `v0.2` | **Planet DNA Sharing** — kode pendek/lengkap, pratinjau, duplikat, remix, Web Share. *(selesai)* |
 | `v0.3` | **Living Planet** — agen satwa otonom, rantai makanan, habitat, migrasi, kepunahan, species discovery. *(selesai)* |
-| `v0.4` | **Cloud Ecosystem + Gallery** — Supabase Auth/DB, offline-first sync, conflict resolution, galeri DNA publik. |
-| `v0.5` | **Social Universe** — kunjungan planet, challenge, trading blueprint, colaborasi, lalu live multiplayer. |
+| `v0.4` | **Ecosystem Data Foundation** — schema v3, 9 konfigurasi planet, 103 spesies unik, validasi habitat. *(selesai)* |
+| `v0.5` | **Terra Core** — simulasi populasi berbasis habitat, reproduksi/kematian, detritus, metrik turunan. *(selesai)* |
+| `v0.5.1` | **Observability & Stress Tests** — hook `eco()`, panel `?eco=1`, lima skenario gangguan. *(selesai)* |
+| `v0.6` | **Food Web + Wildlife AI** — agen fauna yang terhubung ke populasi ekologis. |
+| `v0.7+` | **Nine Worlds** — Dune, Glaciere, Inferna, Aquaria, Mycelia, Sakura, Aurelia, Cosmos. |
 
 ## Langkah berikutnya
 
 1. Selesaikan checklist `docs/QA-DEVICE.md` di Android menengah sungguhan: p50/p95, cold start, pinch, context loss/restore, PWA offline/update.
 2. Deploy produksi HTTPS mengikuti `docs/RELEASE.md`, lalu jalankan `?qa=1&qaSeconds=45` dari perangkat.
-3. Lanjut ke v0.4 (Cloud Ecosystem + Gallery) setelah QA HTTPS/perangkat nyata selesai.
-4. Siapkan v0.4 dengan Supabase RLS sejak awal dan konflik sync yang tidak menimpa diam-diam.
+3. Lanjut ke v0.6 (Food Web + Wildlife AI) setelah QA HTTPS/perangkat nyata selesai.
+4. Baru setelah Nine Worlds selesai, evaluasi ulang Supabase cloud/gallery/social sebagai fase terpisah.

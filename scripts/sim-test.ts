@@ -15,9 +15,29 @@ import {
 import { migratePlanet, CURRENT_SCHEMA_VERSION } from '../src/sim/migrate.ts';
 import { replayEvents } from '../src/sim/replay.ts';
 import { deserializePlanet, serializePlanet } from '../src/sim/serialize.ts';
+import type { PlanetState } from '../src/sim/types.ts';
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
+}
+
+function tickN(planet: PlanetState, count: number): void {
+  for (let i = 0; i < count; i++) simulateTick(planet, false);
+}
+
+function producerTotal(planet: PlanetState): number {
+  return ['terra_oak', 'terra_pine', 'terra_wildflower', 'terra_river_reed']
+    .reduce((sum, id) => sum + (planet.eco.populations[id]?.estimate ?? 0), 0);
+}
+
+function assertBoundedEco(planet: PlanetState, label: string): void {
+  for (const [id, entry] of Object.entries(planet.eco.populations)) {
+    assert(
+      Number.isFinite(entry.estimate) && entry.estimate >= 0 && entry.estimate <= entry.capacity * 1.01,
+      `${label}: populasi ${id} di luar batas`,
+    );
+  }
+  assert(planet.eco.detritus >= 0 && planet.eco.detritus <= 500, `${label}: detritus di luar batas`);
 }
 
 const dirs: Array<[number, number, number]> = [
@@ -196,6 +216,79 @@ assert(
   JSON.stringify(longA.eco) === JSON.stringify(longB.eco),
   'simulasi ekosistem harus deterministik untuk seed yang sama',
 );
+
+// Stress scenarios: disturbance must stay bounded and recovery must be measurable.
+const overpop = createPlanet(101, 'Overpop');
+tickN(overpop, 40);
+overpop.eco.populations.terra_rabbit.estimate = 220;
+tickN(overpop, 300);
+assertBoundedEco(overpop, 'overpopulasi herbivora');
+assert(
+  overpop.eco.populations.terra_rabbit.estimate < 220,
+  'overpopulasi herbivora harus ditekan kembali oleh kapasitas dan predator',
+);
+assert(producerTotal(overpop) > 0, 'vegetasi harus bertahan setelah overpopulasi herbivora');
+
+const predatorOut = createPlanet(202, 'Predator Out');
+tickN(predatorOut, 40);
+const rabbitBeforePredatorOut = predatorOut.eco.populations.terra_rabbit.estimate;
+predatorOut.eco.populations.terra_wolf.estimate = 0;
+predatorOut.eco.populations.terra_fox.estimate = 0;
+tickN(predatorOut, 300);
+assertBoundedEco(predatorOut, 'predator punah');
+assert(
+  predatorOut.eco.populations.terra_rabbit.estimate > rabbitBeforePredatorOut,
+  'populasi herbivora harus naik saat predator hilang',
+);
+assert(
+  predatorOut.eco.populations.terra_rabbit.estimate <= predatorOut.eco.populations.terra_rabbit.capacity * 1.01,
+  'herbivora tanpa predator tetap tidak boleh meledak tanpa batas',
+);
+
+const shortage = createPlanet(303, 'Food Shortage');
+tickN(shortage, 40);
+const foodBeforeShortage = shortage.eco.metrics.foodAvailability;
+for (const id of ['terra_oak', 'terra_pine', 'terra_wildflower', 'terra_river_reed']) {
+  shortage.eco.populations[id].estimate = 0.2;
+}
+tickN(shortage, 1);
+assert(
+  shortage.eco.metrics.foodAvailability < foodBeforeShortage,
+  'kelangkaan produsen harus menurunkan food availability',
+);
+tickN(shortage, 300);
+assertBoundedEco(shortage, 'kelangkaan makanan');
+assert(producerTotal(shortage) > 10, 'produsen harus pulih setelah kelangkaan makanan');
+
+const drought = createPlanet(404, 'Drought');
+tickN(drought, 40);
+const habitatBeforeDrought = drought.eco.metrics.habitatHealth;
+drought.environment.water = 5;
+tickN(drought, 1);
+const habitatDry = drought.eco.metrics.habitatHealth;
+assert(habitatDry < habitatBeforeDrought, 'kekeringan harus menurunkan habitat health');
+tickN(drought, 99);
+drought.environment.water = 85;
+tickN(drought, 300);
+assertBoundedEco(drought, 'kekeringan');
+assert(drought.eco.metrics.habitatHealth > habitatDry, 'habitat health harus pulih setelah air kembali');
+
+const habitatLoss = createPlanet(505, 'Habitat Loss');
+tickN(habitatLoss, 40);
+const habitatBeforeLoss = habitatLoss.eco.metrics.habitatHealth;
+habitatLoss.environment.fertility = 2;
+habitatLoss.ecosystem.vegetation = 2;
+habitatLoss.environment.stability = 10;
+tickN(habitatLoss, 1);
+const habitatDamaged = habitatLoss.eco.metrics.habitatHealth;
+assert(habitatDamaged < habitatBeforeLoss, 'kerusakan habitat harus menurunkan habitat health');
+tickN(habitatLoss, 99);
+habitatLoss.environment.fertility = 75;
+habitatLoss.ecosystem.vegetation = 75;
+habitatLoss.environment.stability = 75;
+tickN(habitatLoss, 300);
+assertBoundedEco(habitatLoss, 'kerusakan habitat');
+assert(habitatLoss.eco.metrics.habitatHealth > habitatDamaged, 'habitat health harus pulih setelah restorasi');
 
 const replayed = replayEvents(planet.eventLog);
 assert(replayed, 'event log harus bisa di-replay');

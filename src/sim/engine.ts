@@ -84,6 +84,7 @@ export function createPlanet(seed: number, name = 'Planet Baru', planetId = 'ter
     stage: 1,
     updatedAt: Date.now(),
   };
+  terraEcosystem.initialize(state);
   appendEvent(state, makePlanetEvent('planet.created', 0, 0, { seed, name }));
   return state;
 }

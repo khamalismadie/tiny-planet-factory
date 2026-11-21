@@ -48,3 +48,22 @@ Semua `eco.metrics` dihitung dari state simulasi:
 - Detritus tetap dalam `[0, 500]`.
 - Fertility akhir lebih tinggi dari fertility awal.
 - `eco` identik untuk dua seed yang sama.
+
+## Observability (v0.5.1)
+
+- `window.__game.eco()` mengembalikan `PlanetState.eco`.
+- `window.__game.ecoScore(id)` menghitung `scoreHabitat()` untuk spesies Terra pada kondisi saat ini.
+- `?eco=1` menampilkan panel ringkas di stats panel: populasi/kapasitas, trend, limiting factor, detritus, dan metrik.
+- Panel tersembunyi di build normal; smoke test memastikan default tetap bersih.
+
+## Stress scenarios (v0.5.1)
+
+Lima skenario dijalankan tanpa rendering:
+
+1. Overpopulasi herbivora — rabbit dipaksa ke 220, lalu 300 tick.
+2. Predator punah — wolf/fox = 0, lalu 300 tick.
+3. Kelangkaan makanan — semua producer = 0.2, lalu 300 tick.
+4. Kekeringan — water = 5 selama 100 tick, lalu water = 85 selama 300 tick.
+5. Kerusakan habitat — fertility/vegetation/stability direndahkan, lalu dikembalikan.
+
+Semua skenario wajib tetap bounded. Kekeringan dan kerusakan habitat wajib menunjukkan penurunan `habitatHealth` lalu pemulihan yang terukur.

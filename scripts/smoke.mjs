@@ -30,6 +30,7 @@ const dom = await page.evaluate(() => ({
   wildlifeButtons: ['deer', 'fox', 'bird'].every((type) => !!document.querySelector(`[data-object="${type}"]`)),
   telemetryUi: !!document.getElementById('telemetry-btn') && !!document.getElementById('telemetry-modal'),
   qaPanelHiddenByDefault: getComputedStyle(document.getElementById('qa')).display === 'none',
+  ecoPanelHiddenByDefault: getComputedStyle(document.getElementById('eco-detail')).display === 'none',
   centerElement: document.elementFromPoint(640, 400)?.tagName,
   manifest: !!document.querySelector('link[rel="manifest"]'),
 }));
@@ -62,6 +63,11 @@ await page.evaluate(() => window.__game.tick(120));
 await page.waitForTimeout(250);
 const grown = await state();
 const grownFauna = await page.evaluate(() => window.__game.wildlife());
+const ecoProbe = await page.evaluate(() => ({
+  hasHook: typeof window.__game.eco === 'function',
+  populations: Object.keys(window.__game.eco?.().populations ?? {}).length,
+  score: window.__game.ecoScore?.('terra_oak') ?? null,
+}));
 const grownDom = await page.evaluate(() => ({
   mission: document.getElementById('mission')?.textContent ?? '',
   weather: document.getElementById('weather')?.textContent ?? '',
@@ -133,6 +139,8 @@ const checks = {
   ecosystemUiUpdated: grownDom.ecosystem.includes('Vegetasi') && grownDom.ecosystem.includes('Satwa'),
   wildlifeAgentsPresent: grownFauna.agents > 0 && grownFauna.discovered.length > 0,
   wildlifeUiUpdated: grownDom.ecosystem.includes('Fauna'),
+  ecoDebugHooks: ecoProbe.hasHook && ecoProbe.populations === 12 && ecoProbe.score !== null,
+  ecoPanelHiddenByDefault: dom.ecoPanelHiddenByDefault,
   statePersisted: reloaded.tick >= grown.tick && reloaded.objects.length === grown.objects.length,
   dnaShortCode: /^TPF-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(dnaShort),
   dnaCodeGenerated: dnaCode.length > dnaShort.length,
@@ -155,6 +163,7 @@ console.log(JSON.stringify({ boot, initialTick: initialState.tick, placementActi
   mission: grown.mission,
   objects: grown.objects.length,
   fauna: grownFauna,
+  eco: ecoProbe,
 }, grownMetrics, reloadedTick: reloaded.tick, reloadedObjects: reloaded.objects.length, sw, errors, checks }, null, 2));
 
 await browser.close();

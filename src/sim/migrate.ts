@@ -3,6 +3,7 @@ import { OBJECT_ORDER } from '../content/objects';
 import { SPECIES_ORDER } from '../content/species';
 import { PLANET_IDS } from '../content/planets/ids';
 import { BIOMES, inferBiome } from './biome';
+import { terraEcosystem } from './eco/manager';
 import { CURRENT_ECOSYSTEM_VERSION, normalizeEcoState } from './eco/state';
 import { createPlanet, planetNameFromSeed } from './engine';
 import type {
@@ -165,7 +166,7 @@ export function migratePlanet(raw: unknown): PlanetState | null {
     ? raw.eventLog.map(normalizeEvent).filter((event): event is PlanetEvent => event !== null)
     : base.eventLog;
 
-  return {
+  const migratedState: PlanetState = {
     ...base,
     id: str(raw.id, base.id),
     planetId,
@@ -218,4 +219,6 @@ export function migratePlanet(raw: unknown): PlanetState | null {
     revision: Math.max(0, Math.floor(num(raw.revision, 0))),
     schemaVersion: CURRENT_SCHEMA_VERSION,
   };
+  terraEcosystem.initialize(migratedState);
+  return migratedState;
 }

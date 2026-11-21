@@ -186,8 +186,38 @@ function recomputeMetrics(
   };
 }
 
+export function habitatContextFor(planet: PlanetState, config: PlanetConfig): HabitatContext {
+  const hazard = planet.weather.type === 'storm'
+    ? 'badai-hujan'
+    : planet.weather.type === 'snow'
+      ? 'gelombang-dingin'
+      : planet.environment.water < 25
+        ? 'kekeringan-musiman'
+        : null;
+  return {
+    environment: planet.environment,
+    ecosystem: planet.ecosystem,
+    biomeTags: config.biomeTags,
+    aquatic: config.aquatic,
+    hazard,
+  };
+}
+
 export class EcosystemManager {
   constructor(private readonly config: PlanetConfig) {}
+
+  initialize(planet: PlanetState): void {
+    if (planet.planetId !== this.config.id) return;
+    ensurePopulations(planet.eco, this.config);
+    const context = habitatContextFor(planet, this.config);
+    const scores: Record<string, number> = {};
+    const resources: Record<string, number> = {};
+    for (const definition of this.config.species) {
+      scores[definition.id] = scoreHabitat(definition, context).suitability;
+      resources[definition.id] = resourceAvailability(definition, this.config, planet.eco, context);
+    }
+    recomputeMetrics(planet, this.config, scores, resources);
+  }
 
   step(planet: PlanetState): string[] {
     if (planet.planetId !== this.config.id) return [];
@@ -196,21 +226,7 @@ export class EcosystemManager {
     const random = mulberry32(hashString(`${planet.seed}:eco:${planet.tick}`));
     const messages: string[] = [];
     ensurePopulations(eco, config);
-
-    const hazard = planet.weather.type === 'storm'
-      ? 'badai-hujan'
-      : planet.weather.type === 'snow'
-        ? 'gelombang-dingin'
-        : planet.environment.water < 25
-          ? 'kekeringan-musiman'
-          : null;
-    const context: HabitatContext = {
-      environment: planet.environment,
-      ecosystem: planet.ecosystem,
-      biomeTags: config.biomeTags,
-      aquatic: config.aquatic,
-      hazard,
-    };
+    const context = habitatContextFor(planet, config);
 
     const scores: Record<string, number> = {};
     const resources: Record<string, number> = {};

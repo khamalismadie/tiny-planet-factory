@@ -65,6 +65,17 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [ ] Dua planet dengan seed sama menghasilkan `eco` identik setelah 10.000 tick.
 - [ ] App chunk tetap di bawah 100 kB meskipun profile Terra ikut ter-bundle.
 
+## 2f. Observability & Stress Tests (v0.5.1)
+
+- [ ] Debug hook `eco()` mengembalikan state ekosistem Terra dengan 12 populasi.
+- [ ] Debug hook `ecoScore(id)` mengembalikan skor dan limiting factor habitat.
+- [ ] Panel `?eco=1` menampilkan populasi, kapasitas, trend, detritus, dan metrik turunan.
+- [ ] Panel eco tersembunyi secara default sehingga HUD normal tidak berubah.
+- [ ] Skenario overpopulasi herbivora tetap bounded dan vegetasi bertahan.
+- [ ] Skenario predator punah menaikkan herbivora tetapi tetap dalam kapasitas.
+- [ ] Skenario kelangkaan makanan menurunkan food availability lalu produsen pulih.
+- [ ] Skenario kekeringan dan kerusakan habitat menurunkan habitat health lalu pulih setelah restorasi.
+
 ## 3. QA perangkat nyata
 
 Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:

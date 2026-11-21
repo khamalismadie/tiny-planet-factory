@@ -47,6 +47,12 @@
       #mission { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 10px; font-size: 13px; line-height: 1.5; }
       #mission strong, #weather strong, #events strong { color: var(--accent); }
       #ecosystem { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; font-size: 12px; color: var(--muted); line-height: 1.5; }
+      #eco-detail { margin-top: 10px; border-top: 1px solid var(--border); padding-top: 8px; font-size: 10px; color: var(--muted); line-height: 1.35; }
+      #eco-detail .eco-list { margin-top: 6px; }
+      #eco-detail .eco-name { display: flex; justify-content: space-between; gap: 6px; }
+      #eco-detail .eco-bar { height: 3px; border-radius: 2px; background: #1e2b38; overflow: hidden; margin: 2px 0; }
+      #eco-detail .eco-bar > i { display: block; height: 100%; background: var(--warn); }
+      #eco-detail .eco-limit { color: #72869a; font-size: 9px; margin-bottom: 4px; }
       #weather { margin-top: 10px; font-size: 12px; color: var(--muted); line-height: 1.5; }
       #events { margin-top: 10px; font-size: 12px; line-height: 1.4; }
       .event { margin-bottom: 6px; }
@@ -123,6 +129,7 @@
       <h2>Ekosistem</h2>
       <div id="stats"></div>
       <div id="ecosystem"></div>
+      <div id="eco-detail" class="hidden"></div>
       <div id="weather"></div>
       <div id="events"></div>
       <div id="mission"></div>

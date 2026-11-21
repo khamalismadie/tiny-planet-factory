@@ -2,7 +2,10 @@ import { EVENT_DEFS } from '../content/missions';
 import { CATEGORY_LABELS, OBJECT_DEFS, OBJECT_ORDER, UNLOCK_LEVEL } from '../content/objects';
 import { SPECIES_DEFS } from '../content/species';
 import { WEATHER_DEFS } from '../content/weather';
+import { terraConfig } from '../content/planets/terra';
 import { STAGE_NAMES } from '../sim/engine';
+import { scoreHabitat } from '../sim/eco/habitat';
+import { habitatContextFor } from '../sim/eco/manager';
 import type { EnvKey, ObjectType, PlanetState } from '../sim/types';
 
 export interface HudCallbacks {
@@ -40,6 +43,8 @@ export class Hud {
   private readonly objectList = document.getElementById('object-list')!;
   private readonly statsRoot = document.getElementById('stats')!;
   private readonly ecosystem = document.getElementById('ecosystem')!;
+  private readonly ecoDetail = document.getElementById('eco-detail')!;
+  private readonly ecoVisible = new URLSearchParams(location.search).has('eco');
   private readonly weatherRoot = document.getElementById('weather')!;
   private readonly eventsRoot = document.getElementById('events')!;
   private readonly mission = document.getElementById('mission')!;
@@ -58,6 +63,7 @@ export class Hud {
 
   constructor(callbacks: HudCallbacks) {
     this.callbacks = callbacks;
+    this.ecoDetail.classList.toggle('hidden', !this.ecoVisible);
     this.buildBuildPanel();
     this.buildStats();
     this.bindTopBar();
@@ -216,6 +222,7 @@ export class Hud {
       `Populasi ${eco.population} · Kesehatan ${eco.health}<br>` +
       `Fauna ${fauna?.agents.length ?? 0} agen · ${fauna?.discovered.length ?? 0} spesies ditemukan` +
       (extinctLabels ? `<br>Punah: ${extinctLabels}` : '');
+    this.renderEcoDetail(planet);
 
     const weather = WEATHER_DEFS[planet.weather.type];
     this.weatherRoot.innerHTML =
@@ -251,6 +258,30 @@ export class Hud {
       button.title = locked ? `Terbuka di level ${UNLOCK_LEVEL[type]}` : OBJECT_DEFS[type].label;
       button.classList.toggle('active', !locked && selected === type);
     }
+  }
+
+  private renderEcoDetail(planet: PlanetState): void {
+    if (!this.ecoVisible) return;
+    const context = habitatContextFor(planet, terraConfig);
+    const metrics = planet.eco.metrics;
+    const rows = terraConfig.species.map((definition) => {
+      const population = planet.eco.populations[definition.id];
+      const score = scoreHabitat(definition, context);
+      if (!population) return '';
+      const percent = Math.max(0, Math.min(100, (population.estimate / Math.max(1, population.capacity)) * 100));
+      const trend = population.trend > 0.05 ? '▲' : population.trend < -0.05 ? '▼' : '•';
+      const limit = score?.limitingFactor ?? '-';
+      return (
+        `<div class="eco-name"><span>${definition.name}</span><span>${Math.round(population.estimate)}/${Math.round(population.capacity)} ${trend}</span></div>` +
+        `<div class="eco-bar"><i style="width:${percent.toFixed(0)}%"></i></div>` +
+        `<div class="eco-limit">batas: ${limit}</div>`
+      );
+    }).join('');
+    this.ecoDetail.innerHTML =
+      '<strong>Ekologi Terra</strong><br>' +
+      `Spesies ${metrics.speciesCount} · Populasi ${metrics.totalPopulation}<br>` +
+      `Habitat ${Math.round(metrics.habitatHealth)} · Pangan ${Math.round(metrics.foodAvailability)} · Detritus ${planet.eco.detritus.toFixed(1)}<br>` +
+      `<div class="eco-list">${rows}</div>`;
   }
 
   notify(message: string, warn = false): void {
