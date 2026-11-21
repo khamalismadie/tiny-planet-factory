@@ -184,6 +184,7 @@ export interface EcoStateV3 {
   planetId: string;
   ecosystemVersion: number;
   populations: Record<EcoSpeciesId, PopulationRecord>;
+  detritus: number;
   traits: Record<EcoSpeciesId, string[]>;
   discovered: EcoSpeciesId[];
   eventHistory: EcoEventRecord[];

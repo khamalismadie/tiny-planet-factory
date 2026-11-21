@@ -129,7 +129,7 @@ assert(migrated!.planetId === 'terra', 'migrasi save lama harus memilih planet d
 assert(migrated!.ecosystemVersion >= 1, 'migrasi harus menyetel ecosystemVersion');
 assert(migrated!.eco.planetId === 'terra', 'migrasi harus membuat eco state default');
 
-const habitat = new HabitatManager();
+const habitat = new HabitatManager(speciesRegistry);
 const habitatContext = {
   environment: planet.environment,
   ecosystem: planet.ecosystem,
@@ -165,6 +165,37 @@ const ecoLoaded = deserializePlanet(serializePlanet(ecoPlanet));
 assert(ecoLoaded?.eco.discovered.includes('terra_oak'), 'save/load harus mempertahankan discovery eco');
 assert(ecoLoaded?.eco.populations.terra_oak?.estimate === 42, 'save/load harus mempertahankan populasi eco');
 assert(ecoLoaded?.schemaVersion === 3, 'save/load harus memakai schema v3');
+
+const longA = createPlanet(7777, 'Long A');
+const longB = createPlanet(7777, 'Long B');
+for (let i = 0; i < 10000; i++) {
+  simulateTick(longA, false);
+  simulateTick(longB, false);
+}
+const ecoEntries = Object.values(longA.eco.populations);
+assert(longA.tick === 10000, 'long-run test harus mencapai 10.000 tick');
+assert(ecoEntries.length === 12, 'Terra core harus mengelola 12 populasi spesies');
+assert(
+  ecoEntries.every((entry) => entry.estimate > 0 && entry.estimate <= entry.capacity * 1.01),
+  'populasi harus tetap positif dan dalam kapasitas setelah 10.000 tick',
+);
+assert(
+  ecoEntries.every((entry) => Number.isFinite(entry.estimate) && Number.isFinite(entry.trend)),
+  'populasi tidak boleh mengandung nilai non-finite',
+);
+assert(longA.eco.metrics.speciesCount === 12, 'semua 12 spesies harus bertahan di long-run');
+assert(longA.eco.discovered.length === 12, 'semua spesies Terra harus tercatat ditemukan');
+assert(longA.eco.populations.terra_oak.births > 0, 'producer harus bereproduksi');
+assert(longA.eco.populations.terra_mushroom.births > 0, 'decomposer harus berkembang');
+assert(longA.eco.detritus >= 0 && longA.eco.detritus <= 500, 'detritus harus terikat');
+assert(
+  longA.environment.fertility > longA.startingEnvironment.fertility,
+  'daur ulang decomposer harus meningkatkan kesuburan',
+);
+assert(
+  JSON.stringify(longA.eco) === JSON.stringify(longB.eco),
+  'simulasi ekosistem harus deterministik untuk seed yang sama',
+);
 
 const replayed = replayEvents(planet.eventLog);
 assert(replayed, 'event log harus bisa di-replay');

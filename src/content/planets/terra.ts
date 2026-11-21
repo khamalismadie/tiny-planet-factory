@@ -4,28 +4,28 @@ import type { PlanetConfig } from '../../sim/eco/types';
 const PLANET_ID = 'terra';
 
 const FOREST_HABITAT = habitat(['temperate-forest', 'pine-forest'], {
-  temperature: range(16, 8),
-  humidity: range(64, 16),
-  water: range(58, 18),
-  vegetation: range(72, 18),
-  fertility: range(62, 20),
+  temperature: range(16, 10),
+  humidity: range(72, 32),
+  water: range(78, 38),
+  vegetation: range(70, 30),
+  fertility: range(60, 28),
 });
 
 const GRASSLAND_HABITAT = habitat(['grassland', 'temperate-forest'], {
-  temperature: range(18, 9),
-  humidity: range(52, 18),
-  water: range(50, 20),
-  vegetation: range(60, 22),
+  temperature: range(18, 12),
+  humidity: range(60, 32),
+  water: range(70, 38),
+  vegetation: range(62, 32),
 });
 
 const RIVER_HABITAT = habitat(['river', 'lake'], {
-  temperature: range(14, 6),
-  humidity: range(78, 12),
-  water: range(88, 10),
-  vegetation: range(45, 20),
+  temperature: range(14, 9),
+  humidity: range(78, 25),
+  water: range(84, 30),
+  vegetation: range(60, 35),
   aquatic: true,
   depth: range(6, 5),
-  dissolvedOxygen: range(8, 2),
+  dissolvedOxygen: range(8, 4),
 });
 
 const SPECIES = [

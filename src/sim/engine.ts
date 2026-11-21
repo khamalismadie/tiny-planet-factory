@@ -3,6 +3,7 @@ import { OBJECT_DEFS, OBJECT_ORDER, UNLOCK_LEVEL } from '../content/objects';
 import { WEATHER_DEFS } from '../content/weather';
 import { inferBiome } from './biome';
 import { appendEvent, makePlanetEvent, nextEventIndex } from './events';
+import { terraEcosystem } from './eco/manager';
 import { CURRENT_ECOSYSTEM_VERSION, createEcoState } from './eco/state';
 import { hashString, mulberry32 } from './rng';
 import { createFauna, simulateWildlife } from './wildlife';
@@ -290,6 +291,8 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
   } else {
     planet.warning = null;
   }
+
+  events.push(...terraEcosystem.step(planet));
 
   const healthy = (Object.keys(IDEAL) as EnvKey[]).filter((key) => inIdeal(e, key)).length;
   planet.progression.xp += healthy * 0.12 + (eco.vegetation > 20 ? 0.08 : 0);

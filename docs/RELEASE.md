@@ -55,6 +55,16 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [ ] `eco.discovered`, `eco.populations`, dan `eco.eventHistory` bertahan setelah save/load.
 - [ ] DNA format lama masih bisa dibaca; schema v3 baru belum mengubah binary DNA sampai phase evolution.
 
+## 2e. Terra Core (v0.5)
+
+- [ ] 12 spesies kunci Terra memiliki populasi awal dan metrik turunan di `eco`.
+- [ ] Producer bereproduksi dan populasi tetap berada dalam kapasitas dinamis.
+- [ ] Decomposer mengubah detritus menjadi fertility yang terukur.
+- [ ] Habitat suitability memengaruhi kelahiran, kematian, dan kapasitas.
+- [ ] Long-run test 10.000 tick: semua spesies bertahan, tidak ada nilai negatif/non-finite, detritus terikat.
+- [ ] Dua planet dengan seed sama menghasilkan `eco` identik setelah 10.000 tick.
+- [ ] App chunk tetap di bawah 100 kB meskipun profile Terra ikut ter-bundle.
+
 ## 3. QA perangkat nyata
 
 Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:

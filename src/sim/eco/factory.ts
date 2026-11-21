@@ -74,7 +74,7 @@ function defaultReproduction(trophicLevel: TrophicLevel): number {
     case 'producer': return 0.08;
     case 'primary-consumer': return 0.05;
     case 'secondary-consumer': return 0.035;
-    case 'apex-predator': return 0.018;
+    case 'apex-predator': return 0.03;
     case 'pollinator': return 0.045;
     case 'decomposer':
     case 'microorganism': return 0.07;
