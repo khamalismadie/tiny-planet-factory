@@ -131,6 +131,18 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [ ] Terra, Dune, Glaciera, dan Inferna tidak berubah secara numerik dari gate v0.9.
 - [ ] App chunk <100 kB.
 
+## 2l. Mycelia + Fungal Biome (v0.11)
+
+- [ ] `?planet=mycelia` dan `setPlanet('mycelia')` menghasilkan 11 populasi Mycelia.
+- [ ] Empat musim berjalan deterministik: spore-spring → glow-summer → damp-autumn → quiet-winter.
+- [ ] Spora naik saat Musim Spora, cahaya naik saat Musim Cahaya, nutrisi naik saat Musim Lembap, stres naik saat Musim Tenang.
+- [ ] Jaringan tetap >0 dan 11 spesies tetap hidup setelah satu siklus 360 tick.
+- [ ] Guild Mycelia memetakan kijang spora, kelelawar, dan ngengat; predator terhubung ke food web.
+- [ ] Save/load mempertahankan `eco.fungal`.
+- [ ] DNA lengkap mempertahankan `planetId` Mycelia.
+- [ ] Terra, Dune, Glaciera, Inferna, dan Aquaria tidak berubah secara numerik dari gate v0.10.
+- [ ] App chunk <100 kB.
+
 ## 3. QA perangkat nyata
 
 Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:

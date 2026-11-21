@@ -185,6 +185,23 @@ const waterProbe = await page.evaluate(() => {
   };
 });
 
+// Mycelia boot + fungal telemetry.
+phase = 'mycelia';
+await page.evaluate(() => {
+  window.__game.setPlanet('mycelia', 4321);
+  window.__game.tick(120);
+});
+const fungalProbe = await page.evaluate(() => {
+  const next = window.__game.state();
+  return {
+    planetId: next.planetId,
+    humidity: next.environment.humidity,
+    ecoSpecies: Object.keys(next.eco.populations).length,
+    fungal: window.__game.fungal(),
+    score: window.__game.ecoScore('mycelia_spore_deer'),
+  };
+});
+
 const contextLossErrors = boot.contextLost
   ? errors.filter((message) => /WebGL context may be lost|Could not initialize shader/.test(message))
   : [];
@@ -257,6 +274,14 @@ const checks = {
     waterProbe.ocean.plankton > 70 &&
     waterProbe.ocean.reefHealth > 50 &&
     waterProbe.score !== null,
+  myceliaPlanetActive:
+    fungalProbe.planetId === 'mycelia' &&
+    fungalProbe.humidity > 80 &&
+    fungalProbe.ecoSpecies === 11 &&
+    fungalProbe.fungal.seasonId === 'glow-summer' &&
+    fungalProbe.fungal.glow > 70 &&
+    fungalProbe.fungal.network > 50 &&
+    fungalProbe.score !== null,
 };
 
 console.log(JSON.stringify({ boot, initialTick: initialState.tick, placementActive, contextLossErrors, appErrors, grown: {
@@ -268,7 +293,7 @@ console.log(JSON.stringify({ boot, initialTick: initialState.tick, placementActi
   objects: grown.objects.length,
   fauna: grownFauna,
   eco: ecoProbe,
-}, grownMetrics, reloadedTick: reloaded.tick, reloadedObjects: reloaded.objects.length, sw, dune: duneProbe, glaciere: iceProbe, inferna: fireProbe, aquaria: waterProbe, errors, checks }, null, 2));
+}, grownMetrics, reloadedTick: reloaded.tick, reloadedObjects: reloaded.objects.length, sw, dune: duneProbe, glaciere: iceProbe, inferna: fireProbe, aquaria: waterProbe, mycelia: fungalProbe, errors, checks }, null, 2));
 
 await browser.close();
 const failed = Object.entries(checks).filter(([, ok]) => !ok).map(([name]) => name);

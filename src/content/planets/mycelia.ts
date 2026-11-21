@@ -5,7 +5,7 @@ const PLANET_ID = 'mycelia';
 
 const MUSHROOM_HABITAT = habitat(['mushroom-forest', 'spore-fields'], {
   temperature: range(16, 8),
-  humidity: range(86, 10),
+  humidity: range(90, 12),
   water: range(74, 16),
   vegetation: range(70, 20),
   fertility: range(78, 16),
@@ -13,7 +13,7 @@ const MUSHROOM_HABITAT = habitat(['mushroom-forest', 'spore-fields'], {
 
 const GLOW_HABITAT = habitat(['glowing-plains', 'alien-wetlands'], {
   temperature: range(19, 7),
-  humidity: range(78, 14),
+  humidity: range(88, 14),
   water: range(68, 20),
   vegetation: range(58, 22),
   aquatic: true,
@@ -23,7 +23,7 @@ const GLOW_HABITAT = habitat(['glowing-plains', 'alien-wetlands'], {
 
 const WETLAND_HABITAT = habitat(['alien-wetlands', 'mushroom-forest'], {
   temperature: range(17, 6),
-  humidity: range(92, 8),
+  humidity: range(96, 8),
   water: range(88, 10),
   vegetation: range(62, 20),
   aquatic: true,
@@ -52,6 +52,7 @@ const SPECIES = [
     [food('mycelia_giant_mushroom', 0.9, ['grazing']), food('mycelia_spore_tree', 0.5, ['grazing'])], {
       habitatPreferences: [MUSHROOM_HABITAT], migrationBehavior: 'seasonal',
       predatorSpecies: ['mycelia_night_stalker'], populationCapacity: 50,
+      geneticTraits: ['spore-dispersal'], reproductionRate: 0.12, mortalityRate: 0.012,
     }),
   species(PLANET_ID, 'mycelia_glow_rabbit', 'Kelinci Bercahaya', 'primary-consumer', ['glowing-plains', 'spore-fields'],
     [food('mycelia_glow_fern', 1, ['grazing'])], {
@@ -61,26 +62,29 @@ const SPECIES = [
   species(PLANET_ID, 'mycelia_mushroom_grazer', 'Penggembala Jamur', 'primary-consumer', ['mushroom-forest', 'alien-wetlands'],
     [food('mycelia_giant_mushroom', 1, ['grazing']), food('mycelia_glow_fern', 0.35, ['grazing'])], {
       habitatPreferences: [WETLAND_HABITAT], activitySchedule: 'crepuscular', populationCapacity: 58,
+      geneticTraits: ['spore-dispersal'], reproductionRate: 0.12, mortalityRate: 0.012,
     }),
   species(PLANET_ID, 'mycelia_spore_bat', 'Kelelawar Spora', 'secondary-consumer', ['mushroom-forest', 'spore-fields'],
     [food('plankton', 0.7, ['grazing']), food('mycelia_spore_moth', 0.8, ['hunting'])], {
       habitatPreferences: [MUSHROOM_HABITAT], activitySchedule: 'nocturnal', migrationBehavior: 'nomadic',
-      populationCapacity: 62, geneticTraits: ['echolocation'],
+      populationCapacity: 62, geneticTraits: ['echolocation', 'spore-dispersal'], reproductionRate: 0.1, mortalityRate: 0.012,
     }),
   species(PLANET_ID, 'mycelia_crystal_spider', 'Laba-Laba Kristal', 'secondary-consumer', ['glowing-plains', 'alien-wetlands'],
     [food('mycelia_glow_rabbit', 0.9, ['hunting']), food('mycelia_spore_moth', 0.5, ['hunting'])], {
       habitatPreferences: [GLOW_HABITAT], activitySchedule: 'nocturnal', migrationBehavior: 'none',
       preySpecies: ['mycelia_glow_rabbit'], populationCapacity: 30,
+      geneticTraits: ['fungal-network'], reproductionRate: 0.12, mortalityRate: 0.012,
     }),
   species(PLANET_ID, 'mycelia_spore_moth', 'Ngengat Spora', 'pollinator', ['spore-fields', 'mushroom-forest'],
     [food('mycelia_spore_tree', 1, ['pollination']), food('nectar', 0.5, ['pollination'])], {
       habitatPreferences: [MUSHROOM_HABITAT], activitySchedule: 'nocturnal', migrationBehavior: 'nomadic',
-      lifespan: 80, populationCapacity: 110, geneticTraits: ['spore-dispersal'],
+      lifespan: 80, populationCapacity: 110, geneticTraits: ['spore-dispersal'], reproductionRate: 0.14, mortalityRate: 0.012,
     }),
   species(PLANET_ID, 'mycelia_night_stalker', 'Pemburu Malam', 'apex-predator', ['mushroom-forest', 'glowing-plains'],
     [food('mycelia_spore_deer', 0.9, ['hunting']), food('mycelia_glow_rabbit', 0.7, ['hunting'])], {
       habitatPreferences: [MUSHROOM_HABITAT], activitySchedule: 'nocturnal', rarity: 'rare',
-      preySpecies: ['mycelia_spore_deer', 'mycelia_glow_rabbit'], populationCapacity: 10,
+      preySpecies: ['mycelia_spore_deer', 'mycelia_glow_rabbit'], populationCapacity: 12,
+      geneticTraits: ['fungal-network'], reproductionRate: 0.14, mortalityRate: 0.012,
     }),
 
   species(PLANET_ID, 'mycelia_network', 'Jaringan Miselium', 'decomposer', ['mushroom-forest', 'alien-wetlands', 'glowing-plains', 'spore-fields'],

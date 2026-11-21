@@ -243,6 +243,7 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
   const cryo = planet.eco.cryo;
   const volcano = planet.eco.volcano;
   const ocean = planet.eco.ocean;
+  const fungal = planet.eco.fungal;
   const random = mulberry32((planet.seed ^ (planet.tick * 2654435761)) >>> 0);
   const counts = Object.fromEntries(OBJECT_ORDER.map((type) => [type, 0])) as Record<ObjectType, number>;
   for (const object of planet.objects) counts[object.type] += 1;
@@ -374,9 +375,53 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
     ocean.dissolvedOxygen = 0;
   }
 
+  if (planetConfig?.specialSystems.includes('fungal-network')) {
+    const networkPop = planet.eco.populations.mycelia_network?.estimate ?? 0;
+    const glowPop = (planet.eco.populations.mycelia_giant_mushroom?.estimate ?? 0)
+      + (planet.eco.populations.mycelia_glow_fern?.estimate ?? 0)
+      + (planet.eco.populations.mycelia_spore_moth?.estimate ?? 0);
+    const sporeBase = season?.id === 'spore-spring' ? 85
+      : season?.id === 'glow-summer' ? 55
+        : season?.id === 'damp-autumn' ? 45 : 20;
+    fungal.spores = approach(fungal.spores, clamp(sporeBase + networkPop * 0.12 - e.humidity * 0.05), 0.05);
+    const glowBase = season?.id === 'glow-summer' ? 90
+      : season?.id === 'spore-spring' ? 40
+        : season?.id === 'damp-autumn' ? 55 : 12;
+    fungal.glow = approach(fungal.glow, clamp(glowBase + glowPop * 0.15), 0.05);
+    const nutrientBase = e.fertility * 0.6 + planet.eco.detritus * 0.35 + networkPop * 0.2;
+    fungal.nutrients = approach(fungal.nutrients, clamp(
+      nutrientBase + (season?.id === 'damp-autumn' ? 14 : 0) - (season?.id === 'quiet-winter' ? 4 : 0),
+    ), 0.05);
+    const stressBase = Math.max(0, e.humidity - 96) * 1.5
+      + Math.max(0, 55 - e.humidity) * 1.5
+      + (season?.id === 'quiet-winter' ? 22 : 0)
+      + (season?.id === 'damp-autumn' ? 12 : 0);
+    fungal.networkStress = approach(fungal.networkStress, clamp(stressBase), 0.07);
+    const networkBase = season?.id === 'spore-spring' ? 70
+      : season?.id === 'glow-summer' ? 78
+        : season?.id === 'damp-autumn' ? 85 : 45;
+    fungal.network = approach(fungal.network, clamp(
+      networkBase + networkPop * 0.15 + e.fertility * 0.1 - fungal.networkStress * 0.25,
+    ), 0.05);
+    fungal.seasonId = season?.id ?? 'none';
+    fungal.seasonName = season?.name ?? '';
+    fungal.phase = seasonInfo?.phase ?? 0;
+  } else if (fungal.seasonId !== 'none' || fungal.network || fungal.spores || fungal.glow || fungal.nutrients || fungal.networkStress) {
+    fungal.seasonId = 'none';
+    fungal.seasonName = '';
+    fungal.phase = 0;
+    fungal.network = 0;
+    fungal.spores = 0;
+    fungal.glow = 0;
+    fungal.nutrients = 0;
+    fungal.networkStress = 0;
+  }
+
   const seasonalVegetation = clamp(1 + (season?.vegetationModifier ?? 0), 0.25, 1.6);
   const volcanicBiome = planetConfig?.specialSystems.includes('volcanic-eruption') ?? false;
   const aquaticBiome = planetConfig?.specialSystems.includes('coral-health') ?? false;
+  const fungalBiome = planetConfig?.specialSystems.includes('fungal-network') ?? false;
+  const fungalFactor = fungalBiome ? 1 + (fungal.network - 50) * 0.003 - fungal.networkStress * 0.002 : 1;
   const coldFactor = cryo.seasonId !== 'none'
     ? 1 - cryo.freeze / 100 * 0.3
     : volcanicBiome
@@ -386,7 +431,7 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
         : e.temperature < 0 || e.temperature > 40 || e.water < 15 ? 0.5 : 1;
   const vegetationTarget = clamp(
     Math.min(100, counts.grass * 2 + counts.tree * 4 + counts.bush * 2 + e.water * 0.28 + e.fertility * 0.2) *
-      seasonalVegetation * coldFactor,
+      seasonalVegetation * coldFactor * fungalFactor,
   );
   eco.vegetation = approach(eco.vegetation, vegetationTarget, 0.035);
 
@@ -397,6 +442,7 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
 
   const fertilityTarget = clamp(14 + e.water * 0.26 + eco.vegetation * 0.28 + counts.grass * 0.4 - counts.sand * 0.35);
   e.fertility = approach(e.fertility, fertilityTarget, 0.05);
+  if (fungalBiome) e.fertility = clamp(e.fertility + fungal.nutrients * 0.02 + (fungal.network - 50) * 0.01);
 
   const distinct = new Set(planet.objects.map((o) => o.type)).size;
   const discoveredSpecies = planet.fauna?.discovered.length ?? 0;

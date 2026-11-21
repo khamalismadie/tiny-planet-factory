@@ -239,6 +239,7 @@ export class Game {
         cryo: () => this.state.eco.cryo,
         volcano: () => this.state.eco.volcano,
         ocean: () => this.state.eco.ocean,
+        fungal: () => this.state.eco.fungal,
         foodWeb: () => ({
           guilds: SPECIES_ORDER.map((species) => ({
             species,

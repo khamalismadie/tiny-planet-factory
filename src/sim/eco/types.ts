@@ -211,6 +211,17 @@ export interface OceanState {
   dissolvedOxygen: number;
 }
 
+export interface FungalState {
+  seasonId: string;
+  seasonName: string;
+  phase: number;
+  network: number;
+  spores: number;
+  glow: number;
+  nutrients: number;
+  networkStress: number;
+}
+
 export interface EcoStateV3 {
   planetId: string;
   ecosystemVersion: number;
@@ -223,6 +234,7 @@ export interface EcoStateV3 {
   cryo: CryosphereState;
   volcano: VolcanoState;
   ocean: OceanState;
+  fungal: FungalState;
 }
 
 export interface HabitatContext {

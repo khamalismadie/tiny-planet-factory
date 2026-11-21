@@ -132,12 +132,14 @@ const dnaDune = createPlanet(321, 'DNA Dune', 'dune');
 const dnaGlaciere = createPlanet(322, 'DNA Es', 'glaciere');
 const dnaInferna = createPlanet(323, 'DNA Api', 'inferna');
 const dnaAquaria = createPlanet(324, 'DNA Laut', 'aquaria');
-for (const [source, id] of [[dnaDune, 'dune'], [dnaGlaciere, 'glaciere'], [dnaInferna, 'inferna'], [dnaAquaria, 'aquaria']] as const) {
+const dnaMycelia = createPlanet(325, 'DNA Jamur', 'mycelia');
+for (const [source, id] of [[dnaDune, 'dune'], [dnaGlaciere, 'glaciere'], [dnaInferna, 'inferna'], [dnaAquaria, 'aquaria'], [dnaMycelia, 'mycelia']] as const) {
   const roundTrip = decodePlanetDna(encodePlanetDna(source).full);
   assert(roundTrip?.planetId === id, `DNA lengkap ${id} harus mempertahankan planetId`);
+  const expected = ecosystemConfigFor(id)?.species.length ?? 12;
   assert(
-    Object.keys(roundTrip?.eco.populations ?? {}).length === 12,
-    `DNA lengkap ${id} harus memulihkan 12 populasi`,
+    Object.keys(roundTrip?.eco.populations ?? {}).length === expected,
+    `DNA lengkap ${id} harus memulihkan ${expected} populasi`,
   );
 }
 const brokenBody = codes.full.slice(4);
@@ -404,7 +406,7 @@ assert(foxSupplyAfter < foxSupplyBefore, 'runtuhnya mangsa harus menurunkan supl
 assert(agentCount(predatorPlanet, 'fox') <= foxBefore, 'jumlah predator tidak boleh naik saat mangsa habis');
 
 // Dune is the second active ecosystem with its own climate and guild mapping.
-assert(isSupportedPlanet('dune') && isSupportedPlanet('glaciere') && isSupportedPlanet('inferna') && isSupportedPlanet('aquaria'), 'Terra, Dune, Glaciera, Inferna, dan Aquaria aktif');
+assert(isSupportedPlanet('dune') && isSupportedPlanet('glaciere') && isSupportedPlanet('inferna') && isSupportedPlanet('aquaria') && isSupportedPlanet('mycelia'), 'Terra, Dune, Glaciera, Inferna, Aquaria, dan Mycelia aktif');
 const duneConfig = ecosystemConfigFor('dune');
 assert(duneConfig !== null && duneConfig.species.length === 12, 'Dune harus membawa 12 spesies');
 const dunePlanet = createPlanet(6161, 'Dune Uji', 'dune');
@@ -593,6 +595,61 @@ for (const type of ['ocean', 'lake', 'grass', 'tree', 'rock', 'deer', 'fox', 'bi
 tickN(waterTwin, 361);
 assert(JSON.stringify(waterPlanet.fauna) === JSON.stringify(waterTwin.fauna), 'fauna Aquaria harus deterministik');
 assert(JSON.stringify(waterPlanet.eco) === JSON.stringify(waterTwin.eco), 'ekosistem Aquaria harus deterministik');
+
+// Mycelia is the sixth active ecosystem with fungal networks and bioluminescence.
+const fungalConfig = ecosystemConfigFor('mycelia');
+assert(fungalConfig !== null && fungalConfig.species.length === 11, 'Mycelia harus membawa 11 spesies');
+assert(fungalConfig.climate.seasons.length === 4, 'Mycelia harus membawa empat musim');
+assert(fungalConfig.specialSystems.includes('fungal-network'), 'Mycelia harus membawa sistem fungal-network');
+const fungalPlanet = createPlanet(4321, 'Mycelia Uji', 'mycelia');
+assert(fungalPlanet.planetId === 'mycelia', 'createPlanet harus mempertahankan planetId Mycelia');
+assert(fungalPlanet.environment.humidity > 80, 'Mycelia harus mulai lembap');
+assert(fungalPlanet.eco.populations.mycelia_network, 'populasi Mycelia harus diinisialisasi');
+assert(!fungalPlanet.eco.populations.aquaria_kelp && !fungalPlanet.eco.populations.inferna_ember_moss, 'tidak boleh ada kebocoran spesies planet lain');
+for (const type of ['tree', 'grass', 'bush', 'rock', 'deer', 'fox', 'bird'] as const) {
+  assert(placeObject(fungalPlanet, type, [0.5, 0.4, 0.75]), `${type} harus bisa ditempatkan di Mycelia`);
+}
+tickN(fungalPlanet, 50);
+const sporeSeason = { ...fungalPlanet.eco.fungal };
+assert(sporeSeason.seasonId === 'spore-spring', '50 tick pertama harus musim spora');
+assert(sporeSeason.spores > 60, 'musim spora harus menghasilkan spora tinggi');
+assert(sporeSeason.network > 50, 'jaringan harus aktif di awal');
+tickN(fungalPlanet, 70);
+const glowSeason = { ...fungalPlanet.eco.fungal };
+assert(glowSeason.seasonId === 'glow-summer', 'tick 120 harus masuk musim cahaya');
+assert(glowSeason.glow > sporeSeason.glow, 'musim cahaya harus menaikkan bioluminesensi');
+tickN(fungalPlanet, 90);
+const dampSeason = { ...fungalPlanet.eco.fungal };
+assert(dampSeason.seasonId === 'damp-autumn', 'tick 210 harus masuk musim lembap');
+assert(dampSeason.nutrients > glowSeason.nutrients, 'musim lembap harus menaikkan nutrisi');
+tickN(fungalPlanet, 90);
+const quietSeason = { ...fungalPlanet.eco.fungal };
+assert(quietSeason.seasonId === 'quiet-winter', 'tick 300 harus masuk musim tenang');
+assert(quietSeason.networkStress > sporeSeason.networkStress, 'musim tenang harus menaikkan stres jaringan');
+tickN(fungalPlanet, 61);
+assert(fungalPlanet.eco.fungal.seasonId === 'spore-spring', 'tick 361 harus kembali ke musim spora');
+assert(fungalPlanet.eco.fungal.network > 0, 'jaringan harus bertahan setelah siklus penuh');
+assert(fungalPlanet.eco.metrics.speciesCount === 11, 'ekosistem Mycelia harus tetap memiliki 11 spesies');
+assertBoundedEco(fungalPlanet, 'Mycelia');
+const fungalDeer = guildStatus(fungalPlanet, 'deer');
+assert(fungalDeer !== null && fungalDeer.speciesIds.includes('mycelia_spore_deer'), 'guild deer Mycelia harus memetakan kijang spora');
+assert(guildFoodSourceIds(fungalPlanet, 'fox').includes('mycelia_spore_deer'), 'guild predator Mycelia harus terhubung ke food web');
+assert(agentCount(fungalPlanet, 'bird') > 0, 'Mycelia harus memunculkan agen kelelawar sebagai guild burung');
+assert(agentCount(fungalPlanet, 'insect') > 0, 'Mycelia harus memunculkan agen ngengat');
+const fungalLoaded = deserializePlanet(serializePlanet(fungalPlanet));
+assert(
+  fungalLoaded?.planetId === 'mycelia' &&
+    fungalLoaded.eco.fungal.seasonId === 'spore-spring' &&
+    !!fungalLoaded.eco.populations.mycelia_night_stalker,
+  'save/load Mycelia harus mempertahankan identitas, musim, dan populasi',
+);
+const fungalTwin = createPlanet(4321, 'Mycelia Uji', 'mycelia');
+for (const type of ['tree', 'grass', 'bush', 'rock', 'deer', 'fox', 'bird'] as const) {
+  placeObject(fungalTwin, type, [0.5, 0.4, 0.75]);
+}
+tickN(fungalTwin, 361);
+assert(JSON.stringify(fungalPlanet.fauna) === JSON.stringify(fungalTwin.fauna), 'fauna Mycelia harus deterministik');
+assert(JSON.stringify(fungalPlanet.eco) === JSON.stringify(fungalTwin.eco), 'ekosistem Mycelia harus deterministik');
 
 const rainPlanet = createPlanet(7001, 'Hujan');
 rainPlanet.weather = { type: 'rain', intensity: 0.8, remainingTicks: 5 };

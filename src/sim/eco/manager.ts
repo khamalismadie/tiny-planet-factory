@@ -2,6 +2,7 @@ import { aquariaConfig } from '../../content/planets/aquaria';
 import { duneConfig } from '../../content/planets/dune';
 import { glaciereConfig } from '../../content/planets/glaciera';
 import { infernaConfig } from '../../content/planets/inferna';
+import { myceliaConfig } from '../../content/planets/mycelia';
 import { terraConfig } from '../../content/planets/terra';
 import { hashString, mulberry32 } from '../rng';
 import type { PlanetState } from '../types';
@@ -213,7 +214,13 @@ export function habitatContextFor(planet: PlanetState, config: PlanetConfig): Ha
                     ? 'badai-laut'
                     : (planet.eco.ocean?.seasonId !== 'none' && planet.environment.temperature > 34)
                       ? 'gelombang-panas-laut'
-                      : planet.environment.water < 25
+                      : (planet.eco.fungal?.networkStress ?? 0) > 60
+                        ? 'gangguan-jaringan'
+                        : (planet.eco.fungal?.spores ?? 0) > 82
+                          ? 'spora-beracun'
+                          : (planet.eco.fungal?.seasonId !== 'none' && planet.environment.humidity > 95)
+                            ? 'kelembapan-ekstrem'
+                            : planet.environment.water < 25
                         ? 'kekeringan-musiman'
                         : null;
   return {
@@ -308,12 +315,22 @@ export class EcosystemManager {
         trait === 'nutrient-recycling',
       );
       const reefMortality = bleachingStress * (reefAdapted ? 0.003 : 0.012);
+      const networkStress = (planet.eco.fungal?.networkStress ?? 0) / 100;
+      const fungalAdapted = definition.geneticTraits.some((trait) =>
+        trait === 'nutrient-exchange' ||
+        trait === 'fungal-network' ||
+        trait === 'spore-dispersal' ||
+        trait === 'bioluminescence' ||
+        trait === 'day-night-glow',
+      );
+      const networkMortality = networkStress * (fungalAdapted ? 0.004 : 0.014);
       const mortalityRate = definition.mortalityRate * 0.4
         + (1 - score) * 0.02
         + starvation
         + coldMortality
         + heatMortality
         + reefMortality
+        + networkMortality
         + predationPressure(definition, config, eco, capacity);
       const deaths = Math.min(
         population.estimate,
@@ -369,6 +386,7 @@ const ECOSYSTEM_MANAGERS = new Map<string, EcosystemManager>([
   [glaciereConfig.id, new EcosystemManager(glaciereConfig)],
   [infernaConfig.id, new EcosystemManager(infernaConfig)],
   [aquariaConfig.id, new EcosystemManager(aquariaConfig)],
+  [myceliaConfig.id, new EcosystemManager(myceliaConfig)],
 ]);
 
 export function ecosystemFor(planetId: string): EcosystemManager | null {

@@ -2,6 +2,7 @@ import { aquariaConfig } from './aquaria';
 import { duneConfig } from './dune';
 import { glaciereConfig } from './glaciera';
 import { infernaConfig } from './inferna';
+import { myceliaConfig } from './mycelia';
 import { terraConfig } from './terra';
 import type { PlanetConfig } from '../../sim/eco/types';
 import type { ObjectType, SpeciesId } from '../../sim/types';
@@ -151,10 +152,37 @@ const AQUARIA_PROFILE: GuildProfile = {
   },
 };
 
+const MYCELIA_PROFILE: GuildProfile = {
+  config: myceliaConfig,
+  guilds: {
+    deer: ['mycelia_spore_deer', 'mycelia_glow_rabbit', 'mycelia_mushroom_grazer'],
+    fox: ['mycelia_night_stalker', 'mycelia_crystal_spider'],
+    bird: ['mycelia_spore_bat'],
+    fish: [],
+    insect: ['mycelia_spore_moth'],
+  },
+  divisors: { deer: 10, fox: 4, bird: 3, fish: 10, insect: 8 },
+  prey: { fox: ['deer', 'insect'], bird: ['insect'] },
+  foodObjects: {
+    mycelia_giant_mushroom: ['tree', 'bush', 'grass'],
+    mycelia_glow_fern: ['grass', 'bush'],
+    mycelia_spore_tree: ['tree'],
+    mycelia_spore_deer: ['deer', 'bush'],
+    mycelia_glow_rabbit: ['deer', 'grass', 'bush'],
+    mycelia_mushroom_grazer: ['deer', 'bush'],
+    mycelia_spore_bat: ['bird', 'mountain'],
+    mycelia_crystal_spider: ['fox', 'rock', 'bush'],
+    mycelia_spore_moth: ['flower', 'bush', 'grass'],
+    mycelia_night_stalker: ['fox', 'deer', 'tree'],
+    mycelia_network: ['rock', 'bush', 'grass'],
+  },
+};
+
 export const GUILD_PROFILES: Record<string, GuildProfile> = {
   terra: TERRA_PROFILE,
   dune: DUNE_PROFILE,
   glaciere: GLACIERE_PROFILE,
   inferna: INFERNA_PROFILE,
   aquaria: AQUARIA_PROFILE,
+  mycelia: MYCELIA_PROFILE,
 };

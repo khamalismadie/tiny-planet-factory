@@ -301,6 +301,9 @@ export class Hud {
       (planet.eco.ocean.seasonId !== 'none'
         ? `Musim ${planet.eco.ocean.seasonName} · arus ${planet.eco.ocean.current.toFixed(0)}% · karang ${planet.eco.ocean.reefHealth.toFixed(0)}% · plankton ${planet.eco.ocean.plankton.toFixed(0)}% · pemutihan ${planet.eco.ocean.bleaching.toFixed(0)}%<br>`
         : '') +
+      (planet.eco.fungal.seasonId !== 'none'
+        ? `Musim ${planet.eco.fungal.seasonName} · jaringan ${planet.eco.fungal.network.toFixed(0)}% · spora ${planet.eco.fungal.spores.toFixed(0)}% · cahaya ${planet.eco.fungal.glow.toFixed(0)}% · stres ${planet.eco.fungal.networkStress.toFixed(0)}%<br>`
+        : '') +
       `Spesies ${metrics.speciesCount} · Populasi ${metrics.totalPopulation}<br>` +
       `Habitat ${Math.round(metrics.habitatHealth)} · Pangan ${Math.round(metrics.foodAvailability)} · Detritus ${planet.eco.detritus.toFixed(1)}<br>` +
       `<div class="eco-list">${rows}</div>` +
