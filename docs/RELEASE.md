@@ -212,6 +212,13 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [x] Gate `test:sim` memeriksa margin spacing dan determinisme penumpukan 39 objek.
 - [x] Budget tetap lolos: 18–200 triangle per prop, 0 tekstur.
 
+## 2s. First-Visit SW Fix (v0.15.2)
+
+- [x] `registerPwa()` hanya reload saat `controllerchange` jika sudah ada controller sebelumnya.
+- [x] Install PWA pertama kali tidak memicu reload yang menutup/open ulang menu utama.
+- [x] Gate `test:menu` menghitung navigasi first-load dan menggagalkan reload tak sengaja.
+- [x] Deploy HTTPS produksi diverifikasi melalui smoke, device, menu, dan offline PWA check.
+
 ## 3. QA perangkat nyata
 
 Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:

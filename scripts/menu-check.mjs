@@ -14,9 +14,15 @@ for (const c of [
   const context = await browser.newContext({ viewport: c.viewport, deviceScaleFactor: 1, hasTouch: c.mobile, isMobile: c.mobile });
   const page = await context.newPage();
   const errors = [];
+  const navigations = [];
   page.on('pageerror', (error) => errors.push(String(error)));
+  page.on('framenavigated', (frame) => {
+    if (frame === page.mainFrame()) navigations.push(frame.url());
+  });
   await page.goto(`${base}${base.includes('?') ? '&' : '?'}quality=low`, { waitUntil: 'networkidle' });
   await page.waitForSelector('#main-menu:not(.hidden)', { timeout: 30_000 });
+  await page.waitForTimeout(500);
+  check(`${c.name}: first load not reloaded by SW`, navigations.length === 1);
 
   const menu = await page.evaluate(() => {
     const sheet = document.querySelector('.menu-sheet').getBoundingClientRect();
