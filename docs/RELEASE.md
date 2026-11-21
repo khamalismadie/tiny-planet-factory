@@ -217,7 +217,8 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [x] `registerPwa()` hanya reload saat `controllerchange` jika sudah ada controller sebelumnya.
 - [x] Install PWA pertama kali tidak memicu reload yang menutup/open ulang menu utama.
 - [x] Gate `test:menu` menghitung navigasi first-load dan menggagalkan reload tak sengaja.
-- [x] Deploy HTTPS produksi diverifikasi melalui smoke, device, menu, dan offline PWA check.
+- [x] Deploy HTTPS produksi aktif di <https://tinyplanetfactory.netlify.app/> via auto-deploy Netlify dari `main`.
+- [x] Deploy produksi diverifikasi melalui smoke, device, menu, dan offline PWA check.
 
 ## 3. QA perangkat nyata
 

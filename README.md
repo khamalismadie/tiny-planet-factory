@@ -14,6 +14,8 @@ npm test           # simulasi murni + smoke test browser
 
 Build memakai `NODE_OPTIONS=--max-old-space-size=4096` karena bundler PixiJS 3D membutuhkan heap lebih besar dari default Node.
 
+Deploy produksi HTTPS aktif di <https://tinyplanetfactory.netlify.app/> melalui auto-deploy Netlify dari `main`. Hook QA (`?debug=1`, `?qa=1&qaSeconds=45`, `?planet=...`) tersedia di URL produksi.
+
 ## Kontrol
 
 - Geser / drag: memutar kamera 360°.
@@ -116,6 +118,6 @@ Program Nine Worlds menggantikan roadmap lama: Terra diselesaikan lebih dulu, la
 ## Langkah berikutnya
 
 1. Selesaikan checklist `docs/QA-DEVICE.md` di Android menengah sungguhan: p50/p95, cold start, pinch, context loss/restore, PWA offline/update. Verifikasi localhost sudah lolos, tapi bukan pengganti perangkat nyata.
-2. Deploy produksi HTTPS mengikuti `docs/RELEASE.md`, lalu jalankan `?qa=1&qaSeconds=45` dari perangkat.
+2. Buka URL produksi HTTPS dan jalankan `?qa=1&qaSeconds=45` dari perangkat Android menengah.
 3. Fokus ke QA HTTPS/perangkat nyata sebelum menambah biome berikutnya.
 4. Baru setelah Nine Worlds selesai, evaluasi ulang Supabase cloud/gallery/social sebagai fase terpisah.
