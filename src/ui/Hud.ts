@@ -38,6 +38,16 @@ const ENV_LABELS: Record<EnvKey, string> = {
 const ENV_KEYS = Object.keys(ENV_LABELS) as EnvKey[];
 const CATEGORIES = Object.keys(CATEGORY_LABELS) as Array<keyof typeof CATEGORY_LABELS>;
 
+const STAGE_GOALS = [
+  '',
+  'Pasang objek pertama untuk memulai transformasi.',
+  'Pasang total 3 objek permukaan atau air.',
+  'Tumbuhkan vegetasi ≥25 dan oksigen ≥25.',
+  'Capai O₂ ≥45, air ≥35, biodiversity ≥30.',
+  'Stabilitas ≥68, biodiversity ≥45, O₂ ≥55.',
+  'Pertahankan semua metrik ideal + stabilitas ≥82.',
+];
+
 export class Hud {
   private readonly callbacks: HudCallbacks;
   private readonly categoryRoot = document.getElementById('categories')!;
@@ -49,6 +59,7 @@ export class Hud {
   private readonly weatherRoot = document.getElementById('weather')!;
   private readonly eventsRoot = document.getElementById('events')!;
   private readonly mission = document.getElementById('mission')!;
+  private readonly objectiveStrip = document.getElementById('objective-strip')!;
   private readonly nameLabel = document.getElementById('planet-name')!;
   private readonly stageLabel = document.getElementById('stage-label')!;
   private readonly levelLabel = document.getElementById('level-label')!;
@@ -208,7 +219,10 @@ export class Hud {
   update(planet: PlanetState, selected: ObjectType | null): void {
     this.nameLabel.textContent = planet.name;
     this.stageLabel.textContent = `Tahap ${planet.stage} — ${STAGE_NAMES[planet.stage]}`;
-    this.levelLabel.textContent = `Level ${planet.progression.level} · ${Math.floor(planet.progression.xp)} XP`;
+    const compact = typeof window !== 'undefined' && window.matchMedia('(max-width: 480px)').matches;
+    this.levelLabel.textContent = compact
+      ? `Lv${planet.progression.level}`
+      : `Level ${planet.progression.level} · ${Math.floor(planet.progression.xp)} XP`;
 
     for (const key of ENV_KEYS) {
       const value = planet.environment[key];
@@ -247,6 +261,15 @@ export class Hud {
     this.mission.innerHTML = missionDone
       ? '<strong>Misi selesai</strong><br>Hijaukan Planet ✓'
       : `<strong>Misi: Hijaukan Planet</strong><br>Oksigen ≥ 45 (${Math.round(e.oxygen)}) · Air ≥ 40 (${Math.round(e.water)}) · Stabilitas ≥ 60 (${Math.round(e.stability)})<br>Tahan ${planet.mission.holdTicks}/3 tick`;
+
+    const stage = Math.max(1, Math.min(6, planet.stage));
+    const missionLine = missionDone
+      ? 'Misi Hijaukan ✓'
+      : `Misi O₂ ${Math.round(e.oxygen)}/45 · Air ${Math.round(e.water)}/40 · Stabil ${Math.round(e.stability)}/60 · ${planet.mission.holdTicks}/3`;
+    this.objectiveStrip.innerHTML =
+      `<span class="objective-stage">Tahap ${stage} — ${STAGE_NAMES[stage]}</span>` +
+      `<span class="objective-goal">${STAGE_GOALS[stage]}</span>` +
+      `<span class="objective-mission${missionDone ? ' done' : ''}">${missionLine}</span>`;
 
     for (const button of this.categoryRoot.querySelectorAll<HTMLButtonElement>('[data-type]')) {
       const type = button.dataset.type as ObjectType;

@@ -138,8 +138,8 @@ export function unlockedForLevel(level: number): ObjectType[] {
 function refreshProgression(planet: PlanetState): string[] {
   const events: string[] = [];
   let level = 1;
-  for (let candidate = 6; candidate >= 1; candidate--) {
-    if (planet.progression.xp >= LEVEL_XP[candidate]) {
+  for (let candidate = LEVEL_XP.length; candidate >= 1; candidate--) {
+    if (planet.progression.xp >= LEVEL_XP[candidate - 1]) {
       level = candidate;
       break;
     }
@@ -237,29 +237,32 @@ export function computeStage(planet: PlanetState): number {
   if (objects.length === 0) return 1;
   const terrainAndWater = objects.filter((o) => ['grass', 'sand', 'rock', 'hill', 'mountain', 'ocean', 'lake'].includes(o.type)).length;
   if (terrainAndWater < 3) return 2;
-  if (eco.vegetation >= 25 && e.oxygen >= 25) return 3;
-  if (e.oxygen >= 45 && e.biodiversity >= 30 && e.water >= 35) return 4;
-  if (e.stability >= 68 && e.biodiversity >= 45 && e.oxygen >= 55) return 5;
   if (
     e.stability >= 82 &&
     (Object.keys(IDEAL) as EnvKey[]).every((key) => inIdeal(planet, key))
   ) {
     return 6;
   }
-  return 4;
+  if (e.stability >= 68 && e.biodiversity >= 45 && e.oxygen >= 55) return 5;
+  if (e.oxygen >= 45 && e.biodiversity >= 30 && e.water >= 35) return 4;
+  if (eco.vegetation >= 25 && e.oxygen >= 25) return 3;
+  return 2;
 }
 
 export const STAGE_NAMES = ['', 'Tandus', 'Formasi', 'Vegetasi', 'Ekosistem', 'Peradaban', 'Surga'];
 
 function chooseWeather(planet: PlanetState, random: () => number): WeatherStateLike {
   const { environment: e, weather } = planet;
+  // Recovery beat: badai selalu diikuti dua tick cerah sebelum cuaca acak lagi.
+  if (weather.type === 'storm') {
+    return { type: 'sunny', intensity: 0.6, remainingTicks: 2 };
+  }
   const weights: Array<[WeatherType, number]> = [
     ['sunny', 3 + Math.max(0, 20 - e.humidity) * 0.04],
     ['rain', 2 + e.humidity * 0.05 + e.water * 0.02],
     ['snow', e.temperature < 12 ? 4 : 0.5],
     ['storm', 0.6 + (100 - e.stability) * 0.03],
   ];
-  if (weather.type === 'storm') weights[3][1] *= 0.4;
   const total = weights.reduce((sum, entry) => sum + entry[1], 0);
   let pick = random() * total;
   for (const [type, weight] of weights) {

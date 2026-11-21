@@ -2,6 +2,13 @@ import { version } from '../../package.json';
 
 export type TelemetryName =
   | 'boot'
+  | 'session_start'
+  | 'session_end'
+  | 'objective_shown'
+  | 'stage_reached'
+  | 'level_reached'
+  | 'season_change'
+  | 'planet_switch'
   | 'placement'
   | 'mission_complete'
   | 'event_complete'
@@ -76,7 +83,10 @@ export class Telemetry {
 
   setOptIn(enabled: boolean): void {
     this.data.optedIn = enabled;
-    if (enabled) this.record('boot', { source: 'opt-in' });
+    if (enabled) {
+      this.record('boot', { source: 'opt-in' });
+      this.record('session_start', { source: 'opt-in' });
+    }
     this.write();
   }
 

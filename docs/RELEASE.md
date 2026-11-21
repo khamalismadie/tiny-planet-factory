@@ -230,6 +230,19 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [x] `spacingRadius` dihitung ulang dari footprint baru; spacing deterministik tetap lolos.
 - [x] Gate `test:scale` memeriksa target tinggi, urutan, rasio, wildlife, dan budget aset.
 
+## 2u. Reachable Progression & Mobile UX (v0.15.4)
+
+- [x] Stage 4/5/6 tidak lagi terkunci oleh early return di `computeStage()`; stage 6 terbukti reachable.
+- [x] Off-by-one `LEVEL_XP` diperbaiki; 260 XP sekarang benar-benar membuka level 6.
+- [x] Semua tombol yang terlihat minimal 48×48 dp di 360×640, 390×844, dan 844×390.
+- [x] Objective strip menampilkan stage, tujuan berikutnya, dan progres misi tanpa scroll.
+- [x] Siklus musim seluruh planet dipangkas menjadi 106–120 tick (≈3,5–4 menit) dengan proporsi relatif terjaga.
+- [x] Badai selalu diikuti 2 tick cerah sebagai recovery beat.
+- [x] Telemetri lokal menambah `session_start`, `session_end`, `objective_shown`, `stage_reached`, `level_reached`, `season_change`, dan `planet_switch`.
+- [x] `test:layout` masuk ke `npm test` sebagai gate 48 dp + objective strip + tanpa horizontal overflow.
+- [x] Gate determinisme 50 seed × 9 planet masuk ke `test:sim`.
+- [x] Semua test lokal lolos: sim, art scale, smoke, device, menu, layout. App chunk 58,77 kB / gzip 19,23 kB.
+
 ## 3. QA perangkat nyata
 
 Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:

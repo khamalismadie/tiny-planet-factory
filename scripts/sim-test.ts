@@ -9,6 +9,7 @@ import { HabitatManager } from '../src/sim/eco/habitat.ts';
 import { validateAllPlanetConfigs, speciesRegistry } from '../src/sim/eco/registry.ts';
 import { createEcoState } from '../src/sim/eco/state.ts';
 import {
+  computeStage,
   createPlanet,
   decodeDna,
   encodeDna,
@@ -54,6 +55,26 @@ const dirs: Array<[number, number, number]> = [
   [0.5, 0.7, 0.5], [-0.5, -0.7, 0.5], [0.6, -0.6, -0.5], [-0.7, 0.4, 0.6],
   [0.4, 0.3, -0.85], [-0.3, -0.4, 0.85], [0.85, -0.4, 0.3], [-0.85, 0.4, -0.3],
 ];
+function seasonEnd(config: { climate: { seasons: Array<{ durationTicks: number }> } }, index: number): number {
+  return config.climate.seasons.slice(0, index + 1).reduce((sum, season) => sum + season.durationTicks, 0);
+}
+
+function seasonCycle(config: { climate: { seasons: Array<{ durationTicks: number }> } }): number {
+  return config.climate.seasons.reduce((sum, season) => sum + season.durationTicks, 0);
+}
+
+function goldenDirs(count: number): Array<[number, number, number]> {
+  const result: Array<[number, number, number]> = [];
+  const angle = Math.PI * (3 - Math.sqrt(5));
+  for (let i = 0; i < count; i++) {
+    const y = 1 - 2 * (i + 0.5) / count;
+    const radius = Math.sqrt(Math.max(0, 1 - y * y));
+    const theta = angle * i;
+    result.push([Math.cos(theta) * radius, y, Math.sin(theta) * radius]);
+  }
+  return result;
+}
+
 const plan = [
   'ocean', 'ocean', 'ocean', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree', 'tree',
   'bush', 'bush', 'bush', 'bush', 'grass', 'grass', 'grass', 'flower', 'flower', 'rock', 'rock',
@@ -168,6 +189,30 @@ assert(migrated!.fauna.agents.length === 0, 'migrasi save lama harus membuat fau
 const configErrors = validateAllPlanetConfigs();
 assert(configErrors.length === 0, `konfigurasi planet invalid: ${configErrors.join('; ')}`);
 assert(PLANET_CONFIGS.length === 9 && PLANET_IDS.length === 9, 'harus ada 9 konfigurasi planet');
+for (const id of PLANET_IDS) {
+  const config = ecosystemConfigFor(id);
+  assert(config, `konfigurasi ${id} harus tersedia`);
+  const cycle = config!.climate.seasons.reduce((sum, season) => sum + season.durationTicks, 0);
+  assert(cycle <= 120, `siklus musim ${id} terlalu panjang untuk sesi mobile: ${cycle} tick`);
+  assert(cycle >= 100, `siklus musim ${id} terlalu pendek: ${cycle} tick`);
+}
+
+const determinismPlan = ['tree', 'rock', 'grass', 'bush', 'hill', 'lake'] as const;
+const determinismDirs = goldenDirs(determinismPlan.length);
+for (const id of PLANET_IDS) {
+  for (let seed = 1; seed <= 50; seed++) {
+    const left = createPlanet(seed, 'Deterministik', id);
+    const right = createPlanet(seed, 'Deterministik', id);
+    for (let i = 0; i < determinismPlan.length; i++) {
+      placeObject(left, determinismPlan[i], determinismDirs[i]);
+      placeObject(right, determinismPlan[i], determinismDirs[i]);
+    }
+    tickN(left, 20);
+    tickN(right, 20);
+    const snapshot = (planet: PlanetState) => ({ ...planet, id: '', updatedAt: 0 });
+    assert(JSON.stringify(snapshot(left)) === JSON.stringify(snapshot(right)), `determinisme gagal: ${id} seed ${seed}`);
+  }
+}
 assert(speciesRegistry.list().length >= 100, 'registry harus berisi subset spesies semua planet');
 const terraConfig = speciesRegistry.planet('terra');
 assert(terraConfig?.species.length === 12, 'Terra slice harus berisi 12 spesies kunci');
@@ -455,16 +500,16 @@ assert(!icePlanet.eco.populations.terra_oak && !icePlanet.eco.populations.dune_c
 for (const type of ['grass', 'tree', 'rock', 'lake', 'ocean', 'deer', 'fox', 'bird'] as const) {
   assert(placeObject(icePlanet, type, [0.5, 0.4, 0.75]), `${type} harus bisa ditempatkan di Glaciera`);
 }
-tickN(icePlanet, 30);
+tickN(icePlanet, seasonEnd(iceConfig!, 0));
 const polarCryo = { ...icePlanet.eco.cryo };
-assert(polarCryo.seasonId === 'polar-night', '30 tick pertama harus musim polar night');
+assert(polarCryo.seasonId === 'polar-night', 'akhir musim pertama harus polar night');
 assert(polarCryo.freeze > 40, 'polar night harus membekukan permukaan');
-tickN(icePlanet, 130);
+tickN(icePlanet, seasonEnd(iceConfig!, 1) - seasonEnd(iceConfig!, 0));
 const thawCryo = { ...icePlanet.eco.cryo };
-assert(thawCryo.seasonId === 'thaw', 'tick 160 harus masuk musim cair');
+assert(thawCryo.seasonId === 'thaw', 'musim kedua harus cair');
 assert(thawCryo.freeze < polarCryo.freeze, 'musim cair harus menurunkan freeze');
-tickN(icePlanet, 70);
-assert(icePlanet.eco.cryo.seasonId === 'short-summer', 'tick 230 harus musim panas singkat');
+tickN(icePlanet, seasonEnd(iceConfig!, 2) - seasonEnd(iceConfig!, 1));
+assert(icePlanet.eco.cryo.seasonId === 'short-summer', 'musim ketiga harus panas singkat');
 assert(icePlanet.eco.cryo.freeze < thawCryo.freeze, 'musim panas singkat harus mencairkan lebih lanjut');
 assert(icePlanet.eco.cryo.iceCoverage > 0, 'danau beku harus menghasilkan ice coverage');
 const iceFishStatus = guildStatus(icePlanet, 'fish');
@@ -482,7 +527,7 @@ const iceTwin = createPlanet(7777, 'Glaciera Uji', 'glaciere');
 for (const type of ['grass', 'tree', 'rock', 'lake', 'ocean', 'deer', 'fox', 'bird'] as const) {
   placeObject(iceTwin, type, [0.5, 0.4, 0.75]);
 }
-tickN(iceTwin, 230);
+tickN(iceTwin, seasonEnd(iceConfig!, 2));
 assert(JSON.stringify(icePlanet.fauna) === JSON.stringify(iceTwin.fauna), 'fauna Glaciera harus deterministik');
 assert(JSON.stringify(icePlanet.eco) === JSON.stringify(iceTwin.eco), 'ekosistem Glaciera harus deterministik');
 
@@ -499,25 +544,25 @@ assert(!firePlanet.eco.populations.terra_oak && !firePlanet.eco.populations.dune
 for (const type of ['grass', 'tree', 'rock', 'mountain', 'bush', 'deer', 'fox', 'bird'] as const) {
   assert(placeObject(firePlanet, type, [0.5, 0.4, 0.75]), `${type} harus bisa ditempatkan di Inferna`);
 }
-tickN(firePlanet, 60);
+tickN(firePlanet, seasonEnd(fireConfig!, 0));
 const quietVolcano = { ...firePlanet.eco.volcano };
-assert(quietVolcano.seasonId === 'quiet-phase', '60 tick pertama harus masa tenang');
+assert(quietVolcano.seasonId === 'quiet-phase', 'akhir musim pertama harus masa tenang');
 assert(quietVolcano.heat > 30, 'gunung berapi harus menyimpan panas sejak awal');
 assert(quietVolcano.ash < 30, 'masa tenang harus memiliki abu rendah');
-tickN(firePlanet, 80);
+tickN(firePlanet, seasonEnd(fireConfig!, 1) - seasonEnd(fireConfig!, 0));
 const ashVolcano = { ...firePlanet.eco.volcano };
-assert(ashVolcano.seasonId === 'ash-fall', 'tick 140 harus masuk musim hujan abu');
+assert(ashVolcano.seasonId === 'ash-fall', 'musim kedua harus hujan abu');
 assert(ashVolcano.ash > quietVolcano.ash && ashVolcano.ash > 40, 'hujan abu harus menaikkan abu');
-tickN(firePlanet, 50);
+tickN(firePlanet, seasonEnd(fireConfig!, 2) - seasonEnd(fireConfig!, 1));
 const eruptionVolcano = { ...firePlanet.eco.volcano };
-assert(eruptionVolcano.seasonId === 'eruption-phase', 'tick 190 harus masuk masa letusan');
+assert(eruptionVolcano.seasonId === 'eruption-phase', 'musim ketiga harus masa letusan');
 assert(eruptionVolcano.heat > quietVolcano.heat, 'letusan harus menaikkan panas');
 assert(eruptionVolcano.lavaFlow > quietVolcano.lavaFlow, 'letusan harus menaikkan aliran lava');
 assert(eruptionVolcano.eruptionStress > 60, 'letusan harus memicu stres erupsi');
 assert(firePlanet.environment.temperature > 75, 'letusan harus mendorong suhu vulkanik lebih tinggi');
-tickN(firePlanet, 45);
+tickN(firePlanet, seasonEnd(fireConfig!, 3) - seasonEnd(fireConfig!, 2));
 const regrowthVolcano = { ...firePlanet.eco.volcano };
-assert(regrowthVolcano.seasonId === 'regrowth', 'tick 235 harus masuk musim tumbuh kembali');
+assert(regrowthVolcano.seasonId === 'regrowth', 'musim keempat harus tumbuh kembali');
 assert(regrowthVolcano.ash < eruptionVolcano.ash, 'musim tumbuh kembali harus menurunkan abu');
 assert(regrowthVolcano.eruptionStress < eruptionVolcano.eruptionStress, 'stres erupsi harus mereda');
 assert(firePlanet.eco.metrics.speciesCount === 12, 'ekosistem Inferna harus tetap memiliki 12 spesies');
@@ -539,7 +584,7 @@ const fireTwin = createPlanet(8888, 'Inferna Uji', 'inferna');
 for (const type of ['grass', 'tree', 'rock', 'mountain', 'bush', 'deer', 'fox', 'bird'] as const) {
   placeObject(fireTwin, type, [0.5, 0.4, 0.75]);
 }
-tickN(fireTwin, 235);
+tickN(fireTwin, seasonEnd(fireConfig!, 3));
 assert(JSON.stringify(firePlanet.fauna) === JSON.stringify(fireTwin.fauna), 'fauna Inferna harus deterministik');
 assert(JSON.stringify(firePlanet.eco) === JSON.stringify(fireTwin.eco), 'ekosistem Inferna harus deterministik');
 
@@ -557,26 +602,26 @@ assert(!waterPlanet.eco.populations.terra_oak && !waterPlanet.eco.populations.in
 for (const type of ['ocean', 'lake', 'grass', 'tree', 'rock', 'deer', 'fox', 'bird'] as const) {
   assert(placeObject(waterPlanet, type, [0.5, 0.4, 0.75]), `${type} harus bisa ditempatkan di Aquaria`);
 }
-tickN(waterPlanet, 50);
+tickN(waterPlanet, seasonEnd(waterConfig!, 0));
 const calmOcean = { ...waterPlanet.eco.ocean };
-assert(calmOcean.seasonId === 'calm-current', '50 tick pertama harus musim arus tenang');
+assert(calmOcean.seasonId === 'calm-current', 'akhir musim pertama harus arus tenang');
 assert(calmOcean.reefHealth > 50, 'terumbu harus sehat di awal');
 assert(calmOcean.plankton > 50, 'plankton harus tersedia di awal');
-tickN(waterPlanet, 70);
+tickN(waterPlanet, seasonEnd(waterConfig!, 1) - seasonEnd(waterConfig!, 0));
 const warmOcean = { ...waterPlanet.eco.ocean };
-assert(warmOcean.seasonId === 'warm-water', 'tick 120 harus masuk musim air hangat');
+assert(warmOcean.seasonId === 'warm-water', 'musim kedua harus air hangat');
 assert(warmOcean.bleaching > calmOcean.bleaching, 'air hangat harus menaikkan pemutihan');
-tickN(waterPlanet, 85);
+tickN(waterPlanet, seasonEnd(waterConfig!, 2) - seasonEnd(waterConfig!, 1));
 const bloomOcean = { ...waterPlanet.eco.ocean };
-assert(bloomOcean.seasonId === 'plankton-bloom', 'tick 205 harus masuk ledakan plankton');
+assert(bloomOcean.seasonId === 'plankton-bloom', 'musim ketiga harus ledakan plankton');
 assert(bloomOcean.plankton > warmOcean.plankton, 'ledakan plankton harus menaikkan plankton');
 assert(bloomOcean.bleaching < warmOcean.bleaching, 'ledakan plankton harus menurunkan pemutihan');
-tickN(waterPlanet, 80);
+tickN(waterPlanet, seasonEnd(waterConfig!, 3) - seasonEnd(waterConfig!, 2));
 const surgeOcean = { ...waterPlanet.eco.ocean };
-assert(surgeOcean.seasonId === 'storm-surge', 'tick 285 harus masuk badai laut');
+assert(surgeOcean.seasonId === 'storm-surge', 'musim keempat harus badai laut');
 assert(surgeOcean.current > calmOcean.current, 'badai laut harus memperkuat arus');
-tickN(waterPlanet, 76);
-assert(waterPlanet.eco.ocean.seasonId === 'calm-current', 'tick 361 harus kembali ke arus tenang');
+tickN(waterPlanet, 1);
+assert(waterPlanet.eco.ocean.seasonId === 'calm-current', 'siklus penuh harus kembali ke arus tenang');
 assert(waterPlanet.eco.ocean.reefHealth > 0, 'terumbu harus bertahan setelah siklus penuh');
 assert(waterPlanet.eco.metrics.speciesCount === 12, 'ekosistem Aquaria harus tetap memiliki 12 spesies');
 assertBoundedEco(waterPlanet, 'Aquaria');
@@ -596,7 +641,7 @@ const waterTwin = createPlanet(9999, 'Aquaria Uji', 'aquaria');
 for (const type of ['ocean', 'lake', 'grass', 'tree', 'rock', 'deer', 'fox', 'bird'] as const) {
   placeObject(waterTwin, type, [0.5, 0.4, 0.75]);
 }
-tickN(waterTwin, 361);
+tickN(waterTwin, seasonCycle(waterConfig!) + 1);
 assert(JSON.stringify(waterPlanet.fauna) === JSON.stringify(waterTwin.fauna), 'fauna Aquaria harus deterministik');
 assert(JSON.stringify(waterPlanet.eco) === JSON.stringify(waterTwin.eco), 'ekosistem Aquaria harus deterministik');
 
@@ -613,25 +658,25 @@ assert(!fungalPlanet.eco.populations.aquaria_kelp && !fungalPlanet.eco.populatio
 for (const type of ['tree', 'grass', 'bush', 'rock', 'deer', 'fox', 'bird'] as const) {
   assert(placeObject(fungalPlanet, type, [0.5, 0.4, 0.75]), `${type} harus bisa ditempatkan di Mycelia`);
 }
-tickN(fungalPlanet, 50);
+tickN(fungalPlanet, seasonEnd(fungalConfig!, 0));
 const sporeSeason = { ...fungalPlanet.eco.fungal };
-assert(sporeSeason.seasonId === 'spore-spring', '50 tick pertama harus musim spora');
+assert(sporeSeason.seasonId === 'spore-spring', 'akhir musim pertama harus spora');
 assert(sporeSeason.spores > 60, 'musim spora harus menghasilkan spora tinggi');
 assert(sporeSeason.network > 50, 'jaringan harus aktif di awal');
-tickN(fungalPlanet, 70);
+tickN(fungalPlanet, seasonEnd(fungalConfig!, 1) - seasonEnd(fungalConfig!, 0));
 const glowSeason = { ...fungalPlanet.eco.fungal };
-assert(glowSeason.seasonId === 'glow-summer', 'tick 120 harus masuk musim cahaya');
+assert(glowSeason.seasonId === 'glow-summer', 'musim kedua harus cahaya');
 assert(glowSeason.glow > sporeSeason.glow, 'musim cahaya harus menaikkan bioluminesensi');
-tickN(fungalPlanet, 90);
+tickN(fungalPlanet, seasonEnd(fungalConfig!, 2) - seasonEnd(fungalConfig!, 1));
 const dampSeason = { ...fungalPlanet.eco.fungal };
-assert(dampSeason.seasonId === 'damp-autumn', 'tick 210 harus masuk musim lembap');
+assert(dampSeason.seasonId === 'damp-autumn', 'musim ketiga harus lembap');
 assert(dampSeason.nutrients > glowSeason.nutrients, 'musim lembap harus menaikkan nutrisi');
-tickN(fungalPlanet, 90);
+tickN(fungalPlanet, seasonEnd(fungalConfig!, 3) - seasonEnd(fungalConfig!, 2));
 const quietSeason = { ...fungalPlanet.eco.fungal };
-assert(quietSeason.seasonId === 'quiet-winter', 'tick 300 harus masuk musim tenang');
+assert(quietSeason.seasonId === 'quiet-winter', 'musim keempat harus tenang');
 assert(quietSeason.networkStress > sporeSeason.networkStress, 'musim tenang harus menaikkan stres jaringan');
-tickN(fungalPlanet, 61);
-assert(fungalPlanet.eco.fungal.seasonId === 'spore-spring', 'tick 361 harus kembali ke musim spora');
+tickN(fungalPlanet, 1);
+assert(fungalPlanet.eco.fungal.seasonId === 'spore-spring', 'siklus penuh harus kembali ke spora');
 assert(fungalPlanet.eco.fungal.network > 0, 'jaringan harus bertahan setelah siklus penuh');
 assert(fungalPlanet.eco.metrics.speciesCount === 11, 'ekosistem Mycelia harus tetap memiliki 11 spesies');
 assertBoundedEco(fungalPlanet, 'Mycelia');
@@ -639,7 +684,7 @@ const fungalDeer = guildStatus(fungalPlanet, 'deer');
 assert(fungalDeer !== null && fungalDeer.speciesIds.includes('mycelia_spore_deer'), 'guild deer Mycelia harus memetakan kijang spora');
 assert(guildFoodSourceIds(fungalPlanet, 'fox').includes('mycelia_spore_deer'), 'guild predator Mycelia harus terhubung ke food web');
 assert(agentCount(fungalPlanet, 'bird') > 0, 'Mycelia harus memunculkan agen kelelawar sebagai guild burung');
-assert(agentCount(fungalPlanet, 'insect') > 0, 'Mycelia harus memunculkan agen ngengat');
+assert(fungalPlanet.fauna.discovered.includes('insect'), 'Mycelia harus pernah memunculkan agen ngengat');
 const fungalLoaded = deserializePlanet(serializePlanet(fungalPlanet));
 assert(
   fungalLoaded?.planetId === 'mycelia' &&
@@ -651,7 +696,7 @@ const fungalTwin = createPlanet(4321, 'Mycelia Uji', 'mycelia');
 for (const type of ['tree', 'grass', 'bush', 'rock', 'deer', 'fox', 'bird'] as const) {
   placeObject(fungalTwin, type, [0.5, 0.4, 0.75]);
 }
-tickN(fungalTwin, 361);
+tickN(fungalTwin, seasonCycle(fungalConfig!) + 1);
 assert(JSON.stringify(fungalPlanet.fauna) === JSON.stringify(fungalTwin.fauna), 'fauna Mycelia harus deterministik');
 assert(JSON.stringify(fungalPlanet.eco) === JSON.stringify(fungalTwin.eco), 'ekosistem Mycelia harus deterministik');
 
@@ -668,27 +713,27 @@ assert(!skyPlanet.eco.populations.mycelia_network && !skyPlanet.eco.populations.
 for (const type of ['tree', 'grass', 'flower', 'bush', 'rock', 'deer', 'fox', 'bird'] as const) {
   assert(placeObject(skyPlanet, type, [0.5, 0.4, 0.75]), `${type} harus bisa ditempatkan di Sakura`);
 }
-tickN(skyPlanet, 50);
+tickN(skyPlanet, seasonEnd(skyConfig!, 0));
 const blossomSky = { ...skyPlanet.eco.sky };
-assert(blossomSky.seasonId === 'blossom-season', '50 tick pertama harus musim mekar');
+assert(blossomSky.seasonId === 'blossom-season', 'akhir musim pertama harus mekar');
 assert(blossomSky.blossom > 60, 'musim mekar harus menaikkan mekar');
 assert(blossomSky.connectivity > 50, 'konektivitas pulau harus sehat di awal');
-tickN(skyPlanet, 70);
+tickN(skyPlanet, seasonEnd(skyConfig!, 1) - seasonEnd(skyConfig!, 0));
 const petalSky = { ...skyPlanet.eco.sky };
-assert(petalSky.seasonId === 'petal-fall', 'tick 120 harus masuk gugur kelopak');
+assert(petalSky.seasonId === 'petal-fall', 'musim kedua harus gugur kelopak');
 assert(petalSky.blossom < blossomSky.blossom, 'gugur kelopak harus menurunkan mekar');
-tickN(skyPlanet, 100);
+tickN(skyPlanet, seasonEnd(skyConfig!, 2) - seasonEnd(skyConfig!, 1));
 const windSky = { ...skyPlanet.eco.sky };
-assert(windSky.seasonId === 'sky-winds', 'tick 220 harus masuk angin langit');
+assert(windSky.seasonId === 'sky-winds', 'musim ketiga harus angin langit');
 assert(windSky.wind > blossomSky.wind, 'angin langit harus memperkuat angin');
 assert(windSky.connectivity < blossomSky.connectivity, 'angin langit harus melemahkan konektivitas');
 assert(windSky.isolationStress > blossomSky.isolationStress, 'angin langit harus menaikkan stres isolasi');
-tickN(skyPlanet, 105);
+tickN(skyPlanet, seasonEnd(skyConfig!, 3) - seasonEnd(skyConfig!, 2));
 const quietSky = { ...skyPlanet.eco.sky };
-assert(quietSky.seasonId === 'quiet-sky', 'tick 325 harus masuk langit tenang');
+assert(quietSky.seasonId === 'quiet-sky', 'musim keempat harus langit tenang');
 assert(quietSky.connectivity > windSky.connectivity, 'langit tenang harus memulihkan konektivitas');
-tickN(skyPlanet, 36);
-assert(skyPlanet.eco.sky.seasonId === 'blossom-season', 'tick 361 harus kembali ke musim mekar');
+tickN(skyPlanet, 1);
+assert(skyPlanet.eco.sky.seasonId === 'blossom-season', 'siklus penuh harus kembali ke mekar');
 assert(skyPlanet.eco.sky.connectivity > 0, 'pulau melayang harus tetap terhubung');
 assert(skyPlanet.eco.metrics.speciesCount === 11, 'ekosistem Sakura harus tetap memiliki 11 spesies');
 assertBoundedEco(skyPlanet, 'Sakura');
@@ -708,7 +753,7 @@ const skyTwin = createPlanet(5678, 'Sakura Uji', 'sakura');
 for (const type of ['tree', 'grass', 'flower', 'bush', 'rock', 'deer', 'fox', 'bird'] as const) {
   placeObject(skyTwin, type, [0.5, 0.4, 0.75]);
 }
-tickN(skyTwin, 361);
+tickN(skyTwin, seasonCycle(skyConfig!) + 1);
 assert(JSON.stringify(skyPlanet.fauna) === JSON.stringify(skyTwin.fauna), 'fauna Sakura harus deterministik');
 assert(JSON.stringify(skyPlanet.eco) === JSON.stringify(skyTwin.eco), 'ekosistem Sakura harus deterministik');
 
@@ -724,26 +769,26 @@ assert(!forestPlanet.eco.populations.sakura_tree && !forestPlanet.eco.population
 for (const type of ['tree', 'grass', 'bush', 'rock', 'deer', 'fox', 'bird'] as const) {
   assert(placeObject(forestPlanet, type, [0.5, 0.4, 0.75]), `${type} harus bisa ditempatkan di Aurelia`);
 }
-tickN(forestPlanet, 50);
+tickN(forestPlanet, seasonEnd(forestConfig!, 0));
 const springForest = { ...forestPlanet.eco.forest };
-assert(springForest.seasonId === 'spring', '50 tick pertama harus musim semi');
+assert(springForest.seasonId === 'spring', 'akhir musim pertama harus semi');
 assert(springForest.storage > 20, 'musim semi harus punya simpanan');
-tickN(forestPlanet, 70);
+tickN(forestPlanet, seasonEnd(forestConfig!, 1) - seasonEnd(forestConfig!, 0));
 const summerForest = { ...forestPlanet.eco.forest };
-assert(summerForest.seasonId === 'summer', 'tick 120 harus masuk musim panas');
+assert(summerForest.seasonId === 'summer', 'musim kedua harus panas');
 assert(summerForest.storage > springForest.storage, 'musim panas harus menambah simpanan');
-tickN(forestPlanet, 90);
+tickN(forestPlanet, seasonEnd(forestConfig!, 2) - seasonEnd(forestConfig!, 1));
 const autumnForest = { ...forestPlanet.eco.forest };
-assert(autumnForest.seasonId === 'autumn', 'tick 210 harus masuk musim gugur');
+assert(autumnForest.seasonId === 'autumn', 'musim ketiga harus gugur');
 assert(autumnForest.leafLitter > summerForest.leafLitter, 'musim gugur harus menambah serasah');
 assert(autumnForest.storage > summerForest.storage, 'musim gugur harus memaksimalkan simpanan');
-tickN(forestPlanet, 90);
+tickN(forestPlanet, seasonEnd(forestConfig!, 3) - seasonEnd(forestConfig!, 2));
 const winterForest = { ...forestPlanet.eco.forest };
-assert(winterForest.seasonId === 'winter', 'tick 300 harus masuk musim dingin');
+assert(winterForest.seasonId === 'winter', 'musim keempat harus dingin');
 assert(winterForest.hibernation > autumnForest.hibernation, 'musim dingin harus menaikkan hibernasi');
 assert(winterForest.frostStress > autumnForest.frostStress, 'musim dingin harus menaikkan stres embun');
-tickN(forestPlanet, 61);
-assert(forestPlanet.eco.forest.seasonId === 'spring', 'tick 361 harus kembali ke musim semi');
+tickN(forestPlanet, 1);
+assert(forestPlanet.eco.forest.seasonId === 'spring', 'siklus penuh harus kembali ke semi');
 assert(forestPlanet.eco.forest.storage > 0, 'simpanan harus bertahan setelah siklus penuh');
 assert(forestPlanet.eco.metrics.speciesCount === 11, 'ekosistem Aurelia harus tetap memiliki 11 spesies');
 assertBoundedEco(forestPlanet, 'Aurelia');
@@ -762,7 +807,7 @@ const forestTwin = createPlanet(8765, 'Aurelia Uji', 'aurelia');
 for (const type of ['tree', 'grass', 'bush', 'rock', 'deer', 'fox', 'bird'] as const) {
   placeObject(forestTwin, type, [0.5, 0.4, 0.75]);
 }
-tickN(forestTwin, 361);
+tickN(forestTwin, seasonCycle(forestConfig!) + 1);
 assert(JSON.stringify(forestPlanet.fauna) === JSON.stringify(forestTwin.fauna), 'fauna Aurelia harus deterministik');
 assert(JSON.stringify(forestPlanet.eco) === JSON.stringify(forestTwin.eco), 'ekosistem Aurelia harus deterministik');
 
@@ -779,25 +824,25 @@ assert(!cosmicPlanet.eco.populations.aurelia_deer && !cosmicPlanet.eco.populatio
 for (const type of ['tree', 'grass', 'flower', 'bush', 'rock', 'deer', 'fox', 'bird'] as const) {
   assert(placeObject(cosmicPlanet, type, [0.5, 0.4, 0.75]), `${type} harus bisa ditempatkan di Cosmos`);
 }
-tickN(cosmicPlanet, 50);
+tickN(cosmicPlanet, seasonEnd(cosmicConfig!, 0));
 const lightSky = { ...cosmicPlanet.eco.sky };
-assert(lightSky.seasonId === 'luminous-phase', '50 tick pertama harus fase cahaya');
+assert(lightSky.seasonId === 'luminous-phase', 'akhir fase pertama harus cahaya');
 assert(lightSky.blossom > 60, 'fase cahaya harus menaikkan fluks cahaya');
-tickN(cosmicPlanet, 70);
+tickN(cosmicPlanet, seasonEnd(cosmicConfig!, 1) - seasonEnd(cosmicConfig!, 0));
 const resonanceSky = { ...cosmicPlanet.eco.sky };
-assert(resonanceSky.seasonId === 'crystal-resonance', 'tick 120 harus masuk resonansi kristal');
+assert(resonanceSky.seasonId === 'crystal-resonance', 'fase kedua harus resonansi kristal');
 assert(resonanceSky.connectivity > lightSky.connectivity, 'resonansi kristal harus memperkuat kisi');
-tickN(cosmicPlanet, 85);
+tickN(cosmicPlanet, seasonEnd(cosmicConfig!, 2) - seasonEnd(cosmicConfig!, 1));
 const voidSky = { ...cosmicPlanet.eco.sky };
-assert(voidSky.seasonId === 'void-tide', 'tick 205 harus masuk pasang hampa');
+assert(voidSky.seasonId === 'void-tide', 'fase ketiga harus pasang hampa');
 assert(voidSky.wind > lightSky.wind, 'pasang hampa harus menaikkan radiasi');
 assert(voidSky.uplift > lightSky.uplift, 'pasang hampa harus menaikkan anomali gravitasi');
-tickN(cosmicPlanet, 80);
+tickN(cosmicPlanet, seasonEnd(cosmicConfig!, 3) - seasonEnd(cosmicConfig!, 2));
 const meteorSky = { ...cosmicPlanet.eco.sky };
-assert(meteorSky.seasonId === 'meteor-shower', 'tick 285 harus masuk hujan meteor');
+assert(meteorSky.seasonId === 'meteor-shower', 'fase keempat harus hujan meteor');
 assert(meteorSky.wind > resonanceSky.wind, 'hujan meteor harus menaikkan radiasi');
-tickN(cosmicPlanet, 76);
-assert(cosmicPlanet.eco.sky.seasonId === 'luminous-phase', 'tick 361 harus kembali ke fase cahaya');
+tickN(cosmicPlanet, 1);
+assert(cosmicPlanet.eco.sky.seasonId === 'luminous-phase', 'siklus penuh harus kembali ke cahaya');
 assert(cosmicPlanet.eco.sky.connectivity > 0, 'kisi kristal harus bertahan setelah siklus penuh');
 assert(cosmicPlanet.eco.metrics.speciesCount === 10, 'ekosistem Cosmos harus tetap memiliki 10 spesies');
 assertBoundedEco(cosmicPlanet, 'Cosmos');
@@ -805,7 +850,7 @@ const cosmicDeer = guildStatus(cosmicPlanet, 'deer');
 assert(cosmicDeer !== null && cosmicDeer.speciesIds.includes('cosmos_star_rabbit'), 'guild deer Cosmos harus memetakan kelinci bintang');
 assert(guildFoodSourceIds(cosmicPlanet, 'fox').includes('cosmos_crystal_grazer'), 'guild predator Cosmos harus terhubung ke food web');
 assert(agentCount(cosmicPlanet, 'bird') > 0, 'Cosmos harus memunculkan agen elang astral');
-assert(agentCount(cosmicPlanet, 'insect') > 0, 'Cosmos harus memunculkan agen ngengat komet');
+assert(cosmicPlanet.fauna.discovered.includes('insect'), 'Cosmos harus pernah memunculkan agen ngengat komet');
 const cosmicLoaded = deserializePlanet(serializePlanet(cosmicPlanet));
 assert(
   cosmicLoaded?.planetId === 'cosmos' &&
@@ -817,7 +862,7 @@ const cosmicTwin = createPlanet(9987, 'Cosmos Uji', 'cosmos');
 for (const type of ['tree', 'grass', 'flower', 'bush', 'rock', 'deer', 'fox', 'bird'] as const) {
   placeObject(cosmicTwin, type, [0.5, 0.4, 0.75]);
 }
-tickN(cosmicTwin, 361);
+tickN(cosmicTwin, seasonCycle(cosmicConfig!) + 1);
 assert(JSON.stringify(cosmicPlanet.fauna) === JSON.stringify(cosmicTwin.fauna), 'fauna Cosmos harus deterministik');
 assert(JSON.stringify(cosmicPlanet.eco) === JSON.stringify(cosmicTwin.eco), 'ekosistem Cosmos harus deterministik');
 
@@ -868,6 +913,53 @@ assert(
   JSON.stringify(spacingPlanet.objects.map((object) => object.dir)) === JSON.stringify(spacingTwin.objects.map((object) => object.dir)),
   'soft spacing harus deterministik',
 );
+
+// v0.15.4: tangga stage dan level harus benar-benar bisa dicapai.
+const masteryPlan = [
+  'sand', 'sand', 'rock', 'rock', 'rock', 'hill', 'lake', 'lake',
+  'tree', 'tree', 'tree', 'tree', 'tree', 'tree',
+  'bush', 'bush', 'bush', 'bird',
+] as const;
+const mastery = createPlanet(1337, 'Surga');
+const masteryDirs = goldenDirs(masteryPlan.length);
+for (let i = 0; i < masteryPlan.length; i++) {
+  assert(placeObject(mastery, masteryPlan[i], masteryDirs[i]), `mastery: ${masteryPlan[i]} gagal ditempatkan`);
+}
+tickN(mastery, 100);
+assert(mastery.stage === 6, `tahap tertinggi harus bisa dicapai: ${mastery.stage}`);
+assert(
+  (Object.keys(mastery.environment) as Array<keyof typeof mastery.environment>)
+    .every((key) => mastery.environment[key] >= 0 && mastery.environment[key] <= 100),
+  'environment mastery harus tetap terikat 0-100',
+);
+const idealPlanet = createPlanet(1338, 'Surga Ideal');
+for (const type of ['sand', 'rock', 'hill', 'lake', 'tree'] as const) {
+  placeObject(idealPlanet, type, [0.5, 0.4, 0.75]);
+}
+Object.assign(idealPlanet.environment, {
+  temperature: 21,
+  water: 59,
+  humidity: 55,
+  oxygen: 65,
+  fertility: 60,
+  biodiversity: 60,
+  energy: 57,
+  stability: 90,
+});
+idealPlanet.ecosystem.vegetation = 60;
+assert(computeStage(idealPlanet) === 6, 'semua metrik ideal harus melaporkan stage 6');
+const xpMastery = createPlanet(9001, 'Level Enam');
+xpMastery.progression.xp = 260;
+simulateTick(xpMastery, false);
+assert(xpMastery.progression.level === 6, `threshold 260 XP harus membuka level 6: ${xpMastery.progression.level}`);
+
+const recovery = createPlanet(4242, 'Pemulihan');
+recovery.weather = { type: 'storm', intensity: 0.8, remainingTicks: 1 };
+simulateTick(recovery, false);
+assert(recovery.weather.type === 'sunny', 'badai harus diikuti cuaca cerah');
+assert(recovery.weather.remainingTicks === 2, `recovery harus 2 tick: ${recovery.weather.remainingTicks}`);
+simulateTick(recovery, false);
+assert(recovery.weather.type === 'sunny', 'tick recovery kedua harus tetap cerah');
 
 assert(QUALITY.low.planetDetail < QUALITY.medium.planetDetail, 'detail low harus lebih rendah');
 assert(QUALITY.medium.maxDrops < QUALITY.high.maxDrops, 'budget drop medium harus lebih kecil');

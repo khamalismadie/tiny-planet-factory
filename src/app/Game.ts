@@ -52,6 +52,7 @@ export class Game {
   private qaReport: QaReport | null = null;
   private qaPanel: HTMLElement | null = null;
   private previewBackup: PlanetState | null = null;
+  private sessionEnded = false;
 
   private constructor(app: Application, bootStart: number) {
     this.app = app;
@@ -107,6 +108,7 @@ export class Game {
     this.buildMenu();
     this.buildInput();
     this.instrument();
+    this.bindLifecycle();
 
     if (!this.store.persistent) this.hud.notify('Penyimpanan tidak tersedia; progres hanya di memori.', true);
     this.hud.notify('Pilih objek, lalu ketuk permukaan planet untuk meletakkannya.');
@@ -258,12 +260,15 @@ export class Game {
       }
       if (!this.bootMs) {
         this.bootMs = performance.now() - this.bootStart;
-        this.telemetry.record('boot', {
+        const bootData = {
           bootMs: Math.round(this.bootMs),
           quality: this.settings.tier,
           dpr: window.devicePixelRatio,
           viewport: `${window.innerWidth}x${window.innerHeight}`,
-        });
+        };
+        this.telemetry.record('boot', bootData);
+        this.telemetry.record('session_start', bootData);
+        this.telemetry.record('objective_shown', this.telemetryContext());
       }
       this.perf.add(ticker.deltaMS);
       this.qa?.add(ticker.deltaMS);
@@ -400,13 +405,27 @@ export class Game {
     );
     const discoveredBefore = new Set(this.state.fauna?.discovered ?? []);
     const extinctBefore = new Set(this.state.fauna?.extinct ?? []);
+    const stageBefore = this.state.stage;
+    const levelBefore = this.state.progression.level;
+    const seasonBefore = this.currentSeasonId();
     const result = simulateTick(this.state);
     this.refreshScene();
     this.hud.update(this.state, this.selected);
     if (this.state.warning) this.hud.notify(this.state.warning, true);
     else if (result.events.length) this.hud.notify(result.events[result.events.length - 1]);
     if (missionBefore === 'active' && this.state.mission.status === 'complete') {
-      this.telemetry.record('mission_complete', { tick: this.state.tick });
+      this.telemetry.record('mission_complete', this.telemetryContext());
+    }
+    if (this.state.stage !== stageBefore) {
+      this.telemetry.record('stage_reached', this.telemetryContext({ from: stageBefore, to: this.state.stage }));
+      this.telemetry.record('objective_shown', this.telemetryContext());
+    }
+    if (this.state.progression.level !== levelBefore) {
+      this.telemetry.record('level_reached', this.telemetryContext({ from: levelBefore, to: this.state.progression.level }));
+    }
+    const seasonAfter = this.currentSeasonId();
+    if (seasonAfter !== seasonBefore) {
+      this.telemetry.record('season_change', this.telemetryContext({ from: seasonBefore, to: seasonAfter }));
     }
     for (const [id, progress] of Object.entries(this.state.events ?? {})) {
       if (progress.status === 'complete' && !completedBefore.has(id)) {
@@ -426,6 +445,46 @@ export class Game {
     this.hadSave = true;
     window.clearTimeout(this.saveHandle);
     this.saveHandle = window.setTimeout(() => void this.store.save(this.state), 400);
+  }
+
+  private telemetryContext(extra: Record<string, string | number | boolean | null> = {}) {
+    return {
+      tick: this.state.tick,
+      planetId: this.state.planetId,
+      stage: this.state.stage,
+      level: this.state.progression.level,
+      seed: this.state.seed,
+      elapsedMs: Math.round(performance.now() - this.bootStart),
+      ...extra,
+    };
+  }
+
+  private currentSeasonId(): string {
+    const eco = this.state.eco;
+    for (const id of [
+      eco.cryo.seasonId,
+      eco.volcano.seasonId,
+      eco.ocean.seasonId,
+      eco.fungal.seasonId,
+      eco.sky.seasonId,
+      eco.forest.seasonId,
+    ]) {
+      if (id && id !== 'none') return id;
+    }
+    return 'none';
+  }
+
+  private bindLifecycle(): void {
+    const end = () => {
+      if (this.sessionEnded) return;
+      this.sessionEnded = true;
+      this.telemetry.record('session_end', this.telemetryContext());
+      void this.store.save(this.state);
+    };
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') end();
+    });
+    window.addEventListener('pagehide', end);
   }
 
   private dnaCodes(): PlanetDnaCodes {
@@ -507,10 +566,12 @@ export class Game {
 
   private switchPlanet(planetId: string, seed = Math.floor(Math.random() * 0xffffffff)): void {
     if (!isSupportedPlanet(planetId)) return;
+    const from = this.state.planetId;
     this.state = createPlanet(seed >>> 0, planetNameFromSeed(seed >>> 0), planetId);
     this.selected = 'grass';
     this.rebuildScene();
     this.hud.update(this.state, this.selected);
+    this.telemetry.record('planet_switch', this.telemetryContext({ from }));
     this.queueSave();
     this.hud.notify(`Planet ${planetId} siap dibangun.`);
   }
