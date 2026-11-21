@@ -1,6 +1,6 @@
 import { Application, UPDATE_PRIORITY } from 'pixi.js';
 import { ensureEventState } from '../content/missions';
-import { OBJECT_DEFS, UNLOCK_LEVEL } from '../content/objects';
+import { OBJECT_DEFS, OBJECT_ORDER, UNLOCK_LEVEL } from '../content/objects';
 import { SPECIES_ORDER } from '../content/species';
 import { WEATHER_DEFS } from '../content/weather';
 import { scoreHabitat } from '../sim/eco/habitat';
@@ -83,6 +83,12 @@ export class Game {
     this.hadSave = !!usableSave;
     this.state = usableSave ?? createPlanet(seed, planetNameFromSeed(seed), planetId);
     this.state.events = ensureEventState(this.state.events);
+    if (params.has('qa')) {
+      const qaObjects = Number(params.get('qaObjects') ?? 0);
+      if (Number.isFinite(qaObjects) && qaObjects > 0) {
+        this.populateQaObjects(Math.min(96, Math.floor(qaObjects)));
+      }
+    }
     this.settings = QUALITY[detectQuality()];
     this.perf = new PerfMonitor(this.settings.tier);
     this.perfOverlay = document.getElementById('perf');
@@ -149,6 +155,20 @@ export class Game {
     this.scene.syncObjects(this.state.objects, this.state.environment, false);
     this.scene.syncWildlife(this.state.fauna?.agents ?? [], this.state.terrainConfig);
     this.scene.setWeather(this.state.weather.type, this.state.weather.intensity);
+  }
+
+  private populateQaObjects(count: number): void {
+    const angle = Math.PI * (3 - Math.sqrt(5));
+    for (let i = 0; i < count; i++) {
+      const y = 1 - 2 * (i + 0.5) / count;
+      const radius = Math.sqrt(Math.max(0, 1 - y * y));
+      const theta = angle * i;
+      placeObject(this.state, OBJECT_ORDER[i % OBJECT_ORDER.length], [
+        Math.cos(theta) * radius,
+        y,
+        Math.sin(theta) * radius,
+      ]);
+    }
   }
 
   private buildHud(): void {

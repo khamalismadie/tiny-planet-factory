@@ -33,6 +33,7 @@ http://<host>/?debug=1&perf=1&quality=medium
   - `foodWeb()` — status 5 guild visual, jumlah agen, dan link food web planet aktif
   - `setPlanet(id, seed?)` — pindah ke planet aktif (`terra`, `dune`, `glaciere`, `inferna`, `aquaria`, `mycelia`, `sakura`, `aurelia`, atau `cosmos`)
   - `qaReport()` — laporan performa + status fauna terbaru
+  - `qaObjects=N` — saat `qa=1`, menanam N objek (maks 96) dengan sebaran spiral sebelum pengukuran; dipakai untuk beban 25+ objek
 
 Quality tier:
 

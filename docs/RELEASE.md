@@ -243,6 +243,12 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [x] Gate determinisme 50 seed × 9 planet masuk ke `test:sim`.
 - [x] Semua test lokal lolos: sim, art scale, smoke, device, menu, layout. App chunk 58,77 kB / gzip 19,23 kB.
 
+## 2v. Device QA Load Harness (v0.15.5)
+
+- [x] Parameter `?qa=1&qaObjects=N` menanam hingga 96 objek sebelum QaProbe mulai mengukur.
+- [x] Objek mengikuti urutan `OBJECT_ORDER` dan sebaran spiral deterministik, tanpa mengubah sim atau gameplay normal.
+- [x] Dipakai untuk mengulang checklist #2 dengan beban 25+ objek di Android nyata.
+
 ## 3. QA perangkat nyata
 
 Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:

@@ -61,7 +61,7 @@ const low = await page.evaluate(() => window.__game.metrics());
 const perfText = await page.textContent('#perf');
 
 // QA probe generates an exportable device report without user interaction.
-const qaUrl = `${base}${base.includes('?') ? '&' : '?'}debug=1&qa=1&qaSeconds=1&quality=low`;
+const qaUrl = `${base}${base.includes('?') ? '&' : '?'}debug=1&qa=1&qaObjects=30&qaSeconds=1&quality=low`;
 const qaPage = await context.newPage();
 await qaPage.goto(qaUrl, { waitUntil: 'networkidle' });
 await qaPage.waitForFunction(() => !!window.__game, { timeout: 30_000 });
@@ -86,6 +86,7 @@ const checks = {
   qualityDowngrade: low.qualityTier === 'low',
   stillRenderingAfterQualityChange: low.drawCalls > 0,
   qaProbeWorks: !!qaReport && qaReport.frames > 0 && qaReport.p95ms > 0 && qaReport.quality.tier === 'low',
+  qaLoadObjects: qaReport?.scene.objects === 30,
 };
 
 console.log(JSON.stringify({
