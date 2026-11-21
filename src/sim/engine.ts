@@ -241,6 +241,7 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
   const seasonInfo = legacyClimate ? null : activeSeason(planet, planetConfig);
   const season = seasonInfo?.season ?? null;
   const cryo = planet.eco.cryo;
+  const volcano = planet.eco.volcano;
   const random = mulberry32((planet.seed ^ (planet.tick * 2654435761)) >>> 0);
   const counts = Object.fromEntries(OBJECT_ORDER.map((type) => [type, 0])) as Record<ObjectType, number>;
   for (const object of planet.objects) counts[object.type] += 1;
@@ -272,7 +273,7 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
   e.temperature = clamp(
     approach(e.temperature, targetTemp, 0.04) + weather.tempDelta * intensity,
     legacyClimate ? -10 : -20,
-    50,
+    legacyClimate ? 50 : 120,
   );
 
   const evaporation = 0.1 + Math.max(0, e.temperature - 18) * 0.012 - atm.cloudCoverage * 0.001;
@@ -310,10 +311,39 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
     cryo.thawStress = 0;
   }
 
+  if (planetConfig?.specialSystems.includes('volcanic-eruption')) {
+    const previousHeat = volcano.heat;
+    const heatTarget = clamp((e.temperature - 40) / 50 * 100);
+    volcano.heat = approach(previousHeat, heatTarget, 0.08);
+    const lavaTarget = clamp(volcano.heat * 0.55 + counts.mountain * 4 + (season?.id === 'eruption-phase' ? 25 : 0));
+    volcano.lavaFlow = approach(volcano.lavaFlow, lavaTarget, 0.07);
+    const ashBase = season?.id === 'eruption-phase' ? 75 : season?.id === 'ash-fall' ? 55 : 10;
+    const ashTarget = clamp(ashBase + counts.mountain * 2 - (season?.id === 'regrowth' ? 8 : 0));
+    volcano.ash = approach(volcano.ash, ashTarget, 0.05);
+    const eruptionBoost = season?.id === 'eruption-phase' ? 45 : season?.id === 'ash-fall' ? 12 : 0;
+    volcano.eruptionStress = approach(volcano.eruptionStress, clamp(
+      Math.abs(volcano.heat - previousHeat) * 3 + volcano.lavaFlow * 0.2 + volcano.ash * 0.25 + eruptionBoost,
+    ), 0.25);
+    volcano.seasonId = season?.id ?? 'none';
+    volcano.seasonName = season?.name ?? '';
+    volcano.phase = seasonInfo?.phase ?? 0;
+  } else if (volcano.seasonId !== 'none' || volcano.heat || volcano.lavaFlow || volcano.ash || volcano.eruptionStress) {
+    volcano.seasonId = 'none';
+    volcano.seasonName = '';
+    volcano.phase = 0;
+    volcano.heat = 0;
+    volcano.lavaFlow = 0;
+    volcano.ash = 0;
+    volcano.eruptionStress = 0;
+  }
+
   const seasonalVegetation = clamp(1 + (season?.vegetationModifier ?? 0), 0.25, 1.6);
+  const volcanicBiome = planetConfig?.specialSystems.includes('volcanic-eruption') ?? false;
   const coldFactor = cryo.seasonId !== 'none'
     ? 1 - cryo.freeze / 100 * 0.3
-    : e.temperature < 0 || e.temperature > 40 || e.water < 15 ? 0.5 : 1;
+    : volcanicBiome
+      ? 1 - volcano.heat / 100 * 0.35
+      : e.temperature < 0 || e.temperature > 40 || e.water < 15 ? 0.5 : 1;
   const vegetationTarget = clamp(
     Math.min(100, counts.grass * 2 + counts.tree * 4 + counts.bush * 2 + e.water * 0.28 + e.fertility * 0.2) *
       seasonalVegetation * coldFactor,

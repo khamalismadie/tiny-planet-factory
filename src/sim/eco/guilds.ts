@@ -1,5 +1,6 @@
 import { duneConfig } from '../../content/planets/dune';
 import { glaciereConfig } from '../../content/planets/glaciera';
+import { infernaConfig } from '../../content/planets/inferna';
 import { terraConfig } from '../../content/planets/terra';
 import type { FoodWebLink, PlanetConfig } from './types';
 import type { ObjectType, PlanetState, SpeciesId } from '../types';
@@ -95,10 +96,38 @@ const GLACIERE_PROFILE: GuildProfile = {
   },
 };
 
+const INFERNA_PROFILE: GuildProfile = {
+  config: infernaConfig,
+  guilds: {
+    deer: ['inferna_ash_grazer', 'inferna_rock_tortoise'],
+    fox: ['inferna_magma_lizard', 'inferna_ash_jackal', 'inferna_ash_wolf'],
+    bird: ['inferna_fire_hawk'],
+    fish: [],
+    insect: ['inferna_ember_beetle', 'inferna_lava_crab', 'inferna_heat_fungi'],
+  },
+  divisors: { deer: 8, fox: 6, bird: 2, fish: 10, insect: 12 },
+  prey: { fox: ['deer', 'insect'], bird: ['insect'] },
+  foodObjects: {
+    inferna_ember_moss: ['rock', 'sand', 'bush'],
+    inferna_ash_fern: ['grass', 'bush'],
+    inferna_lava_grass: ['grass', 'sand'],
+    inferna_ash_grazer: ['deer', 'grass'],
+    inferna_ember_beetle: ['flower', 'bush', 'grass'],
+    inferna_rock_tortoise: ['deer', 'rock'],
+    inferna_magma_lizard: ['fox', 'rock', 'sand'],
+    inferna_lava_crab: ['rock', 'sand', 'bush'],
+    inferna_ash_jackal: ['fox', 'deer'],
+    inferna_ash_wolf: ['fox', 'deer'],
+    inferna_fire_hawk: ['bird', 'mountain'],
+    inferna_heat_fungi: ['rock', 'sand', 'bush'],
+  },
+};
+
 export const GUILD_PROFILES: Record<string, GuildProfile> = {
   terra: TERRA_PROFILE,
   dune: DUNE_PROFILE,
   glaciere: GLACIERE_PROFILE,
+  inferna: INFERNA_PROFILE,
 };
 
 const FOOD_INTERACTIONS = new Set(['grazing', 'hunting', 'scavenging', 'pollination']);

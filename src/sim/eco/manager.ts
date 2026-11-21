@@ -1,5 +1,6 @@
 import { duneConfig } from '../../content/planets/dune';
 import { glaciereConfig } from '../../content/planets/glaciera';
+import { infernaConfig } from '../../content/planets/inferna';
 import { terraConfig } from '../../content/planets/terra';
 import { hashString, mulberry32 } from '../rng';
 import type { PlanetState } from '../types';
@@ -195,9 +196,17 @@ export function habitatContextFor(planet: PlanetState, config: PlanetConfig): Ha
       ? 'gelombang-dingin'
       : (planet.eco.cryo?.thawStress ?? 0) > 55
         ? 'pencairan-glasial'
-        : planet.environment.water < 25
-          ? 'kekeringan-musiman'
-          : null;
+        : (planet.eco.volcano?.eruptionStress ?? 0) > 60
+          ? 'erupsi-gunung-berapi'
+          : (planet.eco.volcano?.lavaFlow ?? 0) > 50
+            ? 'aliran-lava'
+            : (planet.eco.volcano?.ash ?? 0) > 50
+              ? 'hujan-abu'
+              : (planet.eco.volcano?.heat ?? 0) > 70
+                ? 'gelombang-panas'
+                : planet.environment.water < 25
+                  ? 'kekeringan-musiman'
+                  : null;
   return {
     environment: planet.environment,
     ecosystem: planet.ecosystem,
@@ -265,10 +274,20 @@ export class EcosystemManager {
         (trait) => trait === 'freeze-tolerance' || trait === 'cold-dormancy',
       );
       const coldMortality = coldStress * (coldAdapted ? 0.003 : 0.015);
+      const heatStress = (planet.eco.volcano?.eruptionStress ?? 0) / 100;
+      const heatAdapted = definition.geneticTraits.some((trait) =>
+        trait === 'heat-resistance' ||
+        trait === 'heat-shield' ||
+        trait === 'thermophilic-enzymes' ||
+        trait === 'ash-deposition-recovery' ||
+        trait === 'post-eruption-regrowth',
+      );
+      const heatMortality = heatStress * (heatAdapted ? 0.003 : 0.015);
       const mortalityRate = definition.mortalityRate * 0.4
         + (1 - score) * 0.02
         + starvation
         + coldMortality
+        + heatMortality
         + predationPressure(definition, config, eco, capacity);
       const deaths = Math.min(
         population.estimate,
@@ -322,6 +341,7 @@ const ECOSYSTEM_MANAGERS = new Map<string, EcosystemManager>([
   [terraConfig.id, new EcosystemManager(terraConfig)],
   [duneConfig.id, new EcosystemManager(duneConfig)],
   [glaciereConfig.id, new EcosystemManager(glaciereConfig)],
+  [infernaConfig.id, new EcosystemManager(infernaConfig)],
 ]);
 
 export function ecosystemFor(planetId: string): EcosystemManager | null {

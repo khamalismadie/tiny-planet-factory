@@ -107,6 +107,18 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [ ] Terra tidak berubah secara numerik dari gate v0.7.
 - [ ] App chunk <100 kB.
 
+## 2j. Inferna + Volcanic Biome (v0.9)
+
+- [ ] `?planet=inferna` dan `setPlanet('inferna')` menghasilkan 12 populasi Inferna.
+- [ ] Empat musim berjalan deterministik dari tick: quiet-phase → ash-fall → eruption-phase → regrowth.
+- [ ] `heat`, `lavaFlow`, `ash`, dan `eruptionStress` naik saat letusan lalu turun saat regrowth.
+- [ ] Suhu letusan >75°C dan air tetap <25.
+- [ ] Tidak ada guild atau agen ikan di Inferna.
+- [ ] Save/load mempertahankan `eco.volcano`.
+- [ ] DNA lengkap mempertahankan `planetId` Inferna.
+- [ ] Terra, Dune, dan Glaciera tidak berubah secara numerik dari gate v0.8.
+- [ ] App chunk <100 kB.
+
 ## 3. QA perangkat nyata
 
 Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:

@@ -190,6 +190,16 @@ export interface CryosphereState {
   thawStress: number;
 }
 
+export interface VolcanoState {
+  seasonId: string;
+  seasonName: string;
+  phase: number;
+  heat: number;
+  lavaFlow: number;
+  ash: number;
+  eruptionStress: number;
+}
+
 export interface EcoStateV3 {
   planetId: string;
   ecosystemVersion: number;
@@ -200,6 +210,7 @@ export interface EcoStateV3 {
   eventHistory: EcoEventRecord[];
   metrics: EcoMetrics;
   cryo: CryosphereState;
+  volcano: VolcanoState;
 }
 
 export interface HabitatContext {

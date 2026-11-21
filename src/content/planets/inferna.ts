@@ -71,16 +71,19 @@ const SPECIES = [
     [food('inferna_ash_grazer', 1, ['hunting']), food('inferna_rock_tortoise', 0.5, ['hunting'])], {
       habitatPreferences: [ASH_HABITAT], activitySchedule: 'crepuscular',
       preySpecies: ['inferna_ash_grazer'], migrationBehavior: 'nomadic', populationCapacity: 20,
+      geneticTraits: ['heat-shield'], reproductionRate: 0.09,
     }),
   species(PLANET_ID, 'inferna_ash_wolf', 'Serigala Abu Besar', 'apex-predator', ['ash-plains', 'volcanic-mountains'],
     [food('inferna_ash_grazer', 0.9, ['hunting']), food('inferna_ash_jackal', 0.5, ['hunting'])], {
       habitatPreferences: [ASH_HABITAT], preySpecies: ['inferna_ash_grazer', 'inferna_ash_jackal'],
       rarity: 'uncommon', populationCapacity: 12,
+      geneticTraits: ['heat-resistance'], reproductionRate: 0.07,
     }),
   species(PLANET_ID, 'inferna_fire_hawk', 'Elang Api', 'apex-predator', ['volcanic-mountains', 'lava-fields'],
     [food('inferna_magma_lizard', 1, ['hunting']), food('inferna_lava_crab', 0.6, ['hunting'])], {
       habitatPreferences: [VOLCANIC_HABITAT], preySpecies: ['inferna_magma_lizard', 'inferna_lava_crab'],
       rarity: 'rare', populationCapacity: 8,
+      geneticTraits: ['heat-shield'], reproductionRate: 0.18, mortalityRate: 0.01,
     }),
 
   species(PLANET_ID, 'inferna_heat_fungi', 'Jamur Panas', 'decomposer', ['ash-plains', 'obsidian', 'lava-fields'],
@@ -130,8 +133,8 @@ export const infernaConfig: PlanetConfig = {
     link('inferna_magma_lizard', 'inferna_ember_beetle', 'hunting', 0.8, 'Kadal magma memangsa kumbang bara'),
     link('inferna_ash_jackal', 'inferna_ash_grazer', 'hunting', 0.85, 'Serigala abu berburu penggembala'),
     link('inferna_ash_wolf', 'inferna_ash_jackal', 'hunting', 0.6, 'Serigala abu besar memangsa serigala abu'),
-    link('inferna_fire_hawk', 'inferna_magma_lizard', 'hunting', 0.9, 'Elang api menyambar kadal magma'),
-    link('inferna_fire_hawk', 'inferna_lava_crab', 'hunting', 0.55, 'Elang api memangsa kepiting lava'),
+    link('inferna_fire_hawk', 'inferna_magma_lizard', 'hunting', 0.35, 'Elang api menyambar kadal magma'),
+    link('inferna_fire_hawk', 'inferna_lava_crab', 'hunting', 0.25, 'Elang api memangsa kepiting lava'),
     link('inferna_heat_fungi', 'inferna_ash_fern', 'decomposition', 0.75, 'Jamur panas mengurai pakuis yang hangus'),
     link('inferna_heat_fungi', 'inferna_ash_wolf', 'decomposition', 0.6, 'Jamur panas mengurai bangkai serigala'),
   ],

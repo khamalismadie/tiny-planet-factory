@@ -130,7 +130,8 @@ const legacyRestored = decodePlanetDna(encodePlanetDnaLegacy(planet));
 assert(legacyRestored?.planetId === 'terra', 'DNA v2 tanpa planet id harus tetap terbaca sebagai Terra');
 const dnaDune = createPlanet(321, 'DNA Dune', 'dune');
 const dnaGlaciere = createPlanet(322, 'DNA Es', 'glaciere');
-for (const [source, id] of [[dnaDune, 'dune'], [dnaGlaciere, 'glaciere']] as const) {
+const dnaInferna = createPlanet(323, 'DNA Api', 'inferna');
+for (const [source, id] of [[dnaDune, 'dune'], [dnaGlaciere, 'glaciere'], [dnaInferna, 'inferna']] as const) {
   const roundTrip = decodePlanetDna(encodePlanetDna(source).full);
   assert(roundTrip?.planetId === id, `DNA lengkap ${id} harus mempertahankan planetId`);
   assert(
@@ -402,7 +403,7 @@ assert(foxSupplyAfter < foxSupplyBefore, 'runtuhnya mangsa harus menurunkan supl
 assert(agentCount(predatorPlanet, 'fox') <= foxBefore, 'jumlah predator tidak boleh naik saat mangsa habis');
 
 // Dune is the second active ecosystem with its own climate and guild mapping.
-assert(isSupportedPlanet('dune') && isSupportedPlanet('glaciere') && !isSupportedPlanet('inferna'), 'Terra, Dune, dan Glaciera aktif; planet lain belum');
+assert(isSupportedPlanet('dune') && isSupportedPlanet('glaciere') && isSupportedPlanet('inferna'), 'Terra, Dune, Glaciera, dan Inferna aktif');
 const duneConfig = ecosystemConfigFor('dune');
 assert(duneConfig !== null && duneConfig.species.length === 12, 'Dune harus membawa 12 spesies');
 const dunePlanet = createPlanet(6161, 'Dune Uji', 'dune');
@@ -477,6 +478,63 @@ for (const type of ['grass', 'tree', 'rock', 'lake', 'ocean', 'deer', 'fox', 'bi
 tickN(iceTwin, 230);
 assert(JSON.stringify(icePlanet.fauna) === JSON.stringify(iceTwin.fauna), 'fauna Glaciera harus deterministik');
 assert(JSON.stringify(icePlanet.eco) === JSON.stringify(iceTwin.eco), 'ekosistem Glaciera harus deterministik');
+
+// Inferna is the fourth active ecosystem with heat, lava, ash, and eruption phases.
+const fireConfig = ecosystemConfigFor('inferna');
+assert(fireConfig !== null && fireConfig.species.length === 12, 'Inferna harus membawa 12 spesies');
+assert(fireConfig.climate.seasons.length === 4, 'Inferna harus membawa empat musim');
+const firePlanet = createPlanet(8888, 'Inferna Uji', 'inferna');
+assert(firePlanet.planetId === 'inferna', 'createPlanet harus mempertahankan planetId Inferna');
+assert(firePlanet.environment.temperature > 60, 'Inferna harus mulai dengan suhu vulkanik');
+assert(firePlanet.environment.water < 25, 'Inferna harus mulai dengan air langka');
+assert(firePlanet.eco.populations.inferna_ember_moss, 'populasi Inferna harus diinisialisasi');
+assert(!firePlanet.eco.populations.terra_oak && !firePlanet.eco.populations.dune_camel && !firePlanet.eco.populations.glaciere_ice_fish, 'tidak boleh ada kebocoran spesies planet lain');
+for (const type of ['grass', 'tree', 'rock', 'mountain', 'bush', 'deer', 'fox', 'bird'] as const) {
+  assert(placeObject(firePlanet, type, [0.5, 0.4, 0.75]), `${type} harus bisa ditempatkan di Inferna`);
+}
+tickN(firePlanet, 60);
+const quietVolcano = { ...firePlanet.eco.volcano };
+assert(quietVolcano.seasonId === 'quiet-phase', '60 tick pertama harus masa tenang');
+assert(quietVolcano.heat > 30, 'gunung berapi harus menyimpan panas sejak awal');
+assert(quietVolcano.ash < 30, 'masa tenang harus memiliki abu rendah');
+tickN(firePlanet, 80);
+const ashVolcano = { ...firePlanet.eco.volcano };
+assert(ashVolcano.seasonId === 'ash-fall', 'tick 140 harus masuk musim hujan abu');
+assert(ashVolcano.ash > quietVolcano.ash && ashVolcano.ash > 40, 'hujan abu harus menaikkan abu');
+tickN(firePlanet, 50);
+const eruptionVolcano = { ...firePlanet.eco.volcano };
+assert(eruptionVolcano.seasonId === 'eruption-phase', 'tick 190 harus masuk masa letusan');
+assert(eruptionVolcano.heat > quietVolcano.heat, 'letusan harus menaikkan panas');
+assert(eruptionVolcano.lavaFlow > quietVolcano.lavaFlow, 'letusan harus menaikkan aliran lava');
+assert(eruptionVolcano.eruptionStress > 60, 'letusan harus memicu stres erupsi');
+assert(firePlanet.environment.temperature > 75, 'letusan harus mendorong suhu vulkanik lebih tinggi');
+tickN(firePlanet, 45);
+const regrowthVolcano = { ...firePlanet.eco.volcano };
+assert(regrowthVolcano.seasonId === 'regrowth', 'tick 235 harus masuk musim tumbuh kembali');
+assert(regrowthVolcano.ash < eruptionVolcano.ash, 'musim tumbuh kembali harus menurunkan abu');
+assert(regrowthVolcano.eruptionStress < eruptionVolcano.eruptionStress, 'stres erupsi harus mereda');
+assert(firePlanet.eco.metrics.speciesCount === 12, 'ekosistem Inferna harus tetap memiliki 12 spesies');
+assertBoundedEco(firePlanet, 'Inferna');
+const fireDeer = guildStatus(firePlanet, 'deer');
+assert(fireDeer !== null && fireDeer.speciesIds.includes('inferna_ash_grazer'), 'guild herbivora Inferna harus memetakan penggembala abu');
+assert(guildFoodSourceIds(firePlanet, 'fox').includes('inferna_ember_beetle'), 'serigala abu harus berburu kumbang bara dari food web');
+assert(guildStatus(firePlanet, 'fish') === null, 'Inferna tidak boleh memiliki guild ikan');
+assert(agentCount(firePlanet, 'fish') === 0, 'Inferna tidak boleh memunculkan ikan');
+assert(agentCount(firePlanet, 'insect') <= guildAgentCapacity(firePlanet, 'insect', 24), 'agen Inferna harus bounded');
+const fireLoaded = deserializePlanet(serializePlanet(firePlanet));
+assert(
+  fireLoaded?.planetId === 'inferna' &&
+    fireLoaded.eco.volcano.seasonId === 'regrowth' &&
+    !!fireLoaded.eco.populations.inferna_fire_hawk,
+  'save/load Inferna harus mempertahankan identitas, musim, dan populasi',
+);
+const fireTwin = createPlanet(8888, 'Inferna Uji', 'inferna');
+for (const type of ['grass', 'tree', 'rock', 'mountain', 'bush', 'deer', 'fox', 'bird'] as const) {
+  placeObject(fireTwin, type, [0.5, 0.4, 0.75]);
+}
+tickN(fireTwin, 235);
+assert(JSON.stringify(firePlanet.fauna) === JSON.stringify(fireTwin.fauna), 'fauna Inferna harus deterministik');
+assert(JSON.stringify(firePlanet.eco) === JSON.stringify(fireTwin.eco), 'ekosistem Inferna harus deterministik');
 
 const rainPlanet = createPlanet(7001, 'Hujan');
 rainPlanet.weather = { type: 'rain', intensity: 0.8, remainingTicks: 5 };

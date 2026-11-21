@@ -9,9 +9,10 @@ Tujuan: menambahkan planet ketiga dengan musim, pembekuan, dan food web sendiri 
 | Terra | aktif | 12 | legacy climate (sengaja tidak berubah sejak v0.7) |
 | Dune | aktif | 12 | desert climate baseline |
 | Glaciera | aktif di v0.8 | 12 | `freeze-thaw`, empat musim, danau beku |
-| enam planet lain | data-only | — | — |
+| Inferna | aktif di v0.9 | 12 | `volcanic-eruption`, empat musim, lava/abu |
+| lima planet lain | data-only | — | — |
 
-`isSupportedPlanet()` sekarang menerima `terra`, `dune`, `glaciere`.
+`isSupportedPlanet()` sekarang menerima `terra`, `dune`, `glaciere`, `inferna`.
 
 ## Musim dan kryosfer
 

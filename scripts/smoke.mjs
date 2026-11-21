@@ -149,6 +149,24 @@ const iceProbe = await page.evaluate(() => {
   };
 });
 
+// Inferna boot + eruption telemetry.
+phase = 'inferna';
+await page.evaluate(() => {
+  window.__game.setPlanet('inferna', 8888);
+  window.__game.tick(190);
+});
+const fireProbe = await page.evaluate(() => {
+  const next = window.__game.state();
+  return {
+    planetId: next.planetId,
+    temperature: next.environment.temperature,
+    water: next.environment.water,
+    ecoSpecies: Object.keys(next.eco.populations).length,
+    volcano: window.__game.volcano(),
+    score: window.__game.ecoScore('inferna_fire_hawk'),
+  };
+});
+
 const contextLossErrors = boot.contextLost
   ? errors.filter((message) => /WebGL context may be lost|Could not initialize shader/.test(message))
   : [];
@@ -205,6 +223,14 @@ const checks = {
     iceProbe.cryo.seasonId === 'polar-night' &&
     iceProbe.cryo.freeze > 40 &&
     iceProbe.score !== null,
+  infernaPlanetActive:
+    fireProbe.planetId === 'inferna' &&
+    fireProbe.temperature > 75 &&
+    fireProbe.water < 25 &&
+    fireProbe.ecoSpecies === 12 &&
+    fireProbe.volcano.seasonId === 'eruption-phase' &&
+    fireProbe.volcano.eruptionStress > 60 &&
+    fireProbe.score !== null,
 };
 
 console.log(JSON.stringify({ boot, initialTick: initialState.tick, placementActive, contextLossErrors, appErrors, grown: {
@@ -216,7 +242,7 @@ console.log(JSON.stringify({ boot, initialTick: initialState.tick, placementActi
   objects: grown.objects.length,
   fauna: grownFauna,
   eco: ecoProbe,
-}, grownMetrics, reloadedTick: reloaded.tick, reloadedObjects: reloaded.objects.length, sw, dune: duneProbe, glaciere: iceProbe, errors, checks }, null, 2));
+}, grownMetrics, reloadedTick: reloaded.tick, reloadedObjects: reloaded.objects.length, sw, dune: duneProbe, glaciere: iceProbe, inferna: fireProbe, errors, checks }, null, 2));
 
 await browser.close();
 const failed = Object.entries(checks).filter(([, ok]) => !ok).map(([name]) => name);

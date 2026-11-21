@@ -1,4 +1,4 @@
-import type { CryosphereState, EcoEventRecord, EcoStateV3, PopulationRecord } from './types';
+import type { CryosphereState, EcoEventRecord, EcoStateV3, PopulationRecord, VolcanoState } from './types';
 
 export const CURRENT_ECOSYSTEM_VERSION = 1;
 
@@ -28,6 +28,19 @@ function normalizeCryosphere(raw: unknown): CryosphereState {
     iceCoverage: bounded(record.iceCoverage, 0),
     snowCover: bounded(record.snowCover, 0),
     thawStress: bounded(record.thawStress, 0),
+  };
+}
+
+function normalizeVolcano(raw: unknown): VolcanoState {
+  const record = isRecord(raw) ? raw : {};
+  return {
+    seasonId: typeof record.seasonId === 'string' ? record.seasonId : 'none',
+    seasonName: typeof record.seasonName === 'string' ? record.seasonName : '',
+    phase: Math.max(0, Math.min(1, finite(record.phase, 0))),
+    heat: bounded(record.heat, 0),
+    lavaFlow: bounded(record.lavaFlow, 0),
+    ash: bounded(record.ash, 0),
+    eruptionStress: bounded(record.eruptionStress, 0),
   };
 }
 
@@ -90,6 +103,15 @@ export function createEcoState(planetId = 'terra'): EcoStateV3 {
       snowCover: 0,
       thawStress: 0,
     },
+    volcano: {
+      seasonId: 'none',
+      seasonName: '',
+      phase: 0,
+      heat: 0,
+      lavaFlow: 0,
+      ash: 0,
+      eruptionStress: 0,
+    },
   };
 }
 
@@ -138,5 +160,6 @@ export function normalizeEcoState(raw: unknown, planetId: string): EcoStateV3 {
     eventHistory,
     metrics,
     cryo: normalizeCryosphere(raw.cryo),
+    volcano: normalizeVolcano(raw.volcano),
   };
 }
