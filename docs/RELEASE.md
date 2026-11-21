@@ -220,6 +220,16 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [x] Deploy HTTPS produksi aktif di <https://tinyplanetfactory.netlify.app/> via auto-deploy Netlify dari `main`.
 - [x] Deploy produksi diverifikasi melalui smoke, device, menu, dan offline PWA check.
 
+## 2t. Balanced World Scale (v0.15.3)
+
+- [x] Hierarki final: gunung > bukit > pohon > semak > rusa > rubah > batu ≈ bunga > rumput > burung.
+- [x] Tinggi dunia: gunung `0.115`, bukit `0.060`, pohon `0.045`, rusa `0.0105`, rubah `0.007`, burung `0.004`.
+- [x] Gunung minimum ≈1.46× pohon maksimal pada vegetasi sehat.
+- [x] Rasio kunci: bukit/pohon `1.33`, pohon/rusa `4.29`, rusa/rubah `1.49`, rusa/burung `2.64`.
+- [x] Wildlife memakai `SPECIES_SCALE`; fauna wildlife seukuran prop fauna dan tidak lagi melebihi gunung.
+- [x] `spacingRadius` dihitung ulang dari footprint baru; spacing deterministik tetap lolos.
+- [x] Gate `test:scale` memeriksa target tinggi, urutan, rasio, wildlife, dan budget aset.
+
 ## 3. QA perangkat nyata
 
 Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:

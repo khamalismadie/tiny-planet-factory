@@ -7,6 +7,7 @@ import {
   getAttributeData,
   srgbToLinear,
 } from '@pixi/3d';
+import { OBJECT_DEFS } from '../content/objects';
 import type { ObjectType, SpeciesId } from '../sim/types';
 
 export interface AssetGeometry {
@@ -230,10 +231,10 @@ function defineAsset(parts: Part[], baseLift = 0.004): AssetGeometry {
 
 function buildTree(): AssetGeometry {
   return defineAsset([
-    cylinder(0.016, 0.022, 0.09, 6, PALETTE.bark, [0, 0.045, 0]),
-    cone(0.08, 0.12, 6, PALETTE.leafDark, [0, 0.095, 0]),
-    cone(0.065, 0.11, 6, PALETTE.leaf, [0, 0.145, 0]),
-    cone(0.048, 0.095, 6, PALETTE.leafLight, [0, 0.19, 0]),
+    cylinder(0.016, 0.022, 0.114, 6, PALETTE.bark, [0, 0.057, 0]),
+    cone(0.08, 0.152, 6, PALETTE.leafDark, [0, 0.12, 0]),
+    cone(0.065, 0.139, 6, PALETTE.leaf, [0, 0.183, 0]),
+    cone(0.048, 0.12, 6, PALETTE.leafLight, [0, 0.24, 0]),
   ]);
 }
 
@@ -273,17 +274,17 @@ function buildDeer(): AssetGeometry {
 
 function buildFox(): AssetGeometry {
   const parts: Part[] = [
-    sphere(0.04, 7, 5, PALETTE.fox, [0, 0.055, 0], [1.45, 0.8, 0.8]),
-    cone(0.03, 0.062, 5, PALETTE.fox, [0.06, 0.083, 0], undefined, undefined, -Math.PI / 2),
+    sphere(0.04, 7, 5, PALETTE.fox, [0, 0.047, 0], [1.45, 0.8, 0.8]),
+    cone(0.03, 0.053, 5, PALETTE.fox, [0.06, 0.071, 0], undefined, undefined, -Math.PI / 2),
   ];
   for (const side of [-1, 1]) {
-    parts.push(cone(0.012, 0.032, 4, PALETTE.fox, [0.046, 0.11, side * 0.02], undefined, undefined, side * 0.25));
+    parts.push(cone(0.012, 0.028, 4, PALETTE.fox, [0.046, 0.095, side * 0.02], undefined, undefined, side * 0.25));
   }
-  parts.push(cone(0.024, 0.085, 5, PALETTE.fox, [-0.07, 0.075, 0], undefined, undefined, 1.2));
-  parts.push(cone(0.017, 0.03, 5, PALETTE.foxLight, [-0.108, 0.11, 0], undefined, undefined, 1.2));
+  parts.push(cone(0.024, 0.073, 5, PALETTE.fox, [-0.07, 0.065, 0], undefined, undefined, 1.2));
+  parts.push(cone(0.017, 0.026, 5, PALETTE.foxLight, [-0.108, 0.095, 0], undefined, undefined, 1.2));
   for (const x of [-0.035, 0.035]) {
     for (const z of [-0.017, 0.017]) {
-      parts.push(cylinder(0.005, 0.006, 0.048, 4, PALETTE.fox, [x, 0.024, z]));
+      parts.push(cylinder(0.005, 0.006, 0.041, 4, PALETTE.fox, [x, 0.021, z]));
     }
   }
   return defineAsset(parts);
@@ -291,14 +292,14 @@ function buildFox(): AssetGeometry {
 
 function buildBird(): AssetGeometry {
   const parts: Part[] = [
-    sphere(0.03, 7, 5, PALETTE.bird, [0, 0.04, 0], [1.3, 0.75, 0.8]),
-    sphere(0.018, 6, 4, PALETTE.birdLight, [0.036, 0.058, 0]),
-    cone(0.008, 0.022, 4, PALETTE.beak, [0.056, 0.055, 0], undefined, undefined, -Math.PI / 2),
+    sphere(0.03, 7, 5, PALETTE.bird, [0, 0.061, 0], [1.3, 0.75, 0.8]),
+    sphere(0.018, 6, 4, PALETTE.birdLight, [0.036, 0.088, 0]),
+    cone(0.008, 0.022, 4, PALETTE.beak, [0.056, 0.084, 0], undefined, undefined, -Math.PI / 2),
   ];
   for (const side of [-1, 1]) {
-    parts.push(sphere(0.021, 5, 3, PALETTE.birdLight, [0, 0.05, side * 0.026], [1.1, 0.18, 0.7]));
+    parts.push(sphere(0.021, 5, 3, PALETTE.birdLight, [0, 0.076, side * 0.026], [1.1, 0.18, 0.7]));
   }
-  parts.push(cone(0.012, 0.03, 4, PALETTE.bird, [-0.042, 0.045, 0], undefined, undefined, Math.PI / 2));
+  parts.push(cone(0.012, 0.03, 4, PALETTE.bird, [-0.042, 0.068, 0], undefined, undefined, Math.PI / 2));
   return defineAsset(parts);
 }
 
@@ -348,9 +349,9 @@ export const ASSET_GEOMETRY: Record<ObjectType, AssetGeometry> = {
     rock(0.028, PALETTE.stoneDark, [0.036, 0.025, -0.014]),
   ]),
   hill: defineAsset([
-    sphere(0.1, 8, 4, PALETTE.leaf, [0, 0.03, 0], [1, 0.32, 1]),
-    sphere(0.06, 7, 4, PALETTE.leafDark, [-0.05, 0.02, 0.025], [1, 0.36, 1]),
-    sphere(0.055, 7, 4, PALETTE.leafLight, [0.05, 0.018, -0.02], [1, 0.34, 1]),
+    sphere(0.09, 8, 4, PALETTE.leaf, [0, 0.075, 0], [1, 0.95, 1]),
+    sphere(0.055, 7, 4, PALETTE.leafDark, [-0.05, 0.05, 0.025], [1, 0.9, 1]),
+    sphere(0.05, 7, 4, PALETTE.leafLight, [0.05, 0.045, -0.02], [1, 0.85, 1]),
   ]),
   mountain: defineAsset([
     cone(0.1, 0.5, 5, PALETTE.stone, [0, 0.25, 0]),
@@ -369,9 +370,9 @@ export const ASSET_GEOMETRY: Record<ObjectType, AssetGeometry> = {
   ], 0.012),
   tree: buildTree(),
   bush: defineAsset([
-    sphere(0.06, 7, 4, PALETTE.leaf, [-0.035, 0.05, 0], [1, 0.85, 1]),
-    sphere(0.065, 7, 4, PALETTE.leafLight, [0.035, 0.055, 0.015], [1, 0.85, 1]),
-    sphere(0.05, 6, 4, PALETTE.leafDark, [0, 0.07, -0.035], [1, 0.8, 1]),
+    sphere(0.06, 7, 4, PALETTE.leaf, [-0.035, 0.075, 0], [1, 1.25, 1]),
+    sphere(0.065, 7, 4, PALETTE.leafLight, [0.035, 0.082, 0.015], [1, 1.31, 1]),
+    sphere(0.05, 6, 4, PALETTE.leafDark, [0, 0.095, -0.035], [1, 1.3, 1]),
   ]),
   flower: buildFlower(),
   deer: buildDeer(),
@@ -385,4 +386,13 @@ export const SPECIES_GEOMETRY: Record<SpeciesId, AssetGeometry> = {
   bird: buildBird(),
   fish: buildFish(),
   insect: buildInsect(),
+};
+
+/** World scale applied to wildlife agents so they match placed props and the rest of the scene. */
+export const SPECIES_SCALE: Record<SpeciesId, number> = {
+  deer: OBJECT_DEFS.deer.scale,
+  fox: OBJECT_DEFS.fox.scale,
+  bird: OBJECT_DEFS.bird.scale,
+  fish: 0.08,
+  insect: 0.064,
 };

@@ -114,6 +114,7 @@ Program Nine Worlds menggantikan roadmap lama: Terra diselesaikan lebih dulu, la
 | `v0.15` | **Main Menu & Instrument UI** — menu utama, kontrol kualitas, pause-safe, dan bahasa visual peta kebun planet. *(selesai)* |
 | `v0.15.1` | **Habitat Proportion Balance** — hierarki gunung/pohon, silhouette bunga, dan soft spacing deterministik. *(selesai)* |
 | `v0.15.2` | **First-Visit SW Fix** — tidak ada reload paksa saat install PWA pertama kali. *(selesai)* |
+| `v0.15.3` | **Balanced World Scale** — hierarki ukuran gunung, bukit, pohon, fauna, dan prop mengikuti logika dunia nyata. *(selesai)* |
 
 ## Langkah berikutnya
 

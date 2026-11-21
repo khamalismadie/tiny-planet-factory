@@ -9,7 +9,7 @@ import {
 } from '@pixi/3d';
 import { SPECIES_ORDER } from '../content/species';
 import type { SpeciesId, TerrainConfig, WildlifeAgent } from '../sim/types';
-import { SPECIES_GEOMETRY } from './assetGeometry';
+import { SPECIES_GEOMETRY, SPECIES_SCALE } from './assetGeometry';
 import { terrainRadius } from './terrain';
 
 const PER_SPECIES_CAPACITY = 12;
@@ -77,7 +77,7 @@ export class WildlifeRenderer {
         const length = Math.hypot(...agent.dir) || 1;
         this.normal.set(agent.dir[0] / length, agent.dir[1] / length, agent.dir[2] / length);
         const radius = terrainRadius(this.normal.x, this.normal.y, this.normal.z, seed, terrain);
-        const size = 0.9 + agent.energy / 500;
+        const size = SPECIES_SCALE[species] * (0.9 + agent.energy / 500);
         const contact = radius + asset.baseLift * size + (HOVER[species] ?? 0);
         this.position.set(this.normal.x * contact, this.normal.y * contact, this.normal.z * contact);
         this.q.setFromUnitVectors(this.up, this.normal);
