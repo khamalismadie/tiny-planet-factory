@@ -1,5 +1,6 @@
 import { aquariaConfig } from './aquaria';
 import { aureliaConfig } from './aurelia';
+import { cosmosConfig } from './cosmos';
 import { duneConfig } from './dune';
 import { glaciereConfig } from './glaciera';
 import { infernaConfig } from './inferna';
@@ -232,6 +233,31 @@ const AURELIA_PROFILE: GuildProfile = {
   },
 };
 
+const COSMOS_PROFILE: GuildProfile = {
+  config: cosmosConfig,
+  guilds: {
+    deer: ['cosmos_crystal_grazer', 'cosmos_star_rabbit', 'cosmos_nebula_stag'],
+    fox: ['cosmos_void_panther'],
+    bird: ['cosmos_astral_hawk'],
+    fish: [],
+    insect: ['cosmos_comet_moth', 'cosmos_void_fungi'],
+  },
+  divisors: { deer: 10, fox: 3, bird: 3, fish: 10, insect: 8 },
+  prey: { fox: ['deer'], bird: ['insect'] },
+  foodObjects: {
+    cosmos_star_bloom: ['flower', 'bush'],
+    cosmos_void_grass: ['grass'],
+    cosmos_nebula_tree: ['tree'],
+    cosmos_crystal_grazer: ['deer', 'rock'],
+    cosmos_star_rabbit: ['deer', 'grass'],
+    cosmos_nebula_stag: ['deer', 'bush'],
+    cosmos_comet_moth: ['flower', 'bush'],
+    cosmos_astral_hawk: ['bird', 'mountain'],
+    cosmos_void_panther: ['fox', 'deer'],
+    cosmos_void_fungi: ['rock', 'bush', 'grass'],
+  },
+};
+
 export const GUILD_PROFILES: Record<string, GuildProfile> = {
   terra: TERRA_PROFILE,
   dune: DUNE_PROFILE,
@@ -241,4 +267,5 @@ export const GUILD_PROFILES: Record<string, GuildProfile> = {
   mycelia: MYCELIA_PROFILE,
   sakura: SAKURA_PROFILE,
   aurelia: AURELIA_PROFILE,
+  cosmos: COSMOS_PROFILE,
 };

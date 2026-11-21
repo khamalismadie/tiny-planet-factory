@@ -439,7 +439,7 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
     sky.seasonId = season?.id ?? 'none';
     sky.seasonName = season?.name ?? '';
     sky.phase = seasonInfo?.phase ?? 0;
-  } else if (sky.seasonId !== 'none' || sky.connectivity || sky.wind || sky.blossom || sky.uplift || sky.isolationStress) {
+  } else if (planet.planetId !== 'cosmos' && (sky.seasonId !== 'none' || sky.connectivity || sky.wind || sky.blossom || sky.uplift || sky.isolationStress)) {
     sky.seasonId = 'none';
     sky.seasonName = '';
     sky.phase = 0;
@@ -471,14 +471,38 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
     forest.frostStress = 0;
   }
 
+  if (planetConfig?.specialSystems.includes('crystal-storage')) {
+    const lightBase = season?.id === 'luminous-phase' ? 90
+      : season?.id === 'crystal-resonance' ? 65
+        : season?.id === 'void-tide' ? 20 : 35;
+    sky.blossom = approach(sky.blossom, lightBase, 0.05);
+    const radiationBase = season?.id === 'meteor-shower' ? 85
+      : season?.id === 'void-tide' ? 55
+        : season?.id === 'crystal-resonance' ? 40 : 25;
+    sky.wind = approach(sky.wind, clamp(radiationBase + (planet.weather.type === 'storm' ? 10 : 0)), 0.06);
+    const latticeBase = season?.id === 'crystal-resonance' ? 85
+      : season?.id === 'luminous-phase' ? 70
+        : season?.id === 'void-tide' ? 35 : 55;
+    sky.connectivity = approach(sky.connectivity, clamp(latticeBase + counts.rock * 1.5), 0.05);
+    const gravityBase = season?.id === 'void-tide' ? 85 : season?.id === 'meteor-shower' ? 65 : 45;
+    sky.uplift = approach(sky.uplift, gravityBase, 0.05);
+    sky.isolationStress = approach(sky.isolationStress, clamp(
+      Math.max(0, sky.wind - 60) * 1.2 + Math.max(0, 50 - sky.connectivity) * 0.8,
+    ), 0.07);
+    sky.seasonId = season?.id ?? 'none';
+    sky.seasonName = season?.name ?? '';
+    sky.phase = seasonInfo?.phase ?? 0;
+  }
+
   const seasonalVegetation = clamp(1 + (season?.vegetationModifier ?? 0), 0.25, 1.6);
   const volcanicBiome = planetConfig?.specialSystems.includes('volcanic-eruption') ?? false;
   const aquaticBiome = planetConfig?.specialSystems.includes('coral-health') ?? false;
   const fungalBiome = planetConfig?.specialSystems.includes('fungal-network') ?? false;
   const skyBiome = planetConfig?.specialSystems.includes('floating-connectivity') ?? false;
   const forestBiome = planetConfig?.specialSystems.includes('leaf-fall') ?? false;
+  const cosmosBiome = planetConfig?.specialSystems.includes('crystal-storage') ?? false;
   const fungalFactor = fungalBiome ? 1 + (fungal.network - 50) * 0.003 - fungal.networkStress * 0.002 : 1;
-  const skyFactor = skyBiome ? 1 + (sky.connectivity - 50) * 0.003 - sky.wind * 0.0015 : 1;
+  const skyFactor = (skyBiome || cosmosBiome) ? 1 + (sky.connectivity - 50) * 0.003 - sky.wind * 0.0015 : 1;
   const forestFactor = forestBiome ? 1 + (forest.leafLitter - 50) * 0.002 + forest.storage * 0.001 - forest.frostStress * 0.001 : 1;
   const coldFactor = cryo.seasonId !== 'none'
     ? 1 - cryo.freeze / 100 * 0.3
@@ -504,6 +528,7 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
   if (fungalBiome) e.fertility = clamp(e.fertility + fungal.nutrients * 0.02 + (fungal.network - 50) * 0.01);
   if (skyBiome) e.fertility = clamp(e.fertility + sky.blossom * 0.01);
   if (forestBiome) e.fertility = clamp(e.fertility + forest.leafLitter * 0.006 + forest.storage * 0.004 - forest.hibernation * 0.002);
+  if (cosmosBiome) e.fertility = clamp(e.fertility + sky.blossom * 0.005 - sky.uplift * 0.002);
 
   const distinct = new Set(planet.objects.map((o) => o.type)).size;
   const discoveredSpecies = planet.fauna?.discovered.length ?? 0;
@@ -514,6 +539,7 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
   );
 
   e.energy = approach(e.energy, clamp(sunlight * 55 + (planet.weather.type === 'storm' ? -12 : 0)), 0.08);
+  if (cosmosBiome) e.energy = clamp(e.energy + sky.blossom * 0.01 - sky.wind * 0.004);
 
   const deviations = (Object.keys(IDEAL) as EnvKey[])
     .filter((key) => key !== 'stability')

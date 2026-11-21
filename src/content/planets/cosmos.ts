@@ -46,16 +46,19 @@ const SPECIES = [
     [food('cosmos_void_grass', 1, ['grazing']), food('cosmos_star_bloom', 0.4, ['grazing'])], {
       habitatPreferences: [CRYSTAL_HABITAT], migrationBehavior: 'nomadic', populationCapacity: 56,
       predatorSpecies: ['cosmos_void_panther'],
+      geneticTraits: ['gravity-zones'], reproductionRate: 0.13, mortalityRate: 0.012,
     }),
   species(PLANET_ID, 'cosmos_star_rabbit', 'Kelinci Bintang', 'primary-consumer', ['cosmic-plains', 'nebula-valleys'],
     [food('cosmos_star_bloom', 1, ['grazing'])], {
-      habitatPreferences: [PLAIN_HABITAT], activitySchedule: 'cathemeral', reproductionRate: 0.1,
-      predatorSpecies: ['cosmos_astral_hawk', 'cosmos_void_panther'], populationCapacity: 74,
+      habitatPreferences: [PLAIN_HABITAT], activitySchedule: 'cathemeral', reproductionRate: 0.3,
+      predatorSpecies: ['cosmos_astral_hawk', 'cosmos_void_panther'], populationCapacity: 90,
+      geneticTraits: ['gravity-zones'], mortalityRate: 0.01,
     }),
   species(PLANET_ID, 'cosmos_nebula_stag', 'Rusa Nebula', 'primary-consumer', ['nebula-valleys', 'meteor-craters'],
     [food('cosmos_nebula_tree', 0.9, ['grazing']), food('cosmos_star_bloom', 0.5, ['grazing'])], {
       habitatPreferences: [NEBULA_HABITAT], migrationBehavior: 'seasonal', populationCapacity: 38,
       predatorSpecies: ['cosmos_void_panther'], rarity: 'uncommon',
+      geneticTraits: ['crystal-storage'], reproductionRate: 0.18, mortalityRate: 0.012,
     }),
   species(PLANET_ID, 'cosmos_comet_moth', 'Ngengat Komet', 'pollinator', ['nebula-valleys', 'cosmic-plains'],
     [food('cosmos_star_bloom', 1, ['pollination']), food('nectar', 0.4, ['pollination'])], {
@@ -65,12 +68,14 @@ const SPECIES = [
   species(PLANET_ID, 'cosmos_astral_hawk', 'Elang Astral', 'tertiary-consumer', ['cosmic-plains', 'nebula-valleys'],
     [food('cosmos_star_rabbit', 1, ['hunting']), food('cosmos_comet_moth', 0.5, ['hunting'])], {
       habitatPreferences: [PLAIN_HABITAT], migrationBehavior: 'nomadic', rarity: 'rare',
-      preySpecies: ['cosmos_star_rabbit'], populationCapacity: 12,
+      preySpecies: ['cosmos_star_rabbit'], populationCapacity: 14,
+      geneticTraits: ['energy-organisms'], reproductionRate: 0.12, mortalityRate: 0.012,
     }),
   species(PLANET_ID, 'cosmos_void_panther', 'Panther Hampa', 'apex-predator', ['crystal-fields', 'nebula-valleys', 'meteor-craters'],
     [food('cosmos_crystal_grazer', 0.9, ['hunting']), food('cosmos_nebula_stag', 0.7, ['hunting'])], {
       habitatPreferences: [CRYSTAL_HABITAT], activitySchedule: 'nocturnal', rarity: 'rare',
-      preySpecies: ['cosmos_crystal_grazer', 'cosmos_nebula_stag'], populationCapacity: 7,
+      preySpecies: ['cosmos_crystal_grazer', 'cosmos_nebula_stag'], populationCapacity: 8,
+      geneticTraits: ['energy-organisms'], reproductionRate: 0.12, mortalityRate: 0.012,
     }),
 
   species(PLANET_ID, 'cosmos_void_fungi', 'Jamur Hampa', 'decomposer', ['meteor-craters', 'crystal-fields', 'nebula-valleys'],

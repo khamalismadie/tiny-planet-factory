@@ -135,7 +135,8 @@ const dnaAquaria = createPlanet(324, 'DNA Laut', 'aquaria');
 const dnaMycelia = createPlanet(325, 'DNA Jamur', 'mycelia');
 const dnaSakura = createPlanet(326, 'DNA Sakura', 'sakura');
 const dnaAurelia = createPlanet(327, 'DNA Aurelia', 'aurelia');
-for (const [source, id] of [[dnaDune, 'dune'], [dnaGlaciere, 'glaciere'], [dnaInferna, 'inferna'], [dnaAquaria, 'aquaria'], [dnaMycelia, 'mycelia'], [dnaSakura, 'sakura'], [dnaAurelia, 'aurelia']] as const) {
+const dnaCosmos = createPlanet(328, 'DNA Cosmos', 'cosmos');
+for (const [source, id] of [[dnaDune, 'dune'], [dnaGlaciere, 'glaciere'], [dnaInferna, 'inferna'], [dnaAquaria, 'aquaria'], [dnaMycelia, 'mycelia'], [dnaSakura, 'sakura'], [dnaAurelia, 'aurelia'], [dnaCosmos, 'cosmos']] as const) {
   const roundTrip = decodePlanetDna(encodePlanetDna(source).full);
   assert(roundTrip?.planetId === id, `DNA lengkap ${id} harus mempertahankan planetId`);
   const expected = ecosystemConfigFor(id)?.species.length ?? 12;
@@ -408,7 +409,7 @@ assert(foxSupplyAfter < foxSupplyBefore, 'runtuhnya mangsa harus menurunkan supl
 assert(agentCount(predatorPlanet, 'fox') <= foxBefore, 'jumlah predator tidak boleh naik saat mangsa habis');
 
 // Dune is the second active ecosystem with its own climate and guild mapping.
-assert(isSupportedPlanet('dune') && isSupportedPlanet('glaciere') && isSupportedPlanet('inferna') && isSupportedPlanet('aquaria') && isSupportedPlanet('mycelia') && isSupportedPlanet('sakura') && isSupportedPlanet('aurelia'), 'Terra, Dune, Glaciera, Inferna, Aquaria, Mycelia, Sakura, dan Aurelia aktif');
+assert(isSupportedPlanet('dune') && isSupportedPlanet('glaciere') && isSupportedPlanet('inferna') && isSupportedPlanet('aquaria') && isSupportedPlanet('mycelia') && isSupportedPlanet('sakura') && isSupportedPlanet('aurelia') && isSupportedPlanet('cosmos'), 'Terra, Dune, Glaciera, Inferna, Aquaria, Mycelia, Sakura, Aurelia, dan Cosmos aktif');
 const duneConfig = ecosystemConfigFor('dune');
 assert(duneConfig !== null && duneConfig.species.length === 12, 'Dune harus membawa 12 spesies');
 const dunePlanet = createPlanet(6161, 'Dune Uji', 'dune');
@@ -763,6 +764,61 @@ for (const type of ['tree', 'grass', 'bush', 'rock', 'deer', 'fox', 'bird'] as c
 tickN(forestTwin, 361);
 assert(JSON.stringify(forestPlanet.fauna) === JSON.stringify(forestTwin.fauna), 'fauna Aurelia harus deterministik');
 assert(JSON.stringify(forestPlanet.eco) === JSON.stringify(forestTwin.eco), 'ekosistem Aurelia harus deterministik');
+
+// Cosmos is the ninth active ecosystem. It reuses the eco.sky slot for cosmic telemetry.
+const cosmicConfig = ecosystemConfigFor('cosmos');
+assert(cosmicConfig !== null && cosmicConfig.species.length === 10, 'Cosmos harus membawa 10 spesies');
+assert(cosmicConfig.climate.seasons.length === 4, 'Cosmos harus membawa empat fase');
+assert(cosmicConfig.specialSystems.includes('crystal-storage'), 'Cosmos harus membawa sistem crystal-storage');
+const cosmicPlanet = createPlanet(9987, 'Cosmos Uji', 'cosmos');
+assert(cosmicPlanet.planetId === 'cosmos', 'createPlanet harus mempertahankan planetId Cosmos');
+assert(cosmicPlanet.environment.energy > 70, 'Cosmos harus mulai dengan energi tinggi');
+assert(cosmicPlanet.eco.populations.cosmos_star_bloom, 'populasi Cosmos harus diinisialisasi');
+assert(!cosmicPlanet.eco.populations.aurelia_deer && !cosmicPlanet.eco.populations.sakura_tree, 'tidak boleh ada kebocoran spesies planet lain');
+for (const type of ['tree', 'grass', 'flower', 'bush', 'rock', 'deer', 'fox', 'bird'] as const) {
+  assert(placeObject(cosmicPlanet, type, [0.5, 0.4, 0.75]), `${type} harus bisa ditempatkan di Cosmos`);
+}
+tickN(cosmicPlanet, 50);
+const lightSky = { ...cosmicPlanet.eco.sky };
+assert(lightSky.seasonId === 'luminous-phase', '50 tick pertama harus fase cahaya');
+assert(lightSky.blossom > 60, 'fase cahaya harus menaikkan fluks cahaya');
+tickN(cosmicPlanet, 70);
+const resonanceSky = { ...cosmicPlanet.eco.sky };
+assert(resonanceSky.seasonId === 'crystal-resonance', 'tick 120 harus masuk resonansi kristal');
+assert(resonanceSky.connectivity > lightSky.connectivity, 'resonansi kristal harus memperkuat kisi');
+tickN(cosmicPlanet, 85);
+const voidSky = { ...cosmicPlanet.eco.sky };
+assert(voidSky.seasonId === 'void-tide', 'tick 205 harus masuk pasang hampa');
+assert(voidSky.wind > lightSky.wind, 'pasang hampa harus menaikkan radiasi');
+assert(voidSky.uplift > lightSky.uplift, 'pasang hampa harus menaikkan anomali gravitasi');
+tickN(cosmicPlanet, 80);
+const meteorSky = { ...cosmicPlanet.eco.sky };
+assert(meteorSky.seasonId === 'meteor-shower', 'tick 285 harus masuk hujan meteor');
+assert(meteorSky.wind > resonanceSky.wind, 'hujan meteor harus menaikkan radiasi');
+tickN(cosmicPlanet, 76);
+assert(cosmicPlanet.eco.sky.seasonId === 'luminous-phase', 'tick 361 harus kembali ke fase cahaya');
+assert(cosmicPlanet.eco.sky.connectivity > 0, 'kisi kristal harus bertahan setelah siklus penuh');
+assert(cosmicPlanet.eco.metrics.speciesCount === 10, 'ekosistem Cosmos harus tetap memiliki 10 spesies');
+assertBoundedEco(cosmicPlanet, 'Cosmos');
+const cosmicDeer = guildStatus(cosmicPlanet, 'deer');
+assert(cosmicDeer !== null && cosmicDeer.speciesIds.includes('cosmos_star_rabbit'), 'guild deer Cosmos harus memetakan kelinci bintang');
+assert(guildFoodSourceIds(cosmicPlanet, 'fox').includes('cosmos_crystal_grazer'), 'guild predator Cosmos harus terhubung ke food web');
+assert(agentCount(cosmicPlanet, 'bird') > 0, 'Cosmos harus memunculkan agen elang astral');
+assert(agentCount(cosmicPlanet, 'insect') > 0, 'Cosmos harus memunculkan agen ngengat komet');
+const cosmicLoaded = deserializePlanet(serializePlanet(cosmicPlanet));
+assert(
+  cosmicLoaded?.planetId === 'cosmos' &&
+    cosmicLoaded.eco.sky.seasonId === 'luminous-phase' &&
+    !!cosmicLoaded.eco.populations.cosmos_void_panther,
+  'save/load Cosmos harus mempertahankan identitas, fase, dan populasi',
+);
+const cosmicTwin = createPlanet(9987, 'Cosmos Uji', 'cosmos');
+for (const type of ['tree', 'grass', 'flower', 'bush', 'rock', 'deer', 'fox', 'bird'] as const) {
+  placeObject(cosmicTwin, type, [0.5, 0.4, 0.75]);
+}
+tickN(cosmicTwin, 361);
+assert(JSON.stringify(cosmicPlanet.fauna) === JSON.stringify(cosmicTwin.fauna), 'fauna Cosmos harus deterministik');
+assert(JSON.stringify(cosmicPlanet.eco) === JSON.stringify(cosmicTwin.eco), 'ekosistem Cosmos harus deterministik');
 
 const rainPlanet = createPlanet(7001, 'Hujan');
 rainPlanet.weather = { type: 'rain', intensity: 0.8, remainingTicks: 5 };

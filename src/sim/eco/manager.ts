@@ -1,4 +1,5 @@
 import { aquariaConfig } from '../../content/planets/aquaria';
+import { cosmosConfig } from '../../content/planets/cosmos';
 import { aureliaConfig } from '../../content/planets/aurelia';
 import { duneConfig } from '../../content/planets/dune';
 import { glaciereConfig } from '../../content/planets/glaciera';
@@ -222,8 +223,14 @@ export function habitatContextFor(planet: PlanetState, config: PlanetConfig): Ha
                           ? 'spora-beracun'
                           : (planet.eco.fungal?.seasonId !== 'none' && planet.environment.humidity > 95)
                             ? 'kelembapan-ekstrem'
-                            : (planet.eco.sky?.isolationStress ?? 0) > 60
-                              ? 'putusnya-pulau-melayang'
+                            : (planet.planetId === 'cosmos' && (planet.eco.sky?.wind ?? 0) > 70)
+                              ? 'badai-radiasi'
+                              : (planet.planetId === 'cosmos' && (planet.eco.sky?.uplift ?? 0) > 70)
+                                ? 'anomali-gravitasi'
+                                : (planet.planetId === 'cosmos' && planet.eco.sky?.seasonId === 'meteor-shower')
+                                  ? 'hujan-meteor'
+                                  : (planet.eco.sky?.isolationStress ?? 0) > 60
+                                    ? 'putusnya-pulau-melayang'
                               : (planet.eco.sky?.wind ?? 0) > 75
                                 ? 'angin-kencang'
                                 : (planet.eco.sky?.seasonId !== 'none' && planet.environment.water < 45)
@@ -343,7 +350,11 @@ export class EcosystemManager {
         trait === 'wind-dispersal' ||
         trait === 'blossom-season' ||
         trait === 'vertical-growth' ||
-        trait === 'seed-dispersal',
+        trait === 'seed-dispersal' ||
+        (planet.planetId === 'cosmos' && (
+          trait === 'energy-organisms' || trait === 'crystal-storage' ||
+          trait === 'cosmic-anomaly' || trait === 'gravity-zones' || trait === 'energy-recycling'
+        )),
       );
       const isolationMortality = isolationStress * (skyAdapted ? 0.004 : 0.014);
       const frostStress = (planet.eco.forest?.frostStress ?? 0) / 100;
@@ -418,6 +429,7 @@ const ECOSYSTEM_MANAGERS = new Map<string, EcosystemManager>([
   [myceliaConfig.id, new EcosystemManager(myceliaConfig)],
   [sakuraConfig.id, new EcosystemManager(sakuraConfig)],
   [aureliaConfig.id, new EcosystemManager(aureliaConfig)],
+  [cosmosConfig.id, new EcosystemManager(cosmosConfig)],
 ]);
 
 export function ecosystemFor(planetId: string): EcosystemManager | null {

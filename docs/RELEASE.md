@@ -167,6 +167,18 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [ ] Tujuh planet sebelumnya tidak berubah secara numerik dari gate v0.12.
 - [ ] App chunk <100 kB.
 
+## 2o. Cosmos + Crystal Biome (v0.14)
+
+- [ ] `?planet=cosmos` dan `setPlanet('cosmos')` menghasilkan 10 populasi Cosmos.
+- [ ] Empat fase berjalan deterministik: luminous-phase → crystal-resonance → void-tide → meteor-shower.
+- [ ] Kisi menguat saat Resonansi Kristal; radiasi/gravitasi naik saat Pasang Hampa; radiasi puncak saat Hujan Meteor.
+- [ ] 10 spesies tetap hidup setelah satu siklus 360 tick.
+- [ ] Guild Cosmos memetakan kelinci bintang, elang astral, dan ngengat komet; predator terhubung ke food web.
+- [ ] Save/load mempertahankan `eco.sky` dengan mapping kosmik.
+- [ ] DNA lengkap mempertahankan `planetId` Cosmos.
+- [ ] Delapan planet sebelumnya tidak berubah secara numerik dari gate v0.13.
+- [ ] App chunk <100 kB.
+
 ## 3. QA perangkat nyata
 
 Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:

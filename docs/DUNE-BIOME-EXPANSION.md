@@ -14,7 +14,7 @@ Tujuan: mengaktifkan planet kedua dengan ekosistemnya sendiri tanpa mengubah for
 | Mycelia | aktif di v0.11 | 11 (lihat dokumen sendiri) |
 | Sakura | aktif di v0.12 | 11 (lihat dokumen sendiri) |
 | Aurelia | aktif di v0.13 | 11 (lihat dokumen sendiri) |
-| satu planet lain | config/data saja, belum disimulasikan | — |
+| Cosmos | aktif di v0.14 | 10 (lihat dokumen sendiri) |
 
 Daftar aktif berada di `GUILD_PROFILES`. `isSupportedPlanet()` dipakai oleh `createPlanet()` dan QA hook supaya planet yang belum aktif tidak menghasilkan state ekologis palsu.
 

@@ -16,7 +16,7 @@ Tujuan: menambahkan planet kedelapan dengan hutan musim gugur, serasah daun, pen
 | Aurelia | aktif di v0.13 | 11 | `leaf-fall`, empat musim, simpanan/hibernasi |
 | Cosmos | data-only | — | — |
 
-`isSupportedPlanet()` sekarang menerima `terra`, `dune`, `glaciere`, `inferna`, `aquaria`, `mycelia`, `sakura`, `aurelia`.
+`isSupportedPlanet()` sekarang menerima kesembilan `PLANET_IDS`.
 
 ## Musim dan hutan
 
@@ -89,4 +89,4 @@ Jamur daun memakai proksi serangga untuk agen visual.
 
 - Belum ada partikel daun gugur atau warna kanopi dinamis.
 - Tidak ada UI selector planet permanen; akses lewat query param/debug hook untuk QA.
-- Cosmos masih data-only.
+- Nine Worlds lengkap; lihat dokumen Cosmos.

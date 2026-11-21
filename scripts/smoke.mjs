@@ -236,6 +236,23 @@ const forestProbe = await page.evaluate(() => {
   };
 });
 
+// Cosmos boot + cosmic telemetry (reuses eco.sky slot).
+phase = 'cosmos';
+await page.evaluate(() => {
+  window.__game.setPlanet('cosmos', 9987);
+  window.__game.tick(50);
+});
+const cosmicProbe = await page.evaluate(() => {
+  const next = window.__game.state();
+  return {
+    planetId: next.planetId,
+    energy: next.environment.energy,
+    ecoSpecies: Object.keys(next.eco.populations).length,
+    sky: window.__game.sky(),
+    score: window.__game.ecoScore('cosmos_star_rabbit'),
+  };
+});
+
 const contextLossErrors = boot.contextLost
   ? errors.filter((message) => /WebGL context may be lost|Could not initialize shader/.test(message))
   : [];
@@ -331,6 +348,13 @@ const checks = {
     forestProbe.forest.leafLitter > 50 &&
     forestProbe.forest.storage > 60 &&
     forestProbe.score !== null,
+  cosmosPlanetActive:
+    cosmicProbe.planetId === 'cosmos' &&
+    cosmicProbe.energy > 60 &&
+    cosmicProbe.ecoSpecies === 10 &&
+    cosmicProbe.sky.seasonId === 'luminous-phase' &&
+    cosmicProbe.sky.blossom > 60 &&
+    cosmicProbe.score !== null,
 };
 
 console.log(JSON.stringify({ boot, initialTick: initialState.tick, placementActive, contextLossErrors, appErrors, grown: {
@@ -342,7 +366,7 @@ console.log(JSON.stringify({ boot, initialTick: initialState.tick, placementActi
   objects: grown.objects.length,
   fauna: grownFauna,
   eco: ecoProbe,
-}, grownMetrics, reloadedTick: reloaded.tick, reloadedObjects: reloaded.objects.length, sw, dune: duneProbe, glaciere: iceProbe, inferna: fireProbe, aquaria: waterProbe, mycelia: fungalProbe, sakura: skyProbe, aurelia: forestProbe, errors, checks }, null, 2));
+}, grownMetrics, reloadedTick: reloaded.tick, reloadedObjects: reloaded.objects.length, sw, dune: duneProbe, glaciere: iceProbe, inferna: fireProbe, aquaria: waterProbe, mycelia: fungalProbe, sakura: skyProbe, aurelia: forestProbe, cosmos: cosmicProbe, errors, checks }, null, 2));
 
 await browser.close();
 const failed = Object.entries(checks).filter(([, ok]) => !ok).map(([name]) => name);
