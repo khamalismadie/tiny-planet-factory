@@ -153,7 +153,7 @@ export class Game {
   private refreshScene(): void {
     this.scene.setEnvironment(this.state.environment);
     this.scene.syncObjects(this.state.objects, this.state.environment, false);
-    this.scene.syncWildlife(this.state.fauna?.agents ?? [], this.state.terrainConfig);
+    this.scene.syncWildlife(this.state.fauna?.agents ?? []);
     this.scene.setWeather(this.state.weather.type, this.state.weather.intensity);
   }
 

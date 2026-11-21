@@ -96,3 +96,4 @@ Catatan interpretasi:
 - Boot yang dilaporkan QaProbe adalah **0,24–2,03 s** sejak hook mulai, bukan cold-start 4G penuh dari ikon PWA; baris #1 masih memerlukan pengukuran terpisah.
 - Service worker aktif pada semua run. `installPromptSeen` terlihat pada sebagian run; `standalone: false` karena aplikasi dibuka dari browser, bukan dari ikon yang sudah dipasang. Baris #7–#8 (install → airplane mode, update) **masih belum terverifikasi**.
 - Tidak ada context loss pada semua run; ini melengkapi tetapi tidak menggantikan checklist #6 untuk background/GPU reset nyata.
+- Catatan v0.15.6: normalisasi bentuk planet mengubah skala kontak prop. Angka di atas adalah baseline sebelum perbaikan dan perlu diulang setelah build v0.15.6.

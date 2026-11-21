@@ -5,6 +5,7 @@ import { DEFAULT_TERRAIN_CONFIG, type Environment, type PlacedObject, type Terra
 import { PlanetMesh } from './PlanetMesh';
 import { PlacementFx } from './PlacementFx';
 import { PropRenderer } from './PropRenderer';
+import { normalizeTerrainForRender } from './terrain';
 import { WeatherFx } from './WeatherFx';
 import { WildlifeRenderer } from './WildlifeRenderer';
 
@@ -23,9 +24,10 @@ export class GameScene {
   private readonly rim: DirectionalLight;
 
   constructor(seed: number, settings: QualitySettings, terrain: TerrainConfig = DEFAULT_TERRAIN_CONFIG) {
+    const renderTerrain = normalizeTerrainForRender(terrain);
     this.quality = settings;
     this.seed = seed;
-    this.terrainConfig = { ...terrain };
+    this.terrainConfig = renderTerrain;
     this.view = new View3D({
       autoResize: true,
       toneMapping: 'aces',
@@ -59,8 +61,8 @@ export class GameScene {
     this.rim.lookAt({ x: 0, y: 0, z: 0 });
     this.view.root.addChild(this.sun, this.rim, new AmbientLight({ color: 0x8090ff, intensity: 0.3 }));
 
-    this.planet = new PlanetMesh(seed, settings.planetDetail, terrain);
-    this.props = new PropRenderer(this.view, seed, settings.propCapacity, terrain);
+    this.planet = new PlanetMesh(seed, settings.planetDetail, renderTerrain);
+    this.props = new PropRenderer(this.view, seed, settings.propCapacity, renderTerrain);
     this.wildlife = new WildlifeRenderer(this.view, settings.wildlifeCapacity);
     this.weatherFx = new WeatherFx(this.view, seed, settings.maxClouds, settings.maxDrops);
     this.placementFx = new PlacementFx(this.view);
@@ -68,10 +70,11 @@ export class GameScene {
   }
 
   reseed(seed: number, terrain: TerrainConfig = DEFAULT_TERRAIN_CONFIG): void {
+    const renderTerrain = normalizeTerrainForRender(terrain);
     this.seed = seed;
-    this.terrainConfig = { ...terrain };
-    this.planet.reseed(seed, terrain);
-    this.props.setSeed(seed, terrain);
+    this.terrainConfig = renderTerrain;
+    this.planet.reseed(seed, renderTerrain);
+    this.props.setSeed(seed, renderTerrain);
     this.placementFx.reset();
   }
 
@@ -96,8 +99,8 @@ export class GameScene {
     return this.placementFx.snapshot();
   }
 
-  syncWildlife(agents: WildlifeAgent[], terrain: TerrainConfig): void {
-    this.wildlife.sync(agents, terrain, this.seed);
+  syncWildlife(agents: WildlifeAgent[]): void {
+    this.wildlife.sync(agents, this.terrainConfig, this.seed);
   }
 
   setWeather(type: WeatherType, intensity: number): void {

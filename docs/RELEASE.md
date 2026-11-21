@@ -249,6 +249,14 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [x] Objek mengikuti urutan `OBJECT_ORDER` dan sebaran spiral deterministik, tanpa mengubah sim atau gameplay normal.
 - [x] Dipakai untuk mengulang checklist #2 dengan beban 25+ objek di Android nyata (terukur hingga 94 objek).
 
+## 2w. Planet Shape Fix (v0.15.6)
+
+- [x] Terrain dinormalisasi sekali di render boundary; data sim, DNA, dan save tidak berubah.
+- [x] Radius render semua planet berada pada rentang 0,85–1,15 dengan tidak ada nilai negatif.
+- [x] Prop, satwa, dan efek placement memakai terrain yang sama dengan mesh planet.
+- [x] Gate `test:terrain` mengunci normalisasi, rentang radius, dan determinisme untuk 9 planet + default.
+- [ ] Ulang QA perangkat karena skala kontak prop berubah setelah perbaikan bentuk.
+
 ## 3. QA perangkat nyata
 
 Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:
