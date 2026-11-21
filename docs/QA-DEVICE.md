@@ -75,3 +75,19 @@ Adaptive quality otomatis menurunkan tier bila p95 > 34 ms selama 120 frame. Tid
 `npm run test:device` sudah menguji pinch sintetis, quality override, adaptive downgrade, dan handler context loss/restore di Chromium headless. Namun Chromium headless tidak bisa mengembalikan konteks WebGL sungguhan setelah `WEBGL_lose_context.restoreContext()`, jadi **checklist #6 tetap wajib** dilakukan di perangkat nyata.
 
 > Catatan (v0.14.3): verifikasi localhost secure-context sudah lolos untuk manifest installable shape, service worker control, precache shell + chunk, offline reload, dan tanpa page error. Ini **bukan** pengganti verifikasi HTTPS + Android nyata pada baris 7–8 di atas.
+
+## Hasil perangkat nyata — v0.15.4 (2026-11-21)
+
+Perangkat: **Itel S686LN**, Android 15, 8 core, RAM 8 GB, DPR 3, viewport 360×678. Sumber: produksi `https://tinyplanetfactory.netlify.app/` dengan `?qa=1&qaSeconds=45|60&perf=1`; laporan otomatis tersalin ke clipboard saat selesai.
+
+| Run | Durasi | Frame | p50 | p95 | FPS | Boot | Tier | Draw call | Objek | Context lost | SW | Standalone |
+|---|---:|---:|---:|---:|---:|---:|---|---:|---:|---|---|---|
+| A | 45,0 s | 1777 | 33,20 ms | 33,40 ms | 30,1 | 243 ms | medium | 7 | 15 | false | true | false |
+| B | 60,0 s | 2387 | 16,90 ms | 33,40 ms | 59,2 | 2031 ms | medium | 6 | 4 | false | true | false |
+
+Catatan interpretasi:
+
+- Frame rate **30,1–59,2 FPS** memenuhi target minimum 30 FPS. Namun p95 **33,40 ms** masih **0,40 ms di atas** ambang 33 ms, sehingga baris #2 pada matriks di atas **belum dicentang lulus** sampai diulang dengan beban 25+ objek selama 5 menit.
+- Boot yang dilaporkan QaProbe adalah **0,24–2,03 s** sejak hook mulai, bukan cold-start 4G penuh dari ikon PWA; baris #1 masih memerlukan pengukuran terpisah.
+- Service worker aktif pada kedua run. `installPromptSeen` terlihat pada run A; `standalone: false` karena aplikasi dibuka dari browser, bukan dari ikon yang sudah dipasang. Baris #7–#8 (install → airplane mode, update) **masih belum terverifikasi**.
+- Tidak ada context loss pada kedua run; ini melengkapi tetapi tidak menggantikan checklist #6 untuk background/GPU reset nyata.

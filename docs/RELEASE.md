@@ -257,6 +257,8 @@ Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:
 
 Opsional untuk QA cepat: buka `?qa=1&qaSeconds=45` di perangkat. Panel hasil QA akan muncul dan tombol **Salin hasil QA** menghasilkan JSON berisi p50/p95, boot time, quality tier, device info, status PWA, serta jumlah agen/spesies fauna.
 
+Catatan 2026-11-21: dua run QA nyata di **Itel S686LN / Android 15** menghasilkan p50 **16,90–33,20 ms**, p95 **33,40 ms**, FPS **30,1–59,2**, boot **0,24–2,03 s**, tier medium tanpa downgrade, service worker aktif, dan install prompt terlihat pada run pertama. p95 masih 0,40 ms di atas ambang 33 ms, sehingga checklist #1–#2 belum dicentang lulus penuh; rincian ada di `docs/QA-DEVICE.md`.
+
 ## 4. Telemetri
 
 - [ ] Telemetri **mati secara default**.
