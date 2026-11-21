@@ -13,9 +13,10 @@ Tujuan: menambahkan planet ketiga dengan musim, pembekuan, dan food web sendiri 
 | Aquaria | aktif di v0.10 | 12 | `coral-health`, empat musim, arus/plankton |
 | Mycelia | aktif di v0.11 | 11 | `fungal-network`, empat musim, spora/cahaya |
 | Sakura | aktif di v0.12 | 11 | `floating-connectivity`, empat musim, mekar/angin |
-| dua planet lain | data-only | — | — |
+| Aurelia | aktif di v0.13 | 11 | `leaf-fall`, empat musim, simpanan/hibernasi |
+| satu planet lain | data-only | — | — |
 
-`isSupportedPlanet()` sekarang menerima `terra`, `dune`, `glaciere`, `inferna`, `aquaria`, `mycelia`, `sakura`.
+`isSupportedPlanet()` sekarang menerima `terra`, `dune`, `glaciere`, `inferna`, `aquaria`, `mycelia`, `sakura`, `aurelia`.
 
 ## Musim dan kryosfer
 

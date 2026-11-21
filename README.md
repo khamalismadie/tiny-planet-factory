@@ -35,14 +35,14 @@ Build memakai `NODE_OPTIONS=--max-old-space-size=4096` karena bundler PixiJS 3D 
 - Misi **Hijaukan Planet**, 3 event opsional (hujan pertama, uji badai, pemulihan kekeringan), dan indikator ekosistem/cuaca waktu nyata.
 - Save/load otomatis ke IndexedDB (fallback memori bila tidak tersedia).
 - Planet DNA v2: payload binary ringkas + Crockford base32 + CRC16, termasuk agen fauna, `planetId`, dan CRC; kode base64 v1 serta DNA v2 tanpa `planetId` tetap bisa dibaca sebagai Terra.
-- Tujuh ekosistem aktif: Terra, Dune, Glaciera, Inferna, Aquaria, Mycelia, dan Sakura. Akses QA lewat `?planet=terra|dune|glaciere|inferna|aquaria|mycelia|sakura` atau `window.__game.setPlanet(id, seed?)`.
+- Delapan ekosistem aktif: Terra, Dune, Glaciera, Inferna, Aquaria, Mycelia, Sakura, dan Aurelia. Akses QA lewat `?planet=terra|dune|glaciere|inferna|aquaria|mycelia|sakura|aurelia` atau `window.__game.setPlanet(id, seed?)`.
 - `schemaVersion`, `revision`, `terrainConfig`, `biome`, dan `eventLog` di state; migrasi otomatis untuk save lama.
 - Event mutasi deterministik (`planet.created`, `object.placed`, `clock.tick`) yang bisa di-replay.
 - PWA: manifest, ikon 192/512, service worker cache-first/stale-while-revalidate, fallback offline, dan notifikasi pembaruan.
 - Responsive portrait/landscape; UI memakai overlay DOM di atas kanvas PixiJS.
 - Quality tier (`low`/`medium`/`high`) + adaptive downgrade otomatis bila p95 frame time > 34 ms.
 - Overlay performa (`?perf=1`), hook QA (`?debug=1`), dan probe `?qa=1&qaSeconds=45` yang menghasilkan laporan p50/p95 + info perangkat siap disalin.
-- Vendor PixiJS dipisah menjadi `pixi-core` + `pixi-3d`; app chunk ~96.4 kB (gzip ~31.9 kB) dan data konten menjadi chunk `planet-configs` terpisah ~57.5 kB.
+- Vendor PixiJS dipisah menjadi `pixi-core` + `pixi-3d`; app chunk ~98.4 kB (gzip ~32.4 kB) dan data konten menjadi chunk `planet-configs` terpisah ~64.7 kB.
 - Telemetri opt-in (tersimpan lokal, tanpa server) dengan modal penjelasan, ekspor JSON, dan hapus data.
 - Visual polish berbasis skill `pixi3d-visual-polish`: ground contact prop yang dihitung dari ekstent geometri, rim light, dan topbar mobile tanpa overflow. Standar visual ada di `docs/ART-DIRECTION.md`.
 
@@ -106,11 +106,12 @@ Program Nine Worlds menggantikan roadmap lama: Terra diselesaikan lebih dulu, la
 | `v0.10` | **Aquaria + Aquatic Biome** — arus, terumbu, plankton, pemutihan, guild laut, dan habitat akuatik dinamis. *(selesai)* |
 | `v0.11` | **Mycelia + Fungal Biome** — jaringan miselium, spora, bioluminesensi, nutrisi, dan hazard fungal. *(selesai)* |
 | `v0.12` | **Sakura + Floral Biome** — pulau melayang, mekar, angin langit, dan konektivitas vertikal. *(selesai)* |
-| `v0.13+` | **Nine Worlds lanjutan** — Aurelia, Cosmos. |
+| `v0.13` | **Aurelia + Autumn Biome** — serasah, simpanan makanan, hibernasi, dan embun beku. *(selesai)* |
+| `v0.14` | **Cosmos + Celestial Biome** — planet kesembilan. |
 
 ## Langkah berikutnya
 
 1. Selesaikan checklist `docs/QA-DEVICE.md` di Android menengah sungguhan: p50/p95, cold start, pinch, context loss/restore, PWA offline/update.
 2. Deploy produksi HTTPS mengikuti `docs/RELEASE.md`, lalu jalankan `?qa=1&qaSeconds=45` dari perangkat.
-3. Lanjut ke v0.13 (Aurelia) setelah QA HTTPS/perangkat nyata selesai.
+3. Lanjut ke v0.14 (Cosmos) setelah audit headroom & QA HTTPS/perangkat nyata selesai.
 4. Baru setelah Nine Worlds selesai, evaluasi ulang Supabase cloud/gallery/social sebagai fase terpisah.

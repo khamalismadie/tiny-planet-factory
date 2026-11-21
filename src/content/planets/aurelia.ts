@@ -37,6 +37,7 @@ const SPECIES = [
   species(PLANET_ID, 'aurelia_amber_oak', 'Pohon Ek Amber', 'producer', ['autumn-forest', 'misty-mountains'],
     [food('sunlight', 1)], {
       habitatPreferences: [AUTUMN_HABITAT], lifespan: 440, environmentalTolerance: 22,
+      geneticTraits: ['leaf-fall'], reproductionRate: 0.11, mortalityRate: 0.012,
     }),
   species(PLANET_ID, 'aurelia_autumn_grass', 'Rumput Musim Gugur', 'producer', ['golden-grassland', 'seasonal-lakes'],
     [food('sunlight', 1)], {
@@ -47,17 +48,19 @@ const SPECIES = [
     [food('aurelia_golden_maple', 0.7, ['grazing']), food('aurelia_amber_oak', 0.6, ['grazing'])], {
       habitatPreferences: [AUTUMN_HABITAT], activitySchedule: 'diurnal', migrationBehavior: 'none',
       predatorSpecies: ['aurelia_red_fox', 'aurelia_forest_owl'], populationCapacity: 88,
-      geneticTraits: ['food-storage'],
+      geneticTraits: ['food-storage'], reproductionRate: 0.28, mortalityRate: 0.01,
     }),
   species(PLANET_ID, 'aurelia_deer', 'Kijang Musim Gugur', 'primary-consumer', ['golden-grassland', 'autumn-forest'],
     [food('aurelia_autumn_grass', 1, ['grazing']), food('aurelia_golden_maple', 0.4, ['grazing'])], {
       habitatPreferences: [GOLDEN_HABITAT], migrationBehavior: 'seasonal',
       predatorSpecies: ['aurelia_lynx'], populationCapacity: 54,
+      geneticTraits: ['food-storage'], reproductionRate: 0.12, mortalityRate: 0.012,
     }),
   species(PLANET_ID, 'aurelia_wild_boar', 'Babi Hutan', 'primary-consumer', ['autumn-forest', 'golden-grassland'],
     [food('aurelia_autumn_grass', 0.7, ['grazing']), food('aurelia_amber_oak', 0.5, ['grazing'])], {
       habitatPreferences: [GOLDEN_HABITAT], activitySchedule: 'crepuscular', migrationBehavior: 'nomadic',
       populationCapacity: 40, environmentalTolerance: 26,
+      geneticTraits: ['food-storage'], reproductionRate: 0.12, mortalityRate: 0.012,
     }),
   species(PLANET_ID, 'aurelia_rabbit', 'Kelinci Emas', 'primary-consumer', ['golden-grassland', 'seasonal-lakes'],
     [food('aurelia_autumn_grass', 1, ['grazing'])], {
@@ -68,16 +71,19 @@ const SPECIES = [
     [food('aurelia_rabbit', 1, ['hunting']), food('aurelia_squirrel', 0.6, ['hunting'])], {
       habitatPreferences: [AUTUMN_HABITAT], activitySchedule: 'crepuscular',
       preySpecies: ['aurelia_rabbit', 'aurelia_squirrel'], populationCapacity: 28,
+      geneticTraits: ['food-storage'], reproductionRate: 0.14, mortalityRate: 0.012,
     }),
   species(PLANET_ID, 'aurelia_forest_owl', 'Burung Hantu Hutan', 'tertiary-consumer', ['autumn-forest', 'misty-mountains'],
-    [food('aurelia_squirrel', 0.9, ['hunting']), food('aurelia_rabbit', 0.5, ['hunting'])], {
+    [food('aurelia_squirrel', 0.7, ['hunting']), food('aurelia_rabbit', 0.5, ['hunting'])], {
       habitatPreferences: [AUTUMN_HABITAT], activitySchedule: 'nocturnal', rarity: 'uncommon',
       preySpecies: ['aurelia_squirrel'], populationCapacity: 16,
+      geneticTraits: ['food-storage'], reproductionRate: 0.16, mortalityRate: 0.012,
     }),
   species(PLANET_ID, 'aurelia_lynx', 'Lynx Hutan', 'apex-predator', ['misty-mountains', 'autumn-forest'],
     [food('aurelia_deer', 0.9, ['hunting']), food('aurelia_rabbit', 0.6, ['hunting'])], {
       habitatPreferences: [AUTUMN_HABITAT], activitySchedule: 'nocturnal', migrationBehavior: 'seasonal',
-      preySpecies: ['aurelia_deer', 'aurelia_rabbit'], rarity: 'uncommon', populationCapacity: 10,
+      preySpecies: ['aurelia_deer', 'aurelia_rabbit'], rarity: 'uncommon', populationCapacity: 12,
+      geneticTraits: ['hibernation'], reproductionRate: 0.16, mortalityRate: 0.012,
     }),
 
   species(PLANET_ID, 'aurelia_leaf_fungi', 'Jamur Daun', 'decomposer', ['autumn-forest', 'golden-grassland', 'seasonal-lakes'],

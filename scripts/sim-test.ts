@@ -134,7 +134,8 @@ const dnaInferna = createPlanet(323, 'DNA Api', 'inferna');
 const dnaAquaria = createPlanet(324, 'DNA Laut', 'aquaria');
 const dnaMycelia = createPlanet(325, 'DNA Jamur', 'mycelia');
 const dnaSakura = createPlanet(326, 'DNA Sakura', 'sakura');
-for (const [source, id] of [[dnaDune, 'dune'], [dnaGlaciere, 'glaciere'], [dnaInferna, 'inferna'], [dnaAquaria, 'aquaria'], [dnaMycelia, 'mycelia'], [dnaSakura, 'sakura']] as const) {
+const dnaAurelia = createPlanet(327, 'DNA Aurelia', 'aurelia');
+for (const [source, id] of [[dnaDune, 'dune'], [dnaGlaciere, 'glaciere'], [dnaInferna, 'inferna'], [dnaAquaria, 'aquaria'], [dnaMycelia, 'mycelia'], [dnaSakura, 'sakura'], [dnaAurelia, 'aurelia']] as const) {
   const roundTrip = decodePlanetDna(encodePlanetDna(source).full);
   assert(roundTrip?.planetId === id, `DNA lengkap ${id} harus mempertahankan planetId`);
   const expected = ecosystemConfigFor(id)?.species.length ?? 12;
@@ -407,7 +408,7 @@ assert(foxSupplyAfter < foxSupplyBefore, 'runtuhnya mangsa harus menurunkan supl
 assert(agentCount(predatorPlanet, 'fox') <= foxBefore, 'jumlah predator tidak boleh naik saat mangsa habis');
 
 // Dune is the second active ecosystem with its own climate and guild mapping.
-assert(isSupportedPlanet('dune') && isSupportedPlanet('glaciere') && isSupportedPlanet('inferna') && isSupportedPlanet('aquaria') && isSupportedPlanet('mycelia') && isSupportedPlanet('sakura'), 'Terra, Dune, Glaciera, Inferna, Aquaria, Mycelia, dan Sakura aktif');
+assert(isSupportedPlanet('dune') && isSupportedPlanet('glaciere') && isSupportedPlanet('inferna') && isSupportedPlanet('aquaria') && isSupportedPlanet('mycelia') && isSupportedPlanet('sakura') && isSupportedPlanet('aurelia'), 'Terra, Dune, Glaciera, Inferna, Aquaria, Mycelia, Sakura, dan Aurelia aktif');
 const duneConfig = ecosystemConfigFor('dune');
 assert(duneConfig !== null && duneConfig.species.length === 12, 'Dune harus membawa 12 spesies');
 const dunePlanet = createPlanet(6161, 'Dune Uji', 'dune');
@@ -708,6 +709,60 @@ for (const type of ['tree', 'grass', 'flower', 'bush', 'rock', 'deer', 'fox', 'b
 tickN(skyTwin, 361);
 assert(JSON.stringify(skyPlanet.fauna) === JSON.stringify(skyTwin.fauna), 'fauna Sakura harus deterministik');
 assert(JSON.stringify(skyPlanet.eco) === JSON.stringify(skyTwin.eco), 'ekosistem Sakura harus deterministik');
+
+// Aurelia is the eighth active ecosystem with leaf litter, food storage, and hibernation.
+const forestConfig = ecosystemConfigFor('aurelia');
+assert(forestConfig !== null && forestConfig.species.length === 11, 'Aurelia harus membawa 11 spesies');
+assert(forestConfig.climate.seasons.length === 4, 'Aurelia harus membawa empat musim');
+assert(forestConfig.specialSystems.includes('leaf-fall'), 'Aurelia harus membawa sistem leaf-fall');
+const forestPlanet = createPlanet(8765, 'Aurelia Uji', 'aurelia');
+assert(forestPlanet.planetId === 'aurelia', 'createPlanet harus mempertahankan planetId Aurelia');
+assert(forestPlanet.eco.populations.aurelia_golden_maple, 'populasi Aurelia harus diinisialisasi');
+assert(!forestPlanet.eco.populations.sakura_tree && !forestPlanet.eco.populations.mycelia_network, 'tidak boleh ada kebocoran spesies planet lain');
+for (const type of ['tree', 'grass', 'bush', 'rock', 'deer', 'fox', 'bird'] as const) {
+  assert(placeObject(forestPlanet, type, [0.5, 0.4, 0.75]), `${type} harus bisa ditempatkan di Aurelia`);
+}
+tickN(forestPlanet, 50);
+const springForest = { ...forestPlanet.eco.forest };
+assert(springForest.seasonId === 'spring', '50 tick pertama harus musim semi');
+assert(springForest.storage > 20, 'musim semi harus punya simpanan');
+tickN(forestPlanet, 70);
+const summerForest = { ...forestPlanet.eco.forest };
+assert(summerForest.seasonId === 'summer', 'tick 120 harus masuk musim panas');
+assert(summerForest.storage > springForest.storage, 'musim panas harus menambah simpanan');
+tickN(forestPlanet, 90);
+const autumnForest = { ...forestPlanet.eco.forest };
+assert(autumnForest.seasonId === 'autumn', 'tick 210 harus masuk musim gugur');
+assert(autumnForest.leafLitter > summerForest.leafLitter, 'musim gugur harus menambah serasah');
+assert(autumnForest.storage > summerForest.storage, 'musim gugur harus memaksimalkan simpanan');
+tickN(forestPlanet, 90);
+const winterForest = { ...forestPlanet.eco.forest };
+assert(winterForest.seasonId === 'winter', 'tick 300 harus masuk musim dingin');
+assert(winterForest.hibernation > autumnForest.hibernation, 'musim dingin harus menaikkan hibernasi');
+assert(winterForest.frostStress > autumnForest.frostStress, 'musim dingin harus menaikkan stres embun');
+tickN(forestPlanet, 61);
+assert(forestPlanet.eco.forest.seasonId === 'spring', 'tick 361 harus kembali ke musim semi');
+assert(forestPlanet.eco.forest.storage > 0, 'simpanan harus bertahan setelah siklus penuh');
+assert(forestPlanet.eco.metrics.speciesCount === 11, 'ekosistem Aurelia harus tetap memiliki 11 spesies');
+assertBoundedEco(forestPlanet, 'Aurelia');
+const forestDeer = guildStatus(forestPlanet, 'deer');
+assert(forestDeer !== null && forestDeer.speciesIds.includes('aurelia_deer'), 'guild deer Aurelia harus memetakan kijang musim gugur');
+assert(guildFoodSourceIds(forestPlanet, 'fox').includes('aurelia_rabbit'), 'guild predator Aurelia harus terhubung ke food web');
+assert(agentCount(forestPlanet, 'bird') > 0, 'Aurelia harus memunculkan agen burung hantu');
+const forestLoaded = deserializePlanet(serializePlanet(forestPlanet));
+assert(
+  forestLoaded?.planetId === 'aurelia' &&
+    forestLoaded.eco.forest.seasonId === 'spring' &&
+    !!forestLoaded.eco.populations.aurelia_lynx,
+  'save/load Aurelia harus mempertahankan identitas, musim, dan populasi',
+);
+const forestTwin = createPlanet(8765, 'Aurelia Uji', 'aurelia');
+for (const type of ['tree', 'grass', 'bush', 'rock', 'deer', 'fox', 'bird'] as const) {
+  placeObject(forestTwin, type, [0.5, 0.4, 0.75]);
+}
+tickN(forestTwin, 361);
+assert(JSON.stringify(forestPlanet.fauna) === JSON.stringify(forestTwin.fauna), 'fauna Aurelia harus deterministik');
+assert(JSON.stringify(forestPlanet.eco) === JSON.stringify(forestTwin.eco), 'ekosistem Aurelia harus deterministik');
 
 const rainPlanet = createPlanet(7001, 'Hujan');
 rainPlanet.weather = { type: 'rain', intensity: 0.8, remainingTicks: 5 };

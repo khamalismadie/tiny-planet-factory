@@ -233,6 +233,16 @@ export interface SkyState {
   isolationStress: number;
 }
 
+export interface ForestState {
+  seasonId: string;
+  seasonName: string;
+  phase: number;
+  leafLitter: number;
+  storage: number;
+  hibernation: number;
+  frostStress: number;
+}
+
 export interface EcoStateV3 {
   planetId: string;
   ecosystemVersion: number;
@@ -247,6 +257,7 @@ export interface EcoStateV3 {
   ocean: OceanState;
   fungal: FungalState;
   sky: SkyState;
+  forest: ForestState;
 }
 
 export interface HabitatContext {

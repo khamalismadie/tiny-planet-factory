@@ -245,6 +245,7 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
   const ocean = planet.eco.ocean;
   const fungal = planet.eco.fungal;
   const sky = planet.eco.sky;
+  const forest = planet.eco.forest;
   const random = mulberry32((planet.seed ^ (planet.tick * 2654435761)) >>> 0);
   const counts = Object.fromEntries(OBJECT_ORDER.map((type) => [type, 0])) as Record<ObjectType, number>;
   for (const object of planet.objects) counts[object.type] += 1;
@@ -449,13 +450,36 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
     sky.isolationStress = 0;
   }
 
+  if (planetConfig?.specialSystems.includes('leaf-fall')) {
+    const litterBase = season?.id === 'autumn' ? 80 : season?.id === 'winter' ? 55 : season?.id === 'spring' ? 25 : 15;
+    forest.leafLitter = approach(forest.leafLitter, litterBase, 0.05);
+    const storageBase = season?.id === 'autumn' ? 85 : season?.id === 'summer' ? 65 : season?.id === 'winter' ? 55 : 30;
+    forest.storage = approach(forest.storage, storageBase, 0.05);
+    const hibernationBase = season?.id === 'winter' ? 85 : season?.id === 'spring' ? 40 : season?.id === 'autumn' ? 15 : 5;
+    forest.hibernation = approach(forest.hibernation, hibernationBase, 0.06);
+    forest.frostStress = approach(forest.frostStress, clamp(Math.max(0, 8 - e.temperature) * 6 + (season?.id === 'winter' ? 14 : 0)), 0.07);
+    forest.seasonId = season?.id ?? 'none';
+    forest.seasonName = season?.name ?? '';
+    forest.phase = seasonInfo?.phase ?? 0;
+  } else if (forest.seasonId !== 'none' || forest.leafLitter || forest.storage || forest.hibernation || forest.frostStress) {
+    forest.seasonId = 'none';
+    forest.seasonName = '';
+    forest.phase = 0;
+    forest.leafLitter = 0;
+    forest.storage = 0;
+    forest.hibernation = 0;
+    forest.frostStress = 0;
+  }
+
   const seasonalVegetation = clamp(1 + (season?.vegetationModifier ?? 0), 0.25, 1.6);
   const volcanicBiome = planetConfig?.specialSystems.includes('volcanic-eruption') ?? false;
   const aquaticBiome = planetConfig?.specialSystems.includes('coral-health') ?? false;
   const fungalBiome = planetConfig?.specialSystems.includes('fungal-network') ?? false;
   const skyBiome = planetConfig?.specialSystems.includes('floating-connectivity') ?? false;
+  const forestBiome = planetConfig?.specialSystems.includes('leaf-fall') ?? false;
   const fungalFactor = fungalBiome ? 1 + (fungal.network - 50) * 0.003 - fungal.networkStress * 0.002 : 1;
   const skyFactor = skyBiome ? 1 + (sky.connectivity - 50) * 0.003 - sky.wind * 0.0015 : 1;
+  const forestFactor = forestBiome ? 1 + (forest.leafLitter - 50) * 0.002 + forest.storage * 0.001 - forest.frostStress * 0.001 : 1;
   const coldFactor = cryo.seasonId !== 'none'
     ? 1 - cryo.freeze / 100 * 0.3
     : volcanicBiome
@@ -465,7 +489,7 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
         : e.temperature < 0 || e.temperature > 40 || e.water < 15 ? 0.5 : 1;
   const vegetationTarget = clamp(
     Math.min(100, counts.grass * 2 + counts.tree * 4 + counts.bush * 2 + e.water * 0.28 + e.fertility * 0.2) *
-      seasonalVegetation * coldFactor * fungalFactor * skyFactor,
+      seasonalVegetation * coldFactor * fungalFactor * skyFactor * forestFactor,
   );
   eco.vegetation = approach(eco.vegetation, vegetationTarget, 0.035);
 
@@ -479,6 +503,7 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
   e.fertility = approach(e.fertility, fertilityTarget, 0.05);
   if (fungalBiome) e.fertility = clamp(e.fertility + fungal.nutrients * 0.02 + (fungal.network - 50) * 0.01);
   if (skyBiome) e.fertility = clamp(e.fertility + sky.blossom * 0.01);
+  if (forestBiome) e.fertility = clamp(e.fertility + forest.leafLitter * 0.006 + forest.storage * 0.004 - forest.hibernation * 0.002);
 
   const distinct = new Set(planet.objects.map((o) => o.type)).size;
   const discoveredSpecies = planet.fauna?.discovered.length ?? 0;

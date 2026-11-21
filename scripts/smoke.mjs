@@ -219,6 +219,23 @@ const skyProbe = await page.evaluate(() => {
   };
 });
 
+// Aurelia boot + forest telemetry.
+phase = 'aurelia';
+await page.evaluate(() => {
+  window.__game.setPlanet('aurelia', 8765);
+  window.__game.tick(210);
+});
+const forestProbe = await page.evaluate(() => {
+  const next = window.__game.state();
+  return {
+    planetId: next.planetId,
+    temperature: next.environment.temperature,
+    ecoSpecies: Object.keys(next.eco.populations).length,
+    forest: window.__game.forest(),
+    score: window.__game.ecoScore('aurelia_deer'),
+  };
+});
+
 const contextLossErrors = boot.contextLost
   ? errors.filter((message) => /WebGL context may be lost|Could not initialize shader/.test(message))
   : [];
@@ -307,6 +324,13 @@ const checks = {
     skyProbe.sky.blossom > 60 &&
     skyProbe.sky.connectivity > 50 &&
     skyProbe.score !== null,
+  aureliaPlanetActive:
+    forestProbe.planetId === 'aurelia' &&
+    forestProbe.ecoSpecies === 11 &&
+    forestProbe.forest.seasonId === 'autumn' &&
+    forestProbe.forest.leafLitter > 50 &&
+    forestProbe.forest.storage > 60 &&
+    forestProbe.score !== null,
 };
 
 console.log(JSON.stringify({ boot, initialTick: initialState.tick, placementActive, contextLossErrors, appErrors, grown: {
@@ -318,7 +342,7 @@ console.log(JSON.stringify({ boot, initialTick: initialState.tick, placementActi
   objects: grown.objects.length,
   fauna: grownFauna,
   eco: ecoProbe,
-}, grownMetrics, reloadedTick: reloaded.tick, reloadedObjects: reloaded.objects.length, sw, dune: duneProbe, glaciere: iceProbe, inferna: fireProbe, aquaria: waterProbe, mycelia: fungalProbe, sakura: skyProbe, errors, checks }, null, 2));
+}, grownMetrics, reloadedTick: reloaded.tick, reloadedObjects: reloaded.objects.length, sw, dune: duneProbe, glaciere: iceProbe, inferna: fireProbe, aquaria: waterProbe, mycelia: fungalProbe, sakura: skyProbe, aurelia: forestProbe, errors, checks }, null, 2));
 
 await browser.close();
 const failed = Object.entries(checks).filter(([, ok]) => !ok).map(([name]) => name);

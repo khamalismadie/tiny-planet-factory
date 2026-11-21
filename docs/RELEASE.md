@@ -155,6 +155,18 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [ ] Enam planet sebelumnya tidak berubah secara numerik dari gate v0.11.
 - [ ] App chunk <100 kB.
 
+## 2n. Aurelia + Autumn Biome (v0.13)
+
+- [ ] `?planet=aurelia` dan `setPlanet('aurelia')` menghasilkan 11 populasi Aurelia.
+- [ ] Empat musim berjalan deterministik: spring → summer → autumn → winter.
+- [ ] Simpanan naik saat Panas/Gugur, serasah naik saat Gugur, hibernasi dan embun naik saat Dingin.
+- [ ] 11 spesies tetap hidup setelah satu siklus 360 tick.
+- [ ] Guild Aurelia memetakan kijang, rubah, lynx, dan burung hantu; predator terhubung ke food web.
+- [ ] Save/load mempertahankan `eco.forest`.
+- [ ] DNA lengkap mempertahankan `planetId` Aurelia.
+- [ ] Tujuh planet sebelumnya tidak berubah secara numerik dari gate v0.12.
+- [ ] App chunk <100 kB.
+
 ## 3. QA perangkat nyata
 
 Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:

@@ -241,6 +241,7 @@ export class Game {
         ocean: () => this.state.eco.ocean,
         fungal: () => this.state.eco.fungal,
         sky: () => this.state.eco.sky,
+        forest: () => this.state.eco.forest,
         foodWeb: () => ({
           guilds: SPECIES_ORDER.map((species) => ({
             species,

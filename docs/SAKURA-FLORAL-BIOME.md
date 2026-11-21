@@ -13,9 +13,10 @@ Tujuan: menambahkan planet ketujuh dengan pulau melayang, siklus mekar, angin la
 | Aquaria | aktif | 12 | `coral-health`, empat musim, arus/plankton |
 | Mycelia | aktif | 11 | `fungal-network`, empat musim, spora/cahaya |
 | Sakura | aktif di v0.12 | 11 | `floating-connectivity`, empat musim, mekar/angin |
-| dua planet lain | data-only | — | — |
+| Aurelia | aktif di v0.13 | 11 | `leaf-fall`, empat musim, simpanan/hibernasi |
+| satu planet lain | data-only | — | — |
 
-`isSupportedPlanet()` sekarang menerima `terra`, `dune`, `glaciere`, `inferna`, `aquaria`, `mycelia`, `sakura`.
+`isSupportedPlanet()` sekarang menerima `terra`, `dune`, `glaciere`, `inferna`, `aquaria`, `mycelia`, `sakura`, `aurelia`.
 
 ## Musim dan pulau melayang
 
@@ -91,4 +92,4 @@ Elang langit dan kolibri memakai proksi guild burung. `sakura_sky_mushroom` teta
 - Belum ada partikel kelopak atau jembatan visual antar-pulau.
 - Tidak ada shader warna dinamis untuk mekar; `sky` saat ini memengaruhi sim/HUD.
 - Tidak ada UI selector planet permanen; akses lewat query param/debug hook untuk QA.
-- Aurelia dan Cosmos masih data-only.
+- Cosmos masih data-only.

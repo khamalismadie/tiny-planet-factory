@@ -1,4 +1,5 @@
 import { aquariaConfig } from '../../content/planets/aquaria';
+import { aureliaConfig } from '../../content/planets/aurelia';
 import { duneConfig } from '../../content/planets/dune';
 import { glaciereConfig } from '../../content/planets/glaciera';
 import { infernaConfig } from '../../content/planets/inferna';
@@ -227,9 +228,15 @@ export function habitatContextFor(planet: PlanetState, config: PlanetConfig): Ha
                                 ? 'angin-kencang'
                                 : (planet.eco.sky?.seasonId !== 'none' && planet.environment.water < 45)
                                   ? 'kekeringan-awan'
-                                  : planet.environment.water < 25
-                                    ? 'kekeringan-musiman'
-                                    : null;
+                                  : (planet.eco.forest?.frostStress ?? 0) > 55
+                                    ? 'embun-beku'
+                                    : (planet.eco.forest?.seasonId === 'autumn' && (planet.eco.forest?.leafLitter ?? 0) > 78)
+                                      ? 'badai-daun'
+                                      : (planet.eco.forest?.seasonId === 'summer' && planet.environment.water < 45)
+                                        ? 'kekeringan-musim-panas'
+                                        : planet.environment.water < 25
+                                          ? 'kekeringan-musiman'
+                                          : null;
   return {
     environment: planet.environment,
     ecosystem: planet.ecosystem,
@@ -339,6 +346,11 @@ export class EcosystemManager {
         trait === 'seed-dispersal',
       );
       const isolationMortality = isolationStress * (skyAdapted ? 0.004 : 0.014);
+      const frostStress = (planet.eco.forest?.frostStress ?? 0) / 100;
+      const forestAdapted = definition.geneticTraits.some((trait) =>
+        trait === 'leaf-fall' || trait === 'food-storage' || trait === 'hibernation' || trait === 'leaf-litter-digestion',
+      );
+      const frostMortality = frostStress * (forestAdapted ? 0.004 : 0.016);
       const mortalityRate = definition.mortalityRate * 0.4
         + (1 - score) * 0.02
         + starvation
@@ -347,6 +359,7 @@ export class EcosystemManager {
         + reefMortality
         + networkMortality
         + isolationMortality
+        + frostMortality
         + predationPressure(definition, config, eco, capacity);
       const deaths = Math.min(
         population.estimate,
@@ -404,6 +417,7 @@ const ECOSYSTEM_MANAGERS = new Map<string, EcosystemManager>([
   [aquariaConfig.id, new EcosystemManager(aquariaConfig)],
   [myceliaConfig.id, new EcosystemManager(myceliaConfig)],
   [sakuraConfig.id, new EcosystemManager(sakuraConfig)],
+  [aureliaConfig.id, new EcosystemManager(aureliaConfig)],
 ]);
 
 export function ecosystemFor(planetId: string): EcosystemManager | null {

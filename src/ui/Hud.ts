@@ -307,6 +307,9 @@ export class Hud {
       (planet.eco.sky.seasonId !== 'none'
         ? `Musim ${planet.eco.sky.seasonName} · konektivitas ${planet.eco.sky.connectivity.toFixed(0)}% · angin ${planet.eco.sky.wind.toFixed(0)}% · mekar ${planet.eco.sky.blossom.toFixed(0)}% · stres ${planet.eco.sky.isolationStress.toFixed(0)}%<br>`
         : '') +
+      (planet.eco.forest.seasonId !== 'none'
+        ? `Musim ${planet.eco.forest.seasonName} · serasah ${planet.eco.forest.leafLitter.toFixed(0)}% · simpanan ${planet.eco.forest.storage.toFixed(0)}% · hibernasi ${planet.eco.forest.hibernation.toFixed(0)}% · embun ${planet.eco.forest.frostStress.toFixed(0)}%<br>`
+        : '') +
       `Spesies ${metrics.speciesCount} · Populasi ${metrics.totalPopulation}<br>` +
       `Habitat ${Math.round(metrics.habitatHealth)} · Pangan ${Math.round(metrics.foodAvailability)} · Detritus ${planet.eco.detritus.toFixed(1)}<br>` +
       `<div class="eco-list">${rows}</div>` +

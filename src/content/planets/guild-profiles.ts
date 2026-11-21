@@ -1,4 +1,5 @@
 import { aquariaConfig } from './aquaria';
+import { aureliaConfig } from './aurelia';
 import { duneConfig } from './dune';
 import { glaciereConfig } from './glaciera';
 import { infernaConfig } from './inferna';
@@ -205,6 +206,32 @@ const SAKURA_PROFILE: GuildProfile = {
   },
 };
 
+const AURELIA_PROFILE: GuildProfile = {
+  config: aureliaConfig,
+  guilds: {
+    deer: ['aurelia_deer', 'aurelia_wild_boar', 'aurelia_squirrel', 'aurelia_rabbit'],
+    fox: ['aurelia_red_fox', 'aurelia_lynx'],
+    bird: ['aurelia_forest_owl'],
+    fish: [],
+    insect: ['aurelia_leaf_fungi'],
+  },
+  divisors: { deer: 10, fox: 4, bird: 2, fish: 10, insect: 8 },
+  prey: { fox: ['deer'], bird: ['deer', 'insect'] },
+  foodObjects: {
+    aurelia_golden_maple: ['tree', 'bush'],
+    aurelia_amber_oak: ['tree'],
+    aurelia_autumn_grass: ['grass'],
+    aurelia_squirrel: ['deer', 'bush'],
+    aurelia_deer: ['deer', 'bush'],
+    aurelia_wild_boar: ['deer', 'bush'],
+    aurelia_rabbit: ['deer', 'grass'],
+    aurelia_red_fox: ['fox', 'deer'],
+    aurelia_forest_owl: ['bird', 'mountain'],
+    aurelia_lynx: ['fox', 'deer'],
+    aurelia_leaf_fungi: ['rock', 'bush', 'grass'],
+  },
+};
+
 export const GUILD_PROFILES: Record<string, GuildProfile> = {
   terra: TERRA_PROFILE,
   dune: DUNE_PROFILE,
@@ -213,4 +240,5 @@ export const GUILD_PROFILES: Record<string, GuildProfile> = {
   aquaria: AQUARIA_PROFILE,
   mycelia: MYCELIA_PROFILE,
   sakura: SAKURA_PROFILE,
+  aurelia: AURELIA_PROFILE,
 };
