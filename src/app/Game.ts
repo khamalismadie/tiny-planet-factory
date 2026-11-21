@@ -105,7 +105,7 @@ export class Game {
     this.scene = new GameScene(this.state.seed, this.settings, this.state.terrainConfig);
     this.app.stage.addChild(this.scene.view);
     this.scene.setEnvironment(this.state.environment);
-    this.scene.syncObjects(this.state.objects, this.state.environment);
+    this.scene.syncObjects(this.state.objects, this.state.environment, false);
     this.scene.setWeather(this.state.weather.type, this.state.weather.intensity);
     this.app.canvas.addEventListener('webglcontextlost', (event) => {
       event.preventDefault();
@@ -127,7 +127,7 @@ export class Game {
 
   private refreshScene(): void {
     this.scene.setEnvironment(this.state.environment);
-    this.scene.syncObjects(this.state.objects, this.state.environment);
+    this.scene.syncObjects(this.state.objects, this.state.environment, false);
     this.scene.syncWildlife(this.state.fauna?.agents ?? [], this.state.terrainConfig);
     this.scene.setWeather(this.state.weather.type, this.state.weather.intensity);
   }
@@ -258,6 +258,7 @@ export class Game {
           this.perf.disableAdaptive();
           this.place(type, dir);
         },
+        placement: () => this.scene.placementState(),
         select: (type: ObjectType) => this.select(type),
         reset: (seed: number) => {
           this.state = createPlanet(seed >>> 0, planetNameFromSeed(seed >>> 0));
@@ -302,6 +303,7 @@ export class Game {
       return;
     }
     this.scene.syncObjects(this.state.objects, this.state.environment);
+    this.scene.flashPlacement(dir);
     this.hud.update(this.state, this.selected);
     this.telemetry.record('placement', { type, total: this.state.objects.length, tick: this.state.tick });
     this.queueSave();

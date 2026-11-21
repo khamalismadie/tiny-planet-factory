@@ -56,8 +56,9 @@ await page.evaluate(({ dirs }) => {
     'lake', 'hill', 'mountain',
   ];
   plan.forEach((type, index) => window.__game.place(type, dirs[index % dirs.length]));
-  window.__game.tick(120);
 }, { dirs });
+const placementActive = await page.evaluate(() => window.__game.placement().filter((pulse) => pulse.active).length);
+await page.evaluate(() => window.__game.tick(120));
 await page.waitForTimeout(250);
 const grown = await state();
 const grownFauna = await page.evaluate(() => window.__game.wildlife());
@@ -121,6 +122,7 @@ const checks = {
   manifestLinked: dom.manifest,
   drawCallsPositive: boot.drawCalls > 0 && boot.drawCalls < 150,
   tapPlacedObject: afterClick.objects.length === initialState.objects.length + 1,
+  placementFeedbackActive: placementActive > 0,
   simulationAdvanced: grown.tick >= 120,
   levelUnlocked: grown.progression.level >= 3,
   ecosystemGrew: grown.environment.oxygen > initialState.environment.oxygen && grown.ecosystem.vegetation > initialState.ecosystem.vegetation,
@@ -145,7 +147,7 @@ const checks = {
   mobileStillRendering: mobile.drawCalls > 0,
 };
 
-console.log(JSON.stringify({ boot, initialTick: initialState.tick, contextLossErrors, appErrors, grown: {
+console.log(JSON.stringify({ boot, initialTick: initialState.tick, placementActive, contextLossErrors, appErrors, grown: {
   tick: grown.tick,
   level: grown.progression.level,
   stage: grown.stage,

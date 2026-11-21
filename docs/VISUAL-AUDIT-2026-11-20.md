@@ -106,3 +106,35 @@ Skor ini **bukan pengganti release gate**. Gate HTTPS + QA perangkat nyata tetap
 2. Jika perubahan terlalu subtil, naikkan ukuran prop atau kontras warna per bagian — jangan menambah draw call.
 3. Selesaikan QA HTTPS/device sebelum menyentuh biome terrain atau cloud clusters.
 4. Placement feedback dan camera easing dikerjakan setelah gate device lolos.
+
+---
+
+## 12. Addendum — Placement feedback (dikerjakan setelah poin 2 dipilih user)
+
+### Implementasi
+
+- `src/render/PlacementFx.ts` — **baru**. Satu batch torus (`radius 0.085`, `tube 0.008`, 4×16 segmen) untuk cincin aksen hijau `#6fd39b`. Pulse 0,65 s dengan skala `0.55 + sin(progress·π)·0.85`, 6 slot simultan, reset saat reseed.
+- `src/render/PropRenderer.ts` — menyimpan `id`, `age`, `size`, `position`, `quaternion` per slot. Objek baru melakukan scale-pop `0.45 → 1.0` selama 0,32 s. `sync(..., animateNew = false)` dipakai saat boot/reset/import agar tidak ada pop massal.
+- `src/render/Scene.ts` — `flashPlacement(dir)`, `placementState()`, dan `update()` meneruskan delta ke props + placement FX.
+- `src/app/Game.ts` — `place()` memanggil `flashPlacement(dir)`; debug hook baru `placement()`.
+- `scripts/smoke.mjs` — check `placementFeedbackActive` dan field `placementActive` pada output.
+
+### Bukti terukur
+
+- Smoke test: `placementActive: 6` dan `placementFeedbackActive: true` — 6 pulse aktif langsung setelah 28 `place()` dipanggil.
+- Debug capture satu objek: pulse aktif `age 0.017s / progress 0.026`, lalu `active: false / age 0.65s` setelah ~45 frame.
+- Draw calls saat pulse aktif dengan 1 objek: **3** (planet + prop batch + ring batch). Tanpa pulse: **2**. Ini sesuai pengecualian +1 yang terdokumentasi.
+- Smoke grown scene tetap **15 draw call** karena pulse sudah berakhir saat metrik diambil.
+- p50 tetap **16.7 ms**; build/test tetap lolos.
+
+### Batasan
+
+Screenshot headless pulse tidak dapat dipakai sebagai bukti visual: `page.screenshot()` bergantian menghasilkan frame putih (brightness ~177) dan gelap (~25) akibat WebGL context loss di Chromium. Bukti yang dipakai adalah state debug + test otomatis, bukan piksel. Validasi visual akhir tetap perlu di perangkat nyata lewat HTTPS.
+
+### Skor revisi
+
+| Score | Sebelum | Sesudah | Catatan |
+|---|---:|---:|---|
+| Visual Quality | 64 | 68 | Feedback timing + cincin aksen menaikkan game feel; masih belum ada inspeksi visual device |
+| Technical Quality | 84 | 85 | +1 batch terukur, hook debug, check otomatis |
+| Gameplay Integrity | 88 | 90 | Feedback ke input dikonfirmasi test; sim tetap utuh |

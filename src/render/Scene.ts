@@ -3,6 +3,7 @@ import { OrbitCamera } from '@pixi/3d/extras';
 import type { QualitySettings } from '../app/quality';
 import { DEFAULT_TERRAIN_CONFIG, type Environment, type PlacedObject, type TerrainConfig, type WeatherType, type WildlifeAgent } from '../sim/types';
 import { PlanetMesh } from './PlanetMesh';
+import { PlacementFx } from './PlacementFx';
 import { PropRenderer } from './PropRenderer';
 import { WeatherFx } from './WeatherFx';
 import { WildlifeRenderer } from './WildlifeRenderer';
@@ -15,13 +16,16 @@ export class GameScene {
   private readonly props: PropRenderer;
   private readonly wildlife: WildlifeRenderer;
   private readonly weatherFx: WeatherFx;
+  private readonly placementFx: PlacementFx;
   private seed: number;
+  private terrainConfig: TerrainConfig = { ...DEFAULT_TERRAIN_CONFIG };
   private readonly sun: DirectionalLight;
   private readonly rim: DirectionalLight;
 
   constructor(seed: number, settings: QualitySettings, terrain: TerrainConfig = DEFAULT_TERRAIN_CONFIG) {
     this.quality = settings;
     this.seed = seed;
+    this.terrainConfig = { ...terrain };
     this.view = new View3D({
       autoResize: true,
       toneMapping: 'aces',
@@ -59,13 +63,16 @@ export class GameScene {
     this.props = new PropRenderer(this.view, seed, settings.propCapacity, terrain);
     this.wildlife = new WildlifeRenderer(this.view, settings.wildlifeCapacity);
     this.weatherFx = new WeatherFx(this.view, seed, settings.maxClouds, settings.maxDrops);
+    this.placementFx = new PlacementFx(this.view);
     this.view.root.addChild(this.planet.mesh);
   }
 
   reseed(seed: number, terrain: TerrainConfig = DEFAULT_TERRAIN_CONFIG): void {
     this.seed = seed;
+    this.terrainConfig = { ...terrain };
     this.planet.reseed(seed, terrain);
     this.props.setSeed(seed, terrain);
+    this.placementFx.reset();
   }
 
   setQuality(settings: QualitySettings): void {
@@ -77,8 +84,16 @@ export class GameScene {
     this.planet.update(env);
   }
 
-  syncObjects(objects: PlacedObject[], env: Environment): void {
-    this.props.sync(objects, env);
+  syncObjects(objects: PlacedObject[], env: Environment, animateNew = true): void {
+    this.props.sync(objects, env, animateNew);
+  }
+
+  flashPlacement(dir: [number, number, number]): void {
+    this.placementFx.trigger(dir, this.terrainConfig, this.seed);
+  }
+
+  placementState(): Array<{ active: boolean; age: number; progress: number }> {
+    return this.placementFx.snapshot();
   }
 
   syncWildlife(agents: WildlifeAgent[], terrain: TerrainConfig): void {
@@ -92,6 +107,8 @@ export class GameScene {
 
   update(deltaSeconds: number): void {
     this.weatherFx.update(deltaSeconds);
+    this.props.update(deltaSeconds);
+    this.placementFx.update(deltaSeconds);
   }
 
   updateCamera(): void {

@@ -64,6 +64,8 @@ Aturan: warna vegetasi berubah **bertahap** mengikuti `oxygen`/`water`, bukan XO
 - Hujan: silinder biru tipis; salju: bola putih kecil. Keduanya memakai pool `BatchedMesh3D`.
 - Budget mengikuti quality tier: low 6 cloud/24 drop, medium 10/48, high 14/80.
 - Setiap efek harus bisa dimatikan lewat budget tanpa merusak gameplay.
+- **Placement feedback:** saat ketukan berhasil, objek melakukan scale-pop `0.45 → 1.0` selama 0,32 s (ease-out-back), dan cincin aksen hijau `#6fd39b` muncul tepat di titik kontak selama 0,65 s dengan skala `0.55 + sin(progress·π)·0.85`. Cincin memakai satu `BatchedMesh3D` tambahan (draw call +1 saat aktif) — ini pengecualian yang disengaja dari batas +2.
+- Reset/new planet/import DNA **tidak** memicu pop massal; hanya `place()` langsung yang memberi feedback.
 
 ## 8. UI system
 
@@ -80,3 +82,4 @@ Aturan: warna vegetasi berubah **bertahap** mengikuti `oxygen`/`water`, bukan XO
 3. Build, `npm test`, dan smoke tetap lolos setelah perubahan.
 4. Draw call tidak naik lebih dari +2 tanpa alasan terukur.
 5. Perubahan dibuktikan dengan screenshot sebelum/sesudah pada seed yang sama.
+6. `placementFeedbackActive` pada smoke test bernilai `true` setelah `place()` dipanggil.
