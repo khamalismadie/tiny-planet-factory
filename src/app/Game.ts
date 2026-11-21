@@ -5,6 +5,7 @@ import { SPECIES_ORDER } from '../content/species';
 import { WEATHER_DEFS } from '../content/weather';
 import { terraConfig } from '../content/planets/terra';
 import { scoreHabitat } from '../sim/eco/habitat';
+import { guildStatus } from '../sim/eco/guilds';
 import { habitatContextFor } from '../sim/eco/manager';
 import { placeObject, createPlanet, planetNameFromSeed, simulateTick, TICK_MS } from '../sim/engine';
 import { decodePlanetDna, encodePlanetDna, type PlanetDnaCodes } from '../sim/dna';
@@ -233,6 +234,14 @@ export class Game {
       (window as unknown as Record<string, unknown>).__game = {
         state: () => this.state,
         eco: () => this.state.eco,
+        foodWeb: () => ({
+          guilds: SPECIES_ORDER.map((species) => ({
+            species,
+            agents: this.state.fauna?.agents.filter((agent) => agent.species === species).length ?? 0,
+            status: guildStatus(this.state, species),
+          })),
+          links: terraConfig.foodWeb,
+        }),
         ecoScore: (id: string) => {
           const definition = terraConfig.species.find((entry) => entry.id === id);
           return definition ? scoreHabitat(definition, habitatContextFor(this.state, terraConfig)) : null;

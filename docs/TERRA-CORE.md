@@ -67,3 +67,7 @@ Lima skenario dijalankan tanpa rendering:
 5. Kerusakan habitat — fertility/vegetation/stability direndahkan, lalu dikembalikan.
 
 Semua skenario wajib tetap bounded. Kekeringan dan kerusakan habitat wajib menunjukkan penurunan `habitatHealth` lalu pemulihan yang terukur.
+
+## Lanjutan
+
+Koupling antara populasi ini dan agen fauna visual ada di `docs/FOOD-WEB-WILDLIFE-AI.md`.

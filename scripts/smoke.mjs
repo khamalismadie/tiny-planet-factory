@@ -67,6 +67,7 @@ const ecoProbe = await page.evaluate(() => ({
   hasHook: typeof window.__game.eco === 'function',
   populations: Object.keys(window.__game.eco?.().populations ?? {}).length,
   score: window.__game.ecoScore?.('terra_oak') ?? null,
+  foodWebGuilds: window.__game.foodWeb?.().guilds.length ?? 0,
 }));
 const grownDom = await page.evaluate(() => ({
   mission: document.getElementById('mission')?.textContent ?? '',
@@ -140,6 +141,7 @@ const checks = {
   wildlifeAgentsPresent: grownFauna.agents > 0 && grownFauna.discovered.length > 0,
   wildlifeUiUpdated: grownDom.ecosystem.includes('Fauna'),
   ecoDebugHooks: ecoProbe.hasHook && ecoProbe.populations === 12 && ecoProbe.score !== null,
+  foodWebDebugHook: ecoProbe.foodWebGuilds === 5,
   ecoPanelHiddenByDefault: dom.ecoPanelHiddenByDefault,
   statePersisted: reloaded.tick >= grown.tick && reloaded.objects.length === grown.objects.length,
   dnaShortCode: /^TPF-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(dnaShort),

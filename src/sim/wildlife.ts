@@ -1,4 +1,5 @@
 import { SPECIES_DEFS, SPECIES_ORDER } from '../content/species';
+import { GUILD_PREY_AGENTS, guildAgentCapacity, guildFoodDirs, guildStatus, type GuildStatus } from './eco/guilds';
 import { hashString, mulberry32 } from './rng';
 import type {
   FaunaState,
@@ -72,6 +73,16 @@ export function simulateWildlife(
   const eco = planet.ecosystem;
   const deerAgents = speciesCount(fauna.agents, 'deer');
   const messages: string[] = [];
+  const statuses: Record<SpeciesId, GuildStatus | null> = {
+    deer: guildStatus(planet, 'deer'),
+    fox: guildStatus(planet, 'fox'),
+    bird: guildStatus(planet, 'bird'),
+    fish: guildStatus(planet, 'fish'),
+    insect: guildStatus(planet, 'insect'),
+  };
+  const foodDirsByGuild = Object.fromEntries(
+    SPECIES_ORDER.map((species) => [species, guildFoodDirs(planet, species)]),
+  ) as Record<SpeciesId, Array<[number, number, number]>>;
 
   const capacities: Record<SpeciesId, number> = {
     deer: Math.min(12, counts.grass * 0.8 + counts.tree * 0.4 + counts.bush * 0.6 + eco.vegetation * 0.06 + counts.deer * 4)
@@ -84,7 +95,9 @@ export function simulateWildlife(
     insect: Math.min(14, counts.flower * 1.2 + counts.bush * 0.6 + counts.grass * 0.3 + eco.vegetation * 0.04)
       * (env.temperature > 4 && env.temperature < 38 ? 1 : 0.2),
   };
-  for (const species of SPECIES_ORDER) capacities[species] = Math.max(0, Math.floor(capacities[species]));
+  for (const species of SPECIES_ORDER) {
+    capacities[species] = Math.max(0, Math.floor(guildAgentCapacity(planet, species, capacities[species])));
+  }
 
   const spawn = (species: SpeciesId, dir: [number, number, number], energy: number, generation = 0): WildlifeAgent => {
     const agent: WildlifeAgent = {
@@ -107,8 +120,27 @@ export function simulateWildlife(
 
   for (const agent of [...fauna.agents]) {
     const def = SPECIES_DEFS[agent.species];
-    const dirs = habitatDirs(planet, agent.species);
-    if (dirs.length) {
+    const status = statuses[agent.species];
+    const supply = status ? clamp(status.foodFactor, 0, 1.2) : 1;
+    const presence = status ? clamp(status.availability, 0, 1.2) : 1;
+    const preySpecies = GUILD_PREY_AGENTS[agent.species] ?? [];
+    const prey = preySpecies.length
+      ? fauna.agents
+          .filter((candidate) => preySpecies.includes(candidate.species) && candidate.id !== agent.id && !dead.has(candidate.id))
+          .sort((a, b) => a.energy - b.energy)[0]
+      : undefined;
+    const dirs = foodDirsByGuild[agent.species].length
+      ? foodDirsByGuild[agent.species]
+      : habitatDirs(planet, agent.species);
+
+    if (prey && supply > 0.1) {
+      const step = 0.06 + random() * 0.05;
+      agent.dir = normalizeDir([
+        agent.dir[0] + (prey.dir[0] - agent.dir[0]) * step,
+        agent.dir[1] + (prey.dir[1] - agent.dir[1]) * step,
+        agent.dir[2] + (prey.dir[2] - agent.dir[2]) * step,
+      ]);
+    } else if (dirs.length) {
       const target = dirs[Math.floor(random() * dirs.length)];
       const step = 0.06 + random() * 0.05;
       agent.dir = normalizeDir([
@@ -126,27 +158,32 @@ export function simulateWildlife(
     }
 
     agent.energy -= def.metabolism;
-    if (agent.species === 'deer' && (eco.vegetation > 8 || counts.deer > 0)) {
-      agent.energy += 2.6;
-      grazing += 0.025;
-    } else if (agent.species === 'bird' && counts.tree + counts.flower + counts.bird > 0) {
-      agent.energy += 2.1;
-    } else if (agent.species === 'fish' && env.water >= 35) {
-      agent.energy += 2.5;
-    } else if (agent.species === 'insect' && eco.vegetation > 12) {
-      agent.energy += 2.2;
-      pollination += 0.03;
-    } else if (agent.species === 'fox') {
-      const prey = fauna.agents
-        .filter((candidate) => candidate.species === 'deer' && candidate.id !== agent.id && !dead.has(candidate.id))
-        .sort((a, b) => a.energy - b.energy)[0];
-      if (prey) {
+    const canForage = presence > 0.02 && supply > 0.08;
+
+    if (agent.species === 'deer' && (eco.vegetation > 8 || counts.deer > 0) && canForage) {
+      agent.energy += 2.6 * supply;
+      grazing += 0.025 * supply;
+    } else if (agent.species === 'bird') {
+      if (prey && supply > 0.1 && random() < clamp(supply, 0, 1)) {
         prey.energy -= 7;
         agent.energy += 3.4;
         predation += 1;
-      } else if (counts.deer > 0) {
-        agent.energy += 2.8;
-        predation += 0.5;
+      } else if (canForage && counts.tree + counts.flower + counts.bird > 0) {
+        agent.energy += 2.1 * supply;
+      }
+    } else if (agent.species === 'fish' && env.water >= 35 && canForage) {
+      agent.energy += 2.5 * supply;
+    } else if (agent.species === 'insect' && eco.vegetation > 12 && canForage) {
+      agent.energy += 2.2 * supply;
+      pollination += 0.03 * supply;
+    } else if (agent.species === 'fox') {
+      if (prey && random() < clamp(supply, 0, 1)) {
+        prey.energy -= 7;
+        agent.energy += 3.4;
+        predation += 1;
+      } else if (canForage && (counts.deer > 0 || (status?.foodFactor ?? 0) > 0.2)) {
+        agent.energy += 2.8 * supply;
+        predation += 0.5 * supply;
       }
     }
 

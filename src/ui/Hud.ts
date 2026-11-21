@@ -1,10 +1,11 @@
 import { EVENT_DEFS } from '../content/missions';
 import { CATEGORY_LABELS, OBJECT_DEFS, OBJECT_ORDER, UNLOCK_LEVEL } from '../content/objects';
-import { SPECIES_DEFS } from '../content/species';
+import { SPECIES_DEFS, SPECIES_ORDER } from '../content/species';
 import { WEATHER_DEFS } from '../content/weather';
 import { terraConfig } from '../content/planets/terra';
 import { STAGE_NAMES } from '../sim/engine';
 import { scoreHabitat } from '../sim/eco/habitat';
+import { guildStatus } from '../sim/eco/guilds';
 import { habitatContextFor } from '../sim/eco/manager';
 import type { EnvKey, ObjectType, PlanetState } from '../sim/types';
 
@@ -277,11 +278,21 @@ export class Hud {
         `<div class="eco-limit">batas: ${limit}</div>`
       );
     }).join('');
+    const guildRows = SPECIES_ORDER.map((species) => {
+      const status = guildStatus(planet, species);
+      const agents = planet.fauna?.agents.filter((agent) => agent.species === species).length ?? 0;
+      return (
+        `<div class="eco-name"><span>${SPECIES_DEFS[species].label} (agen)</span><span>${agents} agen</span></div>` +
+        `<div class="eco-limit">pop ${Math.round(status?.estimate ?? 0)} · pangan ${Math.round((status?.foodFactor ?? 0) * 100)}%</div>`
+      );
+    }).join('');
     this.ecoDetail.innerHTML =
       '<strong>Ekologi Terra</strong><br>' +
       `Spesies ${metrics.speciesCount} · Populasi ${metrics.totalPopulation}<br>` +
       `Habitat ${Math.round(metrics.habitatHealth)} · Pangan ${Math.round(metrics.foodAvailability)} · Detritus ${planet.eco.detritus.toFixed(1)}<br>` +
-      `<div class="eco-list">${rows}</div>`;
+      `<div class="eco-list">${rows}</div>` +
+      '<div class="eco-title">Rantai makanan &amp; agen</div>' +
+      `<div class="eco-list">${guildRows}</div>`;
   }
 
   notify(message: string, warn = false): void {

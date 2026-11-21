@@ -76,6 +76,16 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [ ] Skenario kelangkaan makanan menurunkan food availability lalu produsen pulih.
 - [ ] Skenario kekeringan dan kerusakan habitat menurunkan habitat health lalu pulih setelah restorasi.
 
+## 2g. Food Web + Wildlife AI (v0.6)
+
+- [ ] `guildStatus()` memetakan 5 guild visual ke 12 spesies Terra.
+- [ ] `foodWeb()` debug hook mengembalikan 5 guild dan link food web Terra.
+- [ ] Panel `?eco=1` menampilkan ringkasan agen dan suplai makanan per guild.
+- [ ] Kapasitas agen dibatasi oleh habitat **dan** populasi ekologis.
+- [ ] Runtuhnya produsen menurunkan suplai herbivora; runtuhnya mangsa menurunkan suplai predator.
+- [ ] Predasi agen tidak dihitung dua kali sebagai mortalitas ekologis.
+- [ ] DNA fauna dan seed-identik determinisme tidak berubah.
+
 ## 3. QA perangkat nyata
 
 Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:

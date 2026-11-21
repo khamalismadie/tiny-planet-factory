@@ -1,7 +1,9 @@
 import { QUALITY, suggestQuality } from '../src/app/quality.ts';
 import { ensureEventState } from '../src/content/missions.ts';
+import { SPECIES_ORDER } from '../src/content/species.ts';
 import { PLANET_CONFIGS, PLANET_IDS } from '../src/content/planets/index.ts';
 import { decodePlanetDna, encodePlanetDna } from '../src/sim/dna.ts';
+import { guildAgentCapacity, guildFoodSourceIds, guildStatus } from '../src/sim/eco/guilds.ts';
 import { HabitatManager } from '../src/sim/eco/habitat.ts';
 import { validateAllPlanetConfigs, speciesRegistry } from '../src/sim/eco/registry.ts';
 import { createEcoState } from '../src/sim/eco/state.ts';
@@ -23,6 +25,10 @@ function assert(condition: unknown, message: string): asserts condition {
 
 function tickN(planet: PlanetState, count: number): void {
   for (let i = 0; i < count; i++) simulateTick(planet, false);
+}
+
+function agentCount(planet: PlanetState, species: string): number {
+  return planet.fauna.agents.filter((agent) => agent.species === species).length;
 }
 
 function producerTotal(planet: PlanetState): number {
@@ -339,6 +345,50 @@ extinctPlanet.fauna.discovered = ['deer'];
 extinctPlanet.fauna.agents = [];
 for (let i = 0; i < 9; i++) simulateTick(extinctPlanet);
 assert(extinctPlanet.fauna.extinct.includes('deer'), 'spesies tanpa habitat harus punah');
+
+// Food web ↔ wildlife coupling: visual guilds are capped and fed by eco populations.
+assert(guildFoodSourceIds('fox').includes('terra_rabbit'), 'rubah harus berburu kelinci dari food web');
+assert(guildFoodSourceIds('bird').includes('terra_fish'), 'elang harus memakan ikan dari food web');
+assert(guildFoodSourceIds('insect').includes('terra_wildflower'), 'lebah harus menyerbuki bunga liar dari food web');
+
+const foodWebPlanet = createPlanet(9090, 'Rantai Makanan');
+for (const type of ['grass', 'tree', 'flower', 'ocean', 'lake', 'deer', 'fox', 'bird'] as const) {
+  assert(placeObject(foodWebPlanet, type, [0.6, 0.35, 0.7]), `${type} harus ditempatkan untuk uji food web`);
+}
+tickN(foodWebPlanet, 120);
+for (const species of SPECIES_ORDER) {
+  const status = guildStatus(foodWebPlanet, species);
+  assert(status !== null, `guild ${species} harus memiliki status ekologis`);
+  assert(status!.foodSources.length > 0, `guild ${species} harus memiliki sumber makanan dari food web`);
+  assert(
+    agentCount(foodWebPlanet, species) <= guildAgentCapacity(foodWebPlanet, species, 48),
+    `agen ${species} tidak boleh melebihi kapasitas ekologis`,
+  );
+}
+
+const grazerBefore = agentCount(foodWebPlanet, 'deer');
+const grazerSupplyBefore = guildStatus(foodWebPlanet, 'deer')!.foodFactor;
+for (const id of ['terra_oak', 'terra_pine', 'terra_wildflower', 'terra_river_reed']) {
+  foodWebPlanet.eco.populations[id].estimate = 0;
+}
+tickN(foodWebPlanet, 60);
+const grazerSupplyAfter = guildStatus(foodWebPlanet, 'deer')!.foodFactor;
+assert(grazerSupplyAfter < grazerSupplyBefore, 'runtuhnya produsen harus menurunkan suplai herbivora');
+assert(agentCount(foodWebPlanet, 'deer') <= grazerBefore, 'jumlah herbivora tidak boleh naik saat makanan habis');
+
+const predatorPlanet = createPlanet(9091, 'Predator Web');
+for (const type of ['grass', 'tree', 'flower', 'deer', 'fox', 'bird'] as const) {
+  assert(placeObject(predatorPlanet, type, [0.65, 0.3, 0.68]), `${type} harus ditempatkan untuk uji predator`);
+}
+tickN(predatorPlanet, 120);
+const foxBefore = agentCount(predatorPlanet, 'fox');
+const foxSupplyBefore = guildStatus(predatorPlanet, 'fox')!.foodFactor;
+predatorPlanet.eco.populations.terra_rabbit.estimate = 0;
+predatorPlanet.eco.populations.terra_deer.estimate = 0;
+tickN(predatorPlanet, 60);
+const foxSupplyAfter = guildStatus(predatorPlanet, 'fox')!.foodFactor;
+assert(foxSupplyAfter < foxSupplyBefore, 'runtuhnya mangsa harus menurunkan suplai predator');
+assert(agentCount(predatorPlanet, 'fox') <= foxBefore, 'jumlah predator tidak boleh naik saat mangsa habis');
 
 const rainPlanet = createPlanet(7001, 'Hujan');
 rainPlanet.weather = { type: 'rain', intensity: 0.8, remainingTicks: 5 };
