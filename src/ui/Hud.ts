@@ -2,10 +2,9 @@ import { EVENT_DEFS } from '../content/missions';
 import { CATEGORY_LABELS, OBJECT_DEFS, OBJECT_ORDER, UNLOCK_LEVEL } from '../content/objects';
 import { SPECIES_DEFS, SPECIES_ORDER } from '../content/species';
 import { WEATHER_DEFS } from '../content/weather';
-import { terraConfig } from '../content/planets/terra';
 import { STAGE_NAMES } from '../sim/engine';
 import { scoreHabitat } from '../sim/eco/habitat';
-import { guildStatus } from '../sim/eco/guilds';
+import { ecosystemConfigOf, guildStatus } from '../sim/eco/guilds';
 import { habitatContextFor } from '../sim/eco/manager';
 import type { EnvKey, ObjectType, PlanetState } from '../sim/types';
 
@@ -263,9 +262,14 @@ export class Hud {
 
   private renderEcoDetail(planet: PlanetState): void {
     if (!this.ecoVisible) return;
-    const context = habitatContextFor(planet, terraConfig);
+    const config = ecosystemConfigOf(planet);
+    if (!config) {
+      this.ecoDetail.innerHTML = '<strong>Ekologi</strong><br>Belum tersedia untuk planet ini.';
+      return;
+    }
+    const context = habitatContextFor(planet, config);
     const metrics = planet.eco.metrics;
-    const rows = terraConfig.species.map((definition) => {
+    const rows = config.species.map((definition) => {
       const population = planet.eco.populations[definition.id];
       const score = scoreHabitat(definition, context);
       if (!population) return '';
@@ -287,7 +291,7 @@ export class Hud {
       );
     }).join('');
     this.ecoDetail.innerHTML =
-      '<strong>Ekologi Terra</strong><br>' +
+      `<strong>Ekologi ${config.name}</strong><br>` +
       `Spesies ${metrics.speciesCount} · Populasi ${metrics.totalPopulation}<br>` +
       `Habitat ${Math.round(metrics.habitatHealth)} · Pangan ${Math.round(metrics.foodAvailability)} · Detritus ${planet.eco.detritus.toFixed(1)}<br>` +
       `<div class="eco-list">${rows}</div>` +

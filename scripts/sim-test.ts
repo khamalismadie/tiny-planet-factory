@@ -3,7 +3,7 @@ import { ensureEventState } from '../src/content/missions.ts';
 import { SPECIES_ORDER } from '../src/content/species.ts';
 import { PLANET_CONFIGS, PLANET_IDS } from '../src/content/planets/index.ts';
 import { decodePlanetDna, encodePlanetDna } from '../src/sim/dna.ts';
-import { guildAgentCapacity, guildFoodSourceIds, guildStatus } from '../src/sim/eco/guilds.ts';
+import { ecosystemConfigFor, guildAgentCapacity, guildFoodSourceIds, guildStatus, isSupportedPlanet } from '../src/sim/eco/guilds.ts';
 import { HabitatManager } from '../src/sim/eco/habitat.ts';
 import { validateAllPlanetConfigs, speciesRegistry } from '../src/sim/eco/registry.ts';
 import { createEcoState } from '../src/sim/eco/state.ts';
@@ -347,15 +347,14 @@ for (let i = 0; i < 9; i++) simulateTick(extinctPlanet);
 assert(extinctPlanet.fauna.extinct.includes('deer'), 'spesies tanpa habitat harus punah');
 
 // Food web ↔ wildlife coupling: visual guilds are capped and fed by eco populations.
-assert(guildFoodSourceIds('fox').includes('terra_rabbit'), 'rubah harus berburu kelinci dari food web');
-assert(guildFoodSourceIds('bird').includes('terra_fish'), 'elang harus memakan ikan dari food web');
-assert(guildFoodSourceIds('insect').includes('terra_wildflower'), 'lebah harus menyerbuki bunga liar dari food web');
-
 const foodWebPlanet = createPlanet(9090, 'Rantai Makanan');
 for (const type of ['grass', 'tree', 'flower', 'ocean', 'lake', 'deer', 'fox', 'bird'] as const) {
   assert(placeObject(foodWebPlanet, type, [0.6, 0.35, 0.7]), `${type} harus ditempatkan untuk uji food web`);
 }
 tickN(foodWebPlanet, 120);
+assert(guildFoodSourceIds(foodWebPlanet, 'fox').includes('terra_rabbit'), 'rubah harus berburu kelinci dari food web');
+assert(guildFoodSourceIds(foodWebPlanet, 'bird').includes('terra_fish'), 'elang harus memakan ikan dari food web');
+assert(guildFoodSourceIds(foodWebPlanet, 'insect').includes('terra_wildflower'), 'lebah harus menyerbuki bunga liar dari food web');
 for (const species of SPECIES_ORDER) {
   const status = guildStatus(foodWebPlanet, species);
   assert(status !== null, `guild ${species} harus memiliki status ekologis`);
@@ -389,6 +388,39 @@ tickN(predatorPlanet, 60);
 const foxSupplyAfter = guildStatus(predatorPlanet, 'fox')!.foodFactor;
 assert(foxSupplyAfter < foxSupplyBefore, 'runtuhnya mangsa harus menurunkan suplai predator');
 assert(agentCount(predatorPlanet, 'fox') <= foxBefore, 'jumlah predator tidak boleh naik saat mangsa habis');
+
+// Dune is the second active ecosystem with its own climate and guild mapping.
+assert(isSupportedPlanet('dune') && !isSupportedPlanet('glaciere'), 'hanya Terra dan Dune yang aktif saat ini');
+const duneConfig = ecosystemConfigFor('dune');
+assert(duneConfig !== null && duneConfig.species.length === 12, 'Dune harus membawa 12 spesies');
+const dunePlanet = createPlanet(6161, 'Dune Uji', 'dune');
+assert(dunePlanet.planetId === 'dune', 'createPlanet harus mempertahankan planetId Dune');
+assert(dunePlanet.environment.temperature > 30, 'Dune harus mulai dengan suhu gurun');
+assert(dunePlanet.environment.water < 25, 'Dune harus mulai dengan air langka');
+assert(dunePlanet.eco.populations.dune_camel, 'populasi Dune harus diinisialisasi');
+assert(!dunePlanet.eco.populations.terra_oak, 'populasi Terra tidak boleh bocor ke Dune');
+for (const type of ['sand', 'rock', 'grass', 'tree', 'bush', 'fox', 'bird'] as const) {
+  assert(placeObject(dunePlanet, type, [0.55, 0.35, 0.75]), `${type} harus bisa ditempatkan di Dune`);
+}
+tickN(dunePlanet, 200);
+assert(dunePlanet.environment.temperature > 25, 'suhu Dune harus tetap gurun setelah 200 tick');
+assert(dunePlanet.environment.water < 45, 'air Dune harus tetap langka setelah 200 tick');
+assert(dunePlanet.eco.metrics.speciesCount > 0, 'ekosistem Dune harus hidup');
+const duneDeer = guildStatus(dunePlanet, 'deer');
+assert(duneDeer !== null && duneDeer.speciesIds.includes('dune_camel'), 'guild herbivora Dune harus memetakan unta');
+assert(duneDeer.foodSources.includes('dune_desert_grass'), 'herbivora Dune harus mendapat rumput gurun dari food web');
+assert(agentCount(dunePlanet, 'deer') <= guildAgentCapacity(dunePlanet, 'deer', 48), 'agen Dune harus bounded');
+assert(agentCount(dunePlanet, 'fish') === 0, 'Dune tidak boleh memunculkan ikan tanpa spesies akuatik');
+const duneLoaded = deserializePlanet(serializePlanet(dunePlanet));
+assert(duneLoaded?.planetId === 'dune' && !!duneLoaded.eco.populations.dune_camel, 'save/load Dune harus mempertahankan identitas dan populasi');
+
+const duneTwin = createPlanet(6161, 'Dune Uji', 'dune');
+for (const type of ['sand', 'rock', 'grass', 'tree', 'bush', 'fox', 'bird'] as const) {
+  placeObject(duneTwin, type, [0.55, 0.35, 0.75]);
+}
+tickN(duneTwin, 200);
+assert(JSON.stringify(dunePlanet.fauna) === JSON.stringify(duneTwin.fauna), 'fauna Dune harus deterministik untuk seed sama');
+assert(JSON.stringify(dunePlanet.eco) === JSON.stringify(duneTwin.eco), 'ekosistem Dune harus deterministik untuk seed sama');
 
 const rainPlanet = createPlanet(7001, 'Hujan');
 rainPlanet.weather = { type: 'rain', intensity: 0.8, remainingTicks: 5 };

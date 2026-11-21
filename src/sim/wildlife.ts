@@ -1,5 +1,5 @@
 import { SPECIES_DEFS, SPECIES_ORDER } from '../content/species';
-import { GUILD_PREY_AGENTS, guildAgentCapacity, guildFoodDirs, guildStatus, type GuildStatus } from './eco/guilds';
+import { guildAgentCapacity, guildFoodDirs, guildPreyAgents, guildStatus, type GuildStatus } from './eco/guilds';
 import { hashString, mulberry32 } from './rng';
 import type {
   FaunaState,
@@ -123,7 +123,7 @@ export function simulateWildlife(
     const status = statuses[agent.species];
     const supply = status ? clamp(status.foodFactor, 0, 1.2) : 1;
     const presence = status ? clamp(status.availability, 0, 1.2) : 1;
-    const preySpecies = GUILD_PREY_AGENTS[agent.species] ?? [];
+    const preySpecies = guildPreyAgents(planet, agent.species);
     const prey = preySpecies.length
       ? fauna.agents
           .filter((candidate) => preySpecies.includes(candidate.species) && candidate.id !== agent.id && !dead.has(candidate.id))

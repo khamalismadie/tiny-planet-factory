@@ -86,6 +86,16 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [ ] Predasi agen tidak dihitung dua kali sebagai mortalitas ekologis.
 - [ ] DNA fauna dan seed-identik determinisme tidak berubah.
 
+## 2h. Dune + Biome Expansion (v0.7)
+
+- [ ] Hanya Terra dan Dune yang dilaporkan aktif oleh `isSupportedPlanet()`.
+- [ ] `?planet=dune` dan `setPlanet('dune')` menghasilkan planet dengan 12 populasi Dune.
+- [ ] Suhu/air Dune tetap dalam rentang gurun setelah 200 tick.
+- [ ] Guild Dune memetakan unta, kelinci, gazel, kadal, rubah fennec, ular, nasar, dan kumbang.
+- [ ] Tidak ada agen ikan di Dune.
+- [ ] Save/load dan determinisme seed Dune lolos.
+- [ ] App chunk <100 kB dengan `planet-configs` sebagai chunk terpisah.
+
 ## 3. QA perangkat nyata
 
 Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:

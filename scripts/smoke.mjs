@@ -114,6 +114,23 @@ await page.setViewportSize({ width: 390, height: 844 });
 await page.waitForTimeout(1200);
 const mobile = await snapshot();
 
+// Dune boot + per-planet ecosystem switching.
+phase = 'dune';
+await page.evaluate(() => {
+  window.__game.setPlanet('dune', 6161);
+  window.__game.tick(2);
+});
+const duneProbe = await page.evaluate(() => {
+  const next = window.__game.state();
+  return {
+    planetId: next.planetId,
+    temperature: next.environment.temperature,
+    water: next.environment.water,
+    ecoSpecies: Object.keys(next.eco.populations).length,
+    score: window.__game.ecoScore('dune_camel'),
+  };
+});
+
 const contextLossErrors = boot.contextLost
   ? errors.filter((message) => /WebGL context may be lost|Could not initialize shader/.test(message))
   : [];
@@ -155,6 +172,12 @@ const checks = {
     dnaFauna.agents === beforeDnaFauna.agents,
   serviceWorkerRegistered: sw.registered,
   mobileStillRendering: mobile.drawCalls > 0,
+  dunePlanetActive:
+    duneProbe.planetId === 'dune' &&
+    duneProbe.temperature > 30 &&
+    duneProbe.water < 25 &&
+    duneProbe.ecoSpecies === 12 &&
+    duneProbe.score !== null,
 };
 
 console.log(JSON.stringify({ boot, initialTick: initialState.tick, placementActive, contextLossErrors, appErrors, grown: {
@@ -166,7 +189,7 @@ console.log(JSON.stringify({ boot, initialTick: initialState.tick, placementActi
   objects: grown.objects.length,
   fauna: grownFauna,
   eco: ecoProbe,
-}, grownMetrics, reloadedTick: reloaded.tick, reloadedObjects: reloaded.objects.length, sw, errors, checks }, null, 2));
+}, grownMetrics, reloadedTick: reloaded.tick, reloadedObjects: reloaded.objects.length, sw, dune: duneProbe, errors, checks }, null, 2));
 
 await browser.close();
 const failed = Object.entries(checks).filter(([, ok]) => !ok).map(([name]) => name);

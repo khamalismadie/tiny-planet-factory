@@ -1,3 +1,4 @@
+import { duneConfig } from '../../content/planets/dune';
 import { terraConfig } from '../../content/planets/terra';
 import { hashString, mulberry32 } from '../rng';
 import type { PlanetState } from '../types';
@@ -308,4 +309,19 @@ export class EcosystemManager {
   }
 }
 
-export const terraEcosystem = new EcosystemManager(terraConfig);
+const ECOSYSTEM_MANAGERS = new Map<string, EcosystemManager>([
+  [terraConfig.id, new EcosystemManager(terraConfig)],
+  [duneConfig.id, new EcosystemManager(duneConfig)],
+]);
+
+export function ecosystemFor(planetId: string): EcosystemManager | null {
+  return ECOSYSTEM_MANAGERS.get(planetId) ?? null;
+}
+
+export function initializeEcosystem(planet: PlanetState): void {
+  ecosystemFor(planet.planetId)?.initialize(planet);
+}
+
+export function stepEcosystem(planet: PlanetState): string[] {
+  return ecosystemFor(planet.planetId)?.step(planet) ?? [];
+}

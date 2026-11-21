@@ -3,9 +3,8 @@ import { ensureEventState } from '../content/missions';
 import { OBJECT_DEFS, UNLOCK_LEVEL } from '../content/objects';
 import { SPECIES_ORDER } from '../content/species';
 import { WEATHER_DEFS } from '../content/weather';
-import { terraConfig } from '../content/planets/terra';
 import { scoreHabitat } from '../sim/eco/habitat';
-import { guildStatus } from '../sim/eco/guilds';
+import { ecosystemConfigOf, foodWebLinks, guildStatus, isSupportedPlanet } from '../sim/eco/guilds';
 import { habitatContextFor } from '../sim/eco/manager';
 import { placeObject, createPlanet, planetNameFromSeed, simulateTick, TICK_MS } from '../sim/engine';
 import { decodePlanetDna, encodePlanetDna, type PlanetDnaCodes } from '../sim/dna';
@@ -71,12 +70,15 @@ export class Game {
   private async bootstrap(): Promise<void> {
     const saved = await this.store.load();
     const seed = Math.floor(Math.random() * 0xffffffff);
-    this.state = saved ?? createPlanet(seed, planetNameFromSeed(seed));
+    const params = new URLSearchParams(location.search);
+    const requestedPlanet = params.get('planet');
+    const planetId = isSupportedPlanet(requestedPlanet) ? requestedPlanet : 'terra';
+    const usableSave = saved && (!requestedPlanet || saved.planetId === planetId) ? saved : null;
+    this.state = usableSave ?? createPlanet(seed, planetNameFromSeed(seed), planetId);
     this.state.events = ensureEventState(this.state.events);
     this.settings = QUALITY[detectQuality()];
     this.perf = new PerfMonitor(this.settings.tier);
     this.perfOverlay = document.getElementById('perf');
-    const params = new URLSearchParams(location.search);
     if (params.has('perf') || import.meta.env.DEV) {
       this.perfOverlay?.classList.add('show');
     }
@@ -240,11 +242,12 @@ export class Game {
             agents: this.state.fauna?.agents.filter((agent) => agent.species === species).length ?? 0,
             status: guildStatus(this.state, species),
           })),
-          links: terraConfig.foodWeb,
+          links: foodWebLinks(this.state),
         }),
         ecoScore: (id: string) => {
-          const definition = terraConfig.species.find((entry) => entry.id === id);
-          return definition ? scoreHabitat(definition, habitatContextFor(this.state, terraConfig)) : null;
+          const config = ecosystemConfigOf(this.state);
+          const definition = config?.species.find((entry) => entry.id === id);
+          return config && definition ? scoreHabitat(definition, habitatContextFor(this.state, config)) : null;
         },
         metrics: () => this.metrics(),
         qaReport: () => this.qaReport ?? this.qa?.report() ?? null,
@@ -278,12 +281,13 @@ export class Game {
         placement: () => this.scene.placementState(),
         select: (type: ObjectType) => this.select(type),
         reset: (seed: number) => {
-          this.state = createPlanet(seed >>> 0, planetNameFromSeed(seed >>> 0));
+          this.state = createPlanet(seed >>> 0, planetNameFromSeed(seed >>> 0), this.state.planetId);
           this.selected = 'grass';
           this.rebuildScene();
           this.hud.update(this.state, this.selected);
           this.queueSave();
         },
+        setPlanet: (planetId: string, seed?: number) => this.switchPlanet(planetId, seed),
         dna: () => this.dnaCodes(),
         previewDna: (code: string) => this.previewDna(code),
         commitDna: (code: string) => this.loadDna(code),
@@ -439,9 +443,19 @@ export class Game {
     this.commitState(planet, 'Remix dibuat dengan bentuk permukaan baru.');
   }
 
+  private switchPlanet(planetId: string, seed = Math.floor(Math.random() * 0xffffffff)): void {
+    if (!isSupportedPlanet(planetId)) return;
+    this.state = createPlanet(seed >>> 0, planetNameFromSeed(seed >>> 0), planetId);
+    this.selected = 'grass';
+    this.rebuildScene();
+    this.hud.update(this.state, this.selected);
+    this.queueSave();
+    this.hud.notify(`Planet ${planetId} siap dibangun.`);
+  }
+
   private newPlanet(): void {
     const seed = Math.floor(Math.random() * 0xffffffff);
-    this.state = createPlanet(seed, planetNameFromSeed(seed));
+    this.state = createPlanet(seed, planetNameFromSeed(seed), this.state.planetId);
     this.selected = 'grass';
     this.rebuildScene();
     this.hud.update(this.state, this.selected);

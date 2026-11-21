@@ -74,4 +74,4 @@ Jika tidak ada habitat visual, kapasitas tetap 0 sehingga test kepunahan lama ma
 - Ini bukan AI individu dengan memori, rute, atau imperative planning; ini adalah perilaku deterministik berbasis food web + energi.
 - Belum ada agen visual untuk kelinci, serigala, elang, lebah, dan jamur secara terpisah.
 - Belum ada audio, animasi transisi, atau predasi yang mengubah geometry lawan.
-- Planets selain Terra belum memakai guild ekologis; mereka memakai fallback kapasitas lama sampai planet itu mendapat `EcosystemManager`-nya sendiri.
+- Sejak v0.7, Dune juga memakai guild ekologis; tujuh planet lain masih memakai fallback kapasitas lama sampai mendapat `EcosystemManager`-nya sendiri.

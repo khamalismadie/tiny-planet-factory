@@ -99,11 +99,12 @@ Program Nine Worlds menggantikan roadmap lama: Terra diselesaikan lebih dulu, la
 | `v0.5` | **Terra Core** — simulasi populasi berbasis habitat, reproduksi/kematian, detritus, metrik turunan. *(selesai)* |
 | `v0.5.1` | **Observability & Stress Tests** — hook `eco()`, panel `?eco=1`, lima skenario gangguan. *(selesai)* |
 | `v0.6` | **Food Web + Wildlife AI** — agen fauna yang terhubung ke populasi ekologis. *(selesai)* |
-| `v0.7+` | **Nine Worlds** — Dune, Glaciere, Inferna, Aquaria, Mycelia, Sakura, Aurelia, Cosmos. |
+| `v0.7` | **Dune + Biome Expansion** — planet kedua dengan iklim, food web, dan guild sendiri. *(selesai)* |
+| `v0.8+` | **Nine Worlds lanjutan** — Glaciere, Inferna, Aquaria, Mycelia, Sakura, Aurelia, Cosmos. |
 
 ## Langkah berikutnya
 
 1. Selesaikan checklist `docs/QA-DEVICE.md` di Android menengah sungguhan: p50/p95, cold start, pinch, context loss/restore, PWA offline/update.
 2. Deploy produksi HTTPS mengikuti `docs/RELEASE.md`, lalu jalankan `?qa=1&qaSeconds=45` dari perangkat.
-3. Lanjut ke v0.7 (Dune + ekspansi biome) setelah QA HTTPS/perangkat nyata selesai.
+3. Lanjut ke v0.8 (Glaciere) setelah QA HTTPS/perangkat nyata selesai.
 4. Baru setelah Nine Worlds selesai, evaluasi ulang Supabase cloud/gallery/social sebagai fase terpisah.

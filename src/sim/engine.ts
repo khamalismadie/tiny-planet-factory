@@ -3,7 +3,8 @@ import { OBJECT_DEFS, OBJECT_ORDER, UNLOCK_LEVEL } from '../content/objects';
 import { WEATHER_DEFS } from '../content/weather';
 import { inferBiome } from './biome';
 import { appendEvent, makePlanetEvent, nextEventIndex } from './events';
-import { terraEcosystem } from './eco/manager';
+import { initializeEcosystem, stepEcosystem } from './eco/manager';
+import { ecosystemConfigFor, ecosystemConfigOf, isSupportedPlanet } from './eco/guilds';
 import { CURRENT_ECOSYSTEM_VERSION, createEcoState } from './eco/state';
 import { hashString, mulberry32 } from './rng';
 import { createFauna, simulateWildlife } from './wildlife';
@@ -30,6 +31,17 @@ const IDEAL: Record<EnvKey, [number, number]> = {
   stability: [60, 100],
 };
 
+const IDEAL_TOLERANCE: Record<EnvKey, number> = {
+  temperature: 10,
+  water: 18,
+  humidity: 18,
+  oxygen: 20,
+  fertility: 20,
+  biodiversity: 20,
+  energy: 20,
+  stability: 20,
+};
+
 const LEVEL_XP = [0, 0, 40, 100, 160, 260];
 
 export function clamp(value: number, min = 0, max = 100): number {
@@ -40,37 +52,51 @@ function approach(value: number, target: number, rate: number): number {
   return clamp(value + (target - value) * rate);
 }
 
-function inIdeal(env: Environment, key: EnvKey): boolean {
-  const [min, max] = IDEAL[key];
-  return env[key] >= min && env[key] <= max;
+function idealFor(planet: PlanetState, key: EnvKey): [number, number] {
+  const base = ecosystemConfigOf(planet)?.startingEnvironment[key];
+  if (base === undefined || planet.planetId === 'terra') return IDEAL[key];
+  const spread = IDEAL_TOLERANCE[key];
+  return [clamp(base - spread, 0, 100), clamp(base + spread, 0, 100)];
+}
+
+function inIdeal(planet: PlanetState, key: EnvKey): boolean {
+  const [min, max] = idealFor(planet, key);
+  const value = planet.environment[key];
+  return value >= min && value <= max;
 }
 
 export function createPlanet(seed: number, name = 'Planet Baru', planetId = 'terra'): PlanetState {
   const level = 1;
-  const environment: Environment = {
-    temperature: 18,
-    water: 22,
-    humidity: 25,
-    oxygen: 10,
-    fertility: 20,
-    biodiversity: 5,
-    energy: 50,
-    stability: 38,
-  };
+  const resolvedPlanetId = isSupportedPlanet(planetId) ? planetId : 'terra';
+  const config = ecosystemConfigFor(resolvedPlanetId);
+  const useLegacyStart = resolvedPlanetId === 'terra' || !config;
+  const environment: Environment = useLegacyStart
+    ? {
+        temperature: 18,
+        water: 22,
+        humidity: 25,
+        oxygen: 10,
+        fertility: 20,
+        biodiversity: 5,
+        energy: 50,
+        stability: 38,
+      }
+    : { ...config.startingEnvironment };
+  const displayName = useLegacyStart || !config ? name : `${config.name} · ${name}`;
   const state: PlanetState = {
     schemaVersion: 3,
     revision: 0,
     id: `planet-${seed}-${Date.now().toString(36)}`,
-    planetId,
+    planetId: resolvedPlanetId,
     ecosystemVersion: CURRENT_ECOSYSTEM_VERSION,
-    eco: createEcoState(planetId),
+    eco: createEcoState(resolvedPlanetId),
     seed,
-    name,
+    name: displayName,
     tick: 0,
     objects: [],
     environment: { ...environment },
     startingEnvironment: { ...environment },
-    terrainConfig: { ...DEFAULT_TERRAIN_CONFIG },
+    terrainConfig: useLegacyStart || !config ? { ...DEFAULT_TERRAIN_CONFIG } : { ...config.terrain },
     biome: 'barren',
     fauna: createFauna(),
     eventLog: [],
@@ -84,7 +110,7 @@ export function createPlanet(seed: number, name = 'Planet Baru', planetId = 'ter
     stage: 1,
     updatedAt: Date.now(),
   };
-  terraEcosystem.initialize(state);
+  initializeEcosystem(state);
   appendEvent(state, makePlanetEvent('planet.created', 0, 0, { seed, name }));
   return state;
 }
@@ -152,7 +178,7 @@ export function computeStage(planet: PlanetState): number {
   if (e.stability >= 68 && e.biodiversity >= 45 && e.oxygen >= 55) return 5;
   if (
     e.stability >= 82 &&
-    (Object.keys(IDEAL) as EnvKey[]).every((key) => inIdeal(e, key))
+    (Object.keys(IDEAL) as EnvKey[]).every((key) => inIdeal(planet, key))
   ) {
     return 6;
   }
@@ -194,6 +220,8 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
   const e = planet.environment;
   const eco = planet.ecosystem;
   const atm = planet.atmosphere;
+  const planetConfig = ecosystemConfigOf(planet);
+  const legacyClimate = planet.planetId === 'terra' || !planetConfig;
   const random = mulberry32((planet.seed ^ (planet.tick * 2654435761)) >>> 0);
   const counts = Object.fromEntries(OBJECT_ORDER.map((type) => [type, 0])) as Record<ObjectType, number>;
   for (const object of planet.objects) counts[object.type] += 1;
@@ -219,14 +247,17 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
     }
   }
 
-  const targetTemp = 12 + sunlight * 7 + counts.sand * 0.08 - counts.mountain * 0.12 - counts.ocean * 0.08;
+  const tempShift = legacyClimate || !planetConfig ? 0 : planetConfig.climate.baseTemperature - 18;
+  const targetTemp = 12 + sunlight * 7 + tempShift + counts.sand * 0.08 - counts.mountain * 0.12 - counts.ocean * 0.08;
   e.temperature = clamp(approach(e.temperature, targetTemp, 0.04) + weather.tempDelta * intensity, -10, 50);
 
   const evaporation = 0.1 + Math.max(0, e.temperature - 18) * 0.012 - atm.cloudCoverage * 0.001;
   const rainfall = weather.rain * intensity * 1.4 + atm.precipitation * 0.004;
   e.water = clamp(e.water + rainfall - evaporation);
+  if (!legacyClimate && planetConfig) e.water = approach(e.water, planetConfig.climate.baseWater, 0.025);
 
-  const humidityTarget = 18 + e.water * 0.42 + counts.ocean * 1.2 + counts.lake * 0.7 + counts.tree * 0.4 - e.temperature * 0.25;
+  const humidityBase = legacyClimate || !planetConfig ? 18 : planetConfig.climate.baseHumidity;
+  const humidityTarget = humidityBase + e.water * 0.42 + counts.ocean * 1.2 + counts.lake * 0.7 + counts.tree * 0.4 - e.temperature * 0.25;
   e.humidity = approach(e.humidity, humidityTarget, 0.06);
 
   const vegetationTarget = clamp(
@@ -256,7 +287,7 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
   const deviations = (Object.keys(IDEAL) as EnvKey[])
     .filter((key) => key !== 'stability')
     .map((key) => {
-      const [min, max] = IDEAL[key];
+      const [min, max] = idealFor(planet, key);
       const value = e[key];
       return value < min ? (min - value) / Math.max(1, min) : value > max ? (value - max) / Math.max(1, 100 - max) : 0;
     });
@@ -293,9 +324,9 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
     planet.warning = null;
   }
 
-  events.push(...terraEcosystem.step(planet));
+  events.push(...stepEcosystem(planet));
 
-  const healthy = (Object.keys(IDEAL) as EnvKey[]).filter((key) => inIdeal(e, key)).length;
+  const healthy = (Object.keys(IDEAL) as EnvKey[]).filter((key) => inIdeal(planet, key)).length;
   planet.progression.xp += healthy * 0.12 + (eco.vegetation > 20 ? 0.08 : 0);
   events.push(...refreshProgression(planet));
 
