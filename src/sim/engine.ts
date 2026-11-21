@@ -3,6 +3,7 @@ import { OBJECT_DEFS, OBJECT_ORDER, UNLOCK_LEVEL } from '../content/objects';
 import { WEATHER_DEFS } from '../content/weather';
 import { inferBiome } from './biome';
 import { appendEvent, makePlanetEvent, nextEventIndex } from './events';
+import { CURRENT_ECOSYSTEM_VERSION, createEcoState } from './eco/state';
 import { hashString, mulberry32 } from './rng';
 import { createFauna, simulateWildlife } from './wildlife';
 import type {
@@ -43,7 +44,7 @@ function inIdeal(env: Environment, key: EnvKey): boolean {
   return env[key] >= min && env[key] <= max;
 }
 
-export function createPlanet(seed: number, name = 'Planet Baru'): PlanetState {
+export function createPlanet(seed: number, name = 'Planet Baru', planetId = 'terra'): PlanetState {
   const level = 1;
   const environment: Environment = {
     temperature: 18,
@@ -56,9 +57,12 @@ export function createPlanet(seed: number, name = 'Planet Baru'): PlanetState {
     stability: 38,
   };
   const state: PlanetState = {
-    schemaVersion: 2,
+    schemaVersion: 3,
     revision: 0,
     id: `planet-${seed}-${Date.now().toString(36)}`,
+    planetId,
+    ecosystemVersion: CURRENT_ECOSYSTEM_VERSION,
+    eco: createEcoState(planetId),
     seed,
     name,
     tick: 0,

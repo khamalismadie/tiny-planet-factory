@@ -1,6 +1,10 @@
 import { QUALITY, suggestQuality } from '../src/app/quality.ts';
 import { ensureEventState } from '../src/content/missions.ts';
+import { PLANET_CONFIGS, PLANET_IDS } from '../src/content/planets/index.ts';
 import { decodePlanetDna, encodePlanetDna } from '../src/sim/dna.ts';
+import { HabitatManager } from '../src/sim/eco/habitat.ts';
+import { validateAllPlanetConfigs, speciesRegistry } from '../src/sim/eco/registry.ts';
+import { createEcoState } from '../src/sim/eco/state.ts';
 import {
   createPlanet,
   decodeDna,
@@ -110,10 +114,57 @@ delete legacyRaw.eventLog;
 delete legacyRaw.fauna;
 const migrated = migratePlanet(legacyRaw);
 assert(migrated, 'save lama harus bisa dimigrasikan');
-assert(migrated!.schemaVersion === CURRENT_SCHEMA_VERSION, 'schemaVersion hasil migrasi harus 2');
+assert(migrated!.schemaVersion === CURRENT_SCHEMA_VERSION, 'schemaVersion hasil migrasi harus 3');
 assert(migrated!.objects.length === planet.objects.length, 'migrasi harus mempertahankan objek');
 assert(migrated!.eventLog.some((event) => event.type === 'planet.created'), 'migrasi harus membuat event awal');
 assert(migrated!.fauna.agents.length === 0, 'migrasi save lama harus membuat fauna kosong');
+
+const configErrors = validateAllPlanetConfigs();
+assert(configErrors.length === 0, `konfigurasi planet invalid: ${configErrors.join('; ')}`);
+assert(PLANET_CONFIGS.length === 9 && PLANET_IDS.length === 9, 'harus ada 9 konfigurasi planet');
+assert(speciesRegistry.list().length >= 100, 'registry harus berisi subset spesies semua planet');
+const terraConfig = speciesRegistry.planet('terra');
+assert(terraConfig?.species.length === 12, 'Terra slice harus berisi 12 spesies kunci');
+assert(migrated!.planetId === 'terra', 'migrasi save lama harus memilih planet default');
+assert(migrated!.ecosystemVersion >= 1, 'migrasi harus menyetel ecosystemVersion');
+assert(migrated!.eco.planetId === 'terra', 'migrasi harus membuat eco state default');
+
+const habitat = new HabitatManager();
+const habitatContext = {
+  environment: planet.environment,
+  ecosystem: planet.ecosystem,
+  biomeTags: ['temperate-forest', 'river'],
+};
+const habitatBadContext = {
+  environment: { ...planet.environment, temperature: -8, water: 4, humidity: 8, fertility: 2, stability: 5 },
+  ecosystem: { ...planet.ecosystem, vegetation: 0, health: 5 },
+  biomeTags: ['barren'],
+};
+const oakScore = habitat.score('terra_oak', habitatContext);
+assert(oakScore !== null, 'terra_oak harus dikenal HabitatManager');
+assert(oakScore!.suitability > 0, 'habitat cocok harus memberi skor positif');
+assert(
+  JSON.stringify(oakScore) === JSON.stringify(habitat.score('terra_oak', habitatContext)),
+  'skor habitat harus deterministik',
+);
+assert(
+  habitat.score('terra_oak', habitatBadContext)!.suitability < oakScore!.suitability,
+  'habitat buruk harus menurunkan skor',
+);
+
+const ecoPlanet = createPlanet(99, 'Eco Save', 'terra');
+ecoPlanet.eco.discovered.push('terra_oak');
+ecoPlanet.eco.populations.terra_oak = {
+  estimate: 42,
+  trend: 1,
+  births: 3,
+  deaths: 1,
+  capacity: 140,
+};
+const ecoLoaded = deserializePlanet(serializePlanet(ecoPlanet));
+assert(ecoLoaded?.eco.discovered.includes('terra_oak'), 'save/load harus mempertahankan discovery eco');
+assert(ecoLoaded?.eco.populations.terra_oak?.estimate === 42, 'save/load harus mempertahankan populasi eco');
+assert(ecoLoaded?.schemaVersion === 3, 'save/load harus memakai schema v3');
 
 const replayed = replayEvents(planet.eventLog);
 assert(replayed, 'event log harus bisa di-replay');

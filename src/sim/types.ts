@@ -1,3 +1,5 @@
+import type { EcoStateV3 } from './eco/types';
+
 export type EnvKey =
   | 'temperature'
   | 'water'
@@ -139,6 +141,9 @@ export interface PlanetState {
   schemaVersion: number;
   revision: number;
   id: string;
+  planetId: string;
+  ecosystemVersion: number;
+  eco: EcoStateV3;
   seed: number;
   name: string;
   tick: number;

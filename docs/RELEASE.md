@@ -45,6 +45,16 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [ ] Quality tier membatasi jumlah fauna yang dirender (`low` 6, `medium` 12, `high` 24).
 - [ ] Draw call total masih di bawah 150 dengan fauna aktif.
 
+## 2d. Ecosystem Data Foundation (v0.4)
+
+- [ ] `schemaVersion` = 3 dengan field `planetId`, `ecosystemVersion`, dan `eco`.
+- [ ] Save lama v1/v2 tetap terbuka dan mendapat `eco` state default tanpa kehilangan objek/event/fauna.
+- [ ] Semua 9 `PlanetConfig` lolos validasi: species unik, referensi flora/fauna/decomposer valid, food web valid, minimal satu season.
+- [ ] `SpeciesRegistry` berisi subset spesies kunci untuk 9 planet dengan id global unik.
+- [ ] `HabitatManager` menghasilkan skor deterministik untuk input yang sama.
+- [ ] `eco.discovered`, `eco.populations`, dan `eco.eventHistory` bertahan setelah save/load.
+- [ ] DNA format lama masih bisa dibaca; schema v3 baru belum mengubah binary DNA sampai phase evolution.
+
 ## 3. QA perangkat nyata
 
 Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:

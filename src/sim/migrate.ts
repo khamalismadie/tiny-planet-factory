@@ -1,7 +1,9 @@
 import { ensureEventState } from '../content/missions';
 import { OBJECT_ORDER } from '../content/objects';
 import { SPECIES_ORDER } from '../content/species';
+import { PLANET_IDS } from '../content/planets/ids';
 import { BIOMES, inferBiome } from './biome';
+import { CURRENT_ECOSYSTEM_VERSION, normalizeEcoState } from './eco/state';
 import { createPlanet, planetNameFromSeed } from './engine';
 import type {
   Biome,
@@ -20,7 +22,7 @@ import type {
 } from './types';
 import { DEFAULT_TERRAIN_CONFIG } from './types';
 
-export const CURRENT_SCHEMA_VERSION = 2;
+export const CURRENT_SCHEMA_VERSION = 3;
 
 const ENV_KEYS: EnvKey[] = [
   'temperature', 'water', 'humidity', 'oxygen',
@@ -132,7 +134,10 @@ export function migratePlanet(raw: unknown): PlanetState | null {
   if (!isRecord(raw)) return null;
   const seed = num(raw.seed, 1) >>> 0;
   const name = str(raw.name, planetNameFromSeed(seed));
-  const base = createPlanet(seed, name);
+  const rawPlanetId = str(raw.planetId, 'terra');
+  const planetId = PLANET_IDS.includes(rawPlanetId) ? rawPlanetId : 'terra';
+  const base = createPlanet(seed, name, planetId);
+  const eco = normalizeEcoState(raw.eco, planetId);
   const rawEnvironment = mergeEnvironment(raw.environment, base.environment);
   const rawEcosystem = isRecord(raw.ecosystem) ? raw.ecosystem : {};
   const rawAtmosphere = isRecord(raw.atmosphere) ? raw.atmosphere : {};
@@ -163,6 +168,9 @@ export function migratePlanet(raw: unknown): PlanetState | null {
   return {
     ...base,
     id: str(raw.id, base.id),
+    planetId,
+    ecosystemVersion: Math.max(1, Math.floor(num(raw.ecosystemVersion, CURRENT_ECOSYSTEM_VERSION))),
+    eco,
     seed,
     name,
     tick: Math.max(0, Math.floor(num(raw.tick, 0))),

@@ -1,4 +1,4 @@
-const CACHE = 'tpf-shell-v1';
+const CACHE = 'tpf-shell-v0-4-0';
 const SHELL = [
   '/',
   '/index.html',
