@@ -1,6 +1,9 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
+  // Relative asset URLs keep the build portable across LAN root, GitHub Pages
+  // subpaths, and any future custom domain without a rebuild.
+  base: './',
   build: {
     // PixiJS is intentionally split into two cacheable vendor chunks (~540 kB
     // each). Content data (planet configs, guild mappings, objects, missions,

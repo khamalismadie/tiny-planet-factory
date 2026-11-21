@@ -1,11 +1,13 @@
-const CACHE = 'tpf-shell-v0-14-0';
+const CACHE = 'tpf-shell-v0-14-1';
+const SCOPE = new URL('.', self.registration.scope);
+const asset = (path) => new URL(path, SCOPE).href;
 const SHELL = [
-  '/',
-  '/index.html',
-  '/manifest.webmanifest',
-  '/icons/icon.svg',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png',
+  asset(''),
+  asset('index.html'),
+  asset('manifest.webmanifest'),
+  asset('icons/icon.svg'),
+  asset('icons/icon-192.png'),
+  asset('icons/icon-512.png'),
 ];
 
 self.addEventListener('install', (event) => {
@@ -31,10 +33,10 @@ self.addEventListener('fetch', (event) => {
       fetch(request)
         .then((response) => {
           const copy = response.clone();
-          caches.open(CACHE).then((cache) => cache.put('/index.html', copy));
+          caches.open(CACHE).then((cache) => cache.put(asset('index.html'), copy));
           return response;
         })
-        .catch(() => caches.match('/index.html')),
+        .catch(() => caches.match(asset('index.html'))),
     );
     return;
   }

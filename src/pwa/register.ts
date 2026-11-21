@@ -3,7 +3,7 @@ export function registerPwa(onUpdate: (message: string) => void): void {
 
   const register = () => {
     navigator.serviceWorker
-      .register('/sw.js')
+      .register(new URL('sw.js', document.baseURI).href)
       .then((registration) => {
         registration.addEventListener('updatefound', () => {
           const installing = registration.installing;

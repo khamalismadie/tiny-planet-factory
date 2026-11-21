@@ -179,6 +179,15 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [ ] Delapan planet sebelumnya tidak berubah secara numerik dari gate v0.13.
 - [ ] App chunk <100 kB.
 
+## 2p. Deploy HTTPS & PWA portability (v0.14.1)
+
+- [ ] Build memakai `base: './'` sehingga asset bisa di-root LAN maupun subpath GitHub Pages.
+- [ ] Manifest memakai `start_url`/`scope` `./` dan ikon relatif.
+- [ ] `sw.js` menghitung cache path dari `self.registration.scope`.
+- [ ] Registrasi service worker memakai URL relatif terhadap `document.baseURI`.
+- [ ] GitHub Pages aktif di `https://khamalismadie.github.io/tiny-planet-factory/`.
+- [ ] Manifest, service worker, dan chunk bisa dimuat lewat HTTPS.
+
 ## 3. QA perangkat nyata
 
 Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:
