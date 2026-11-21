@@ -42,7 +42,7 @@ Build memakai `NODE_OPTIONS=--max-old-space-size=4096` karena bundler PixiJS 3D 
 - Responsive portrait/landscape; UI memakai overlay DOM di atas kanvas PixiJS.
 - Quality tier (`low`/`medium`/`high`) + adaptive downgrade otomatis bila p95 frame time > 34 ms.
 - Overlay performa (`?perf=1`), hook QA (`?debug=1`), dan probe `?qa=1&qaSeconds=45` yang menghasilkan laporan p50/p95 + info perangkat siap disalin.
-- Vendor PixiJS dipisah menjadi `pixi-core` + `pixi-3d`; app chunk ~99.6 kB (gzip ~32.9 kB) dan konfigurasi planet menjadi chunk `planet-configs` terpisah ~34.6 kB.
+- Vendor PixiJS dipisah menjadi `pixi-core` + `pixi-3d`; app chunk ~91.5 kB (gzip ~30.5 kB) dan data konten menjadi chunk `planet-configs` terpisah ~42.8 kB.
 - Telemetri opt-in (tersimpan lokal, tanpa server) dengan modal penjelasan, ekspor JSON, dan hapus data.
 - Visual polish berbasis skill `pixi3d-visual-polish`: ground contact prop yang dihitung dari ekstent geometri, rim light, dan topbar mobile tanpa overflow. Standar visual ada di `docs/ART-DIRECTION.md`.
 
