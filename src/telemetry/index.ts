@@ -7,6 +7,8 @@ export type TelemetryName =
   | 'event_complete'
   | 'context_loss'
   | 'quality_downgrade'
+  | 'quality_change'
+  | 'menu_open'
   | 'qa_report'
   | 'dna_import'
   | 'dna_preview'

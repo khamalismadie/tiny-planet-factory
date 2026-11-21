@@ -1,7 +1,7 @@
 {
   "name": "tiny-planet-factory",
   "private": true,
-  "version": "0.14.3",
+  "version": "0.15.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
@@ -9,9 +9,10 @@
     "test:sim": "esbuild scripts/sim-test.ts --bundle --platform=node --format=esm --outfile=/tmp/opencode/sim-test.mjs >/dev/null && node /tmp/opencode/sim-test.mjs",
     "test:smoke": "node scripts/smoke.mjs",
     "test:device": "node scripts/device-check.mjs",
+    "test:menu": "node scripts/menu-check.mjs",
     "capture:visual": "node scripts/capture-visual.mjs",
     "audit:layout": "node scripts/layout-audit.mjs",
-    "test": "npm run test:sim && npm run test:smoke && npm run test:device",
+    "test": "npm run test:sim && npm run test:smoke && npm run test:device && npm run test:menu",
     "preview": "vite preview --host 0.0.0.0"
   },
   "dependencies": {

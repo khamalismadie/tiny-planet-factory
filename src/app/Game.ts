@@ -6,7 +6,7 @@ import { WEATHER_DEFS } from '../content/weather';
 import { scoreHabitat } from '../sim/eco/habitat';
 import { ecosystemConfigOf, foodWebLinks, guildStatus, isSupportedPlanet } from '../sim/eco/guilds';
 import { habitatContextFor } from '../sim/eco/manager';
-import { placeObject, createPlanet, planetNameFromSeed, simulateTick, TICK_MS } from '../sim/engine';
+import { placeObject, createPlanet, planetNameFromSeed, simulateTick, STAGE_NAMES, TICK_MS } from '../sim/engine';
 import { decodePlanetDna, encodePlanetDna, type PlanetDnaCodes } from '../sim/dna';
 import { migratePlanet } from '../sim/migrate';
 import type { ObjectType, PlanetState } from '../sim/types';
@@ -14,6 +14,7 @@ import { detectQuality, QUALITY, type QualitySettings, type QualityTier } from '
 import { PerfMonitor } from './PerfMonitor';
 import { QaProbe, type QaReport } from './QaProbe';
 import { Hud } from '../ui/Hud';
+import { MainMenu, type MainMenuInfo } from '../ui/MainMenu';
 import { SurfaceInput } from '../input/SurfaceInput';
 import { SaveStore } from '../persistence/SaveStore';
 import { GameScene } from '../render/Scene';
@@ -26,6 +27,10 @@ export class Game {
   private readonly telemetry = new Telemetry();
   private scene!: GameScene;
   private hud!: Hud;
+  private menu!: MainMenu;
+  private menuOpen = false;
+  private menuWasPaused = false;
+  private hadSave = false;
   private state!: PlanetState;
   private settings!: QualitySettings;
   private perf!: PerfMonitor;
@@ -74,6 +79,7 @@ export class Game {
     const requestedPlanet = params.get('planet');
     const planetId = isSupportedPlanet(requestedPlanet) ? requestedPlanet : 'terra';
     const usableSave = saved && (!requestedPlanet || saved.planetId === planetId) ? saved : null;
+    this.hadSave = !!usableSave;
     this.state = usableSave ?? createPlanet(seed, planetNameFromSeed(seed), planetId);
     this.state.events = ensureEventState(this.state.events);
     this.settings = QUALITY[detectQuality()];
@@ -98,6 +104,7 @@ export class Game {
     }
     this.buildScene();
     this.buildHud();
+    this.buildMenu();
     this.buildInput();
     this.instrument();
 
@@ -105,6 +112,10 @@ export class Game {
     this.hud.notify('Pilih objek, lalu ketuk permukaan planet untuk meletakkannya.');
 
     registerPwa((message) => this.hud.notify(message, true));
+
+    const skipMenu = params.has('debug') || params.has('qa') || params.has('planet') || params.get('menu') === '0';
+    if (skipMenu) this.menu.hide();
+    else this.openMenu();
   }
 
   private buildScene(): void {
@@ -145,6 +156,7 @@ export class Game {
         this.paused = paused;
         this.hud.notify(paused ? 'Simulasi dijeda.' : 'Simulasi dilanjutkan.');
       },
+      onMenu: () => this.openMenu(),
       onCopyDna: () => this.dnaCodes(),
       onLoadDna: (code) => this.loadDna(code),
       onPreviewDna: (code) => this.previewDna(code),
@@ -158,6 +170,51 @@ export class Game {
     });
     this.hud.setTelemetryEnabled(this.telemetry.optedIn);
     this.hud.update(this.state, this.selected);
+  }
+
+  private buildMenu(): void {
+    this.menu = new MainMenu({
+      onContinue: () => {
+        if (!this.hadSave) this.newPlanet();
+        this.closeMenu();
+      },
+      onNew: () => {
+        this.newPlanet();
+        this.closeMenu();
+      },
+      onDna: () => {
+        this.closeMenu();
+        this.hud.openDna();
+      },
+      onQuality: (tier) => this.setQuality(tier),
+      onClose: () => this.closeMenu(),
+    });
+  }
+
+  private menuInfo(): MainMenuInfo {
+    return {
+      hasSave: this.hadSave,
+      planetName: this.state.name,
+      stageLabel: `Tahap ${this.state.stage} — ${STAGE_NAMES[this.state.stage]}`,
+      objects: this.state.objects.length,
+      tick: this.state.tick,
+      quality: this.settings.tier,
+    };
+  }
+
+  private openMenu(): void {
+    if (this.menuOpen) return;
+    this.menuWasPaused = this.paused;
+    this.menuOpen = true;
+    this.menu.show(this.menuInfo());
+    this.telemetry.record('menu_open', { tick: this.state.tick });
+  }
+
+  private closeMenu(): void {
+    if (!this.menuOpen) return;
+    this.menuOpen = false;
+    this.menu.hide();
+    this.paused = this.menuWasPaused;
   }
 
   private buildInput(): void {
@@ -191,7 +248,7 @@ export class Game {
     this.app.ticker.add((ticker) => {
       this.scene.updateCamera();
       this.scene.update(ticker.deltaMS / 1000);
-      if (!this.paused) {
+      if (!this.paused && !this.menuOpen) {
         this.accumulator += ticker.deltaMS;
         let guard = 0;
         while (this.accumulator >= TICK_MS && guard++ < 5) {
@@ -270,12 +327,10 @@ export class Game {
         gl: () => this.gl,
         loseContext: () => this.contextExt?.loseContext(),
         restoreContext: () => this.contextExt?.restoreContext(),
-        setQuality: (tier: QualityTier) => {
-          this.perf.disableAdaptive();
-          this.perf.setTier(tier);
-          this.settings = QUALITY[tier];
-          this.scene.setQuality(this.settings);
-        },
+        setQuality: (tier: QualityTier) => this.setQuality(tier),
+        menuOpen: () => this.menuOpen,
+        openMenu: () => this.openMenu(),
+        closeMenu: () => this.closeMenu(),
         tick: (count = 1) => {
           this.perf.disableAdaptive();
           for (let i = 0; i < count; i++) this.tickOnce();
@@ -368,6 +423,7 @@ export class Game {
   }
 
   private queueSave(): void {
+    this.hadSave = true;
     window.clearTimeout(this.saveHandle);
     this.saveHandle = window.setTimeout(() => void this.store.save(this.state), 400);
   }
@@ -457,6 +513,16 @@ export class Game {
     this.hud.update(this.state, this.selected);
     this.queueSave();
     this.hud.notify(`Planet ${planetId} siap dibangun.`);
+  }
+
+  private setQuality(tier: QualityTier): void {
+    this.perf.disableAdaptive();
+    this.perf.setTier(tier);
+    this.settings = QUALITY[tier];
+    this.scene.setQuality(this.settings);
+    this.menu?.setQuality(tier);
+    this.telemetry.record('quality_change', { tier });
+    this.hud?.notify(`Kualitas grafis: ${QUALITY[tier].label}.`);
   }
 
   private newPlanet(): void {

@@ -11,6 +11,7 @@ import type { EnvKey, ObjectType, PlanetState } from '../sim/types';
 export interface HudCallbacks {
   onSelect: (type: ObjectType) => void;
   onPause: (paused: boolean) => void;
+  onMenu: () => void;
   onCopyDna: () => { short: string; full: string };
   onLoadDna: (code: string) => void;
   onPreviewDna: (code: string) => void;
@@ -112,15 +113,8 @@ export class Hud {
       this.callbacks.onPause(paused);
       this.pauseButton.textContent = paused ? 'Lanjut' : 'Jeda';
     });
-    document.getElementById('dna-btn')!.addEventListener('click', () => {
-      const codes = this.callbacks.onCopyDna();
-      this.dnaInput.value = codes.short;
-      this.dnaFull.value = codes.full;
-      this.setPreviewing(false);
-      this.modal.classList.remove('hidden');
-      this.dnaInput.focus();
-      this.dnaInput.select();
-    });
+    document.getElementById('menu-btn')!.addEventListener('click', () => this.callbacks.onMenu());
+    document.getElementById('dna-btn')!.addEventListener('click', () => this.openDna());
     document.getElementById('dna-close')!.addEventListener('click', () => {
       this.callbacks.onCloseDna();
       this.modal.classList.add('hidden');
@@ -188,6 +182,16 @@ export class Hud {
       this.notify('Data telemetri dihapus.');
     });
     document.getElementById('telemetry-close')!.addEventListener('click', () => this.telemetryModal.classList.add('hidden'));
+  }
+
+  openDna(): void {
+    const codes = this.callbacks.onCopyDna();
+    this.dnaInput.value = codes.short;
+    this.dnaFull.value = codes.full;
+    this.setPreviewing(false);
+    this.modal.classList.remove('hidden');
+    this.dnaInput.focus();
+    this.dnaInput.select();
   }
 
   setTelemetryEnabled(enabled: boolean): void {

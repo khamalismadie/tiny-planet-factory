@@ -6,8 +6,8 @@ Gunakan checklist ini sebelum publish build produksi.
 
 - [ ] Node 20+ dan dependency terpasang (`npm install`).
 - [ ] Version di `package.json` sudah dinaikkan.
-- [ ] Host PWA mendukung **HTTPS** dan melayani `/sw.js` dari root dengan `Service-Worker-Allowed: /`.
-- [ ] Ikon `/icons/icon-192.png`, `/icons/icon-512.png`, dan `/icons/icon.svg` tersedia.
+- [ ] Host PWA mendukung **HTTPS** dan melayani `sw.js` pada scope aplikasi (root atau subpath).
+- [ ] Ikon `icons/icon-192.png`, `icons/icon-512.png`, dan `icons/icon.svg` tersedia di scope aplikasi.
 - [ ] `manifest.webmanifest` masih valid (name, short_name, start_url, display, icons).
 
 ## 2. Build & test
@@ -191,6 +191,16 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [ ] GitHub Pages ditunda: repo masih private dan akun free tidak mendukung Pages untuk repo privat.
 - [ ] Host HTTPS produksi: verifikasi manifest dan `sw.js` mengembalikan 200.
 - [ ] Install prompt, offline, dan update di perangkat nyata.
+
+## 2q. Main Menu & Instrument UI (v0.15)
+
+- [x] Menu utama muncul saat boot normal; dilewati oleh `debug`, `qa`, `planet`, atau `menu=0`.
+- [x] Aksi menu: lanjutkan save, planet baru, buka Planet DNA, ganti kualitas grafis, kembali ke planet.
+- [x] Menu menghentikan simulasi dan mengembalikan status jeda saat ditutup.
+- [x] Tombol `Menu` di topbar, Escape untuk menutup, fokus awal pada aksi utama.
+- [x] Bahasa visual “peta kebun planet”: panel catatan lapangan, aksen hijau hayati/amber, tipografi display + data monospace.
+- [x] Tidak ada pemilih planet permanen di UI; `?planet=` tetap merupakan hook QA/deeplink.
+- [x] Gate baru `npm run test:menu` untuk desktop + mobile, overflow, fokus, kualitas, pause, dan DNA.
 
 ## 3. QA perangkat nyata
 
