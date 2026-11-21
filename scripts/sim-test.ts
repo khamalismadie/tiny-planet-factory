@@ -133,7 +133,8 @@ const dnaGlaciere = createPlanet(322, 'DNA Es', 'glaciere');
 const dnaInferna = createPlanet(323, 'DNA Api', 'inferna');
 const dnaAquaria = createPlanet(324, 'DNA Laut', 'aquaria');
 const dnaMycelia = createPlanet(325, 'DNA Jamur', 'mycelia');
-for (const [source, id] of [[dnaDune, 'dune'], [dnaGlaciere, 'glaciere'], [dnaInferna, 'inferna'], [dnaAquaria, 'aquaria'], [dnaMycelia, 'mycelia']] as const) {
+const dnaSakura = createPlanet(326, 'DNA Sakura', 'sakura');
+for (const [source, id] of [[dnaDune, 'dune'], [dnaGlaciere, 'glaciere'], [dnaInferna, 'inferna'], [dnaAquaria, 'aquaria'], [dnaMycelia, 'mycelia'], [dnaSakura, 'sakura']] as const) {
   const roundTrip = decodePlanetDna(encodePlanetDna(source).full);
   assert(roundTrip?.planetId === id, `DNA lengkap ${id} harus mempertahankan planetId`);
   const expected = ecosystemConfigFor(id)?.species.length ?? 12;
@@ -406,7 +407,7 @@ assert(foxSupplyAfter < foxSupplyBefore, 'runtuhnya mangsa harus menurunkan supl
 assert(agentCount(predatorPlanet, 'fox') <= foxBefore, 'jumlah predator tidak boleh naik saat mangsa habis');
 
 // Dune is the second active ecosystem with its own climate and guild mapping.
-assert(isSupportedPlanet('dune') && isSupportedPlanet('glaciere') && isSupportedPlanet('inferna') && isSupportedPlanet('aquaria') && isSupportedPlanet('mycelia'), 'Terra, Dune, Glaciera, Inferna, Aquaria, dan Mycelia aktif');
+assert(isSupportedPlanet('dune') && isSupportedPlanet('glaciere') && isSupportedPlanet('inferna') && isSupportedPlanet('aquaria') && isSupportedPlanet('mycelia') && isSupportedPlanet('sakura'), 'Terra, Dune, Glaciera, Inferna, Aquaria, Mycelia, dan Sakura aktif');
 const duneConfig = ecosystemConfigFor('dune');
 assert(duneConfig !== null && duneConfig.species.length === 12, 'Dune harus membawa 12 spesies');
 const dunePlanet = createPlanet(6161, 'Dune Uji', 'dune');
@@ -650,6 +651,63 @@ for (const type of ['tree', 'grass', 'bush', 'rock', 'deer', 'fox', 'bird'] as c
 tickN(fungalTwin, 361);
 assert(JSON.stringify(fungalPlanet.fauna) === JSON.stringify(fungalTwin.fauna), 'fauna Mycelia harus deterministik');
 assert(JSON.stringify(fungalPlanet.eco) === JSON.stringify(fungalTwin.eco), 'ekosistem Mycelia harus deterministik');
+
+// Sakura is the seventh active ecosystem with floating islands and blossom cycles.
+const skyConfig = ecosystemConfigFor('sakura');
+assert(skyConfig !== null && skyConfig.species.length === 11, 'Sakura harus membawa 11 spesies');
+assert(skyConfig.climate.seasons.length === 4, 'Sakura harus membawa empat musim');
+assert(skyConfig.specialSystems.includes('floating-connectivity'), 'Sakura harus membawa sistem floating-connectivity');
+const skyPlanet = createPlanet(5678, 'Sakura Uji', 'sakura');
+assert(skyPlanet.planetId === 'sakura', 'createPlanet harus mempertahankan planetId Sakura');
+assert(skyPlanet.environment.water > 50 && skyPlanet.environment.humidity > 60, 'Sakura harus mulai dengan awan lembap');
+assert(skyPlanet.eco.populations.sakura_tree, 'populasi Sakura harus diinisialisasi');
+assert(!skyPlanet.eco.populations.mycelia_network && !skyPlanet.eco.populations.aquaria_kelp, 'tidak boleh ada kebocoran spesies planet lain');
+for (const type of ['tree', 'grass', 'flower', 'bush', 'rock', 'deer', 'fox', 'bird'] as const) {
+  assert(placeObject(skyPlanet, type, [0.5, 0.4, 0.75]), `${type} harus bisa ditempatkan di Sakura`);
+}
+tickN(skyPlanet, 50);
+const blossomSky = { ...skyPlanet.eco.sky };
+assert(blossomSky.seasonId === 'blossom-season', '50 tick pertama harus musim mekar');
+assert(blossomSky.blossom > 60, 'musim mekar harus menaikkan mekar');
+assert(blossomSky.connectivity > 50, 'konektivitas pulau harus sehat di awal');
+tickN(skyPlanet, 70);
+const petalSky = { ...skyPlanet.eco.sky };
+assert(petalSky.seasonId === 'petal-fall', 'tick 120 harus masuk gugur kelopak');
+assert(petalSky.blossom < blossomSky.blossom, 'gugur kelopak harus menurunkan mekar');
+tickN(skyPlanet, 100);
+const windSky = { ...skyPlanet.eco.sky };
+assert(windSky.seasonId === 'sky-winds', 'tick 220 harus masuk angin langit');
+assert(windSky.wind > blossomSky.wind, 'angin langit harus memperkuat angin');
+assert(windSky.connectivity < blossomSky.connectivity, 'angin langit harus melemahkan konektivitas');
+assert(windSky.isolationStress > blossomSky.isolationStress, 'angin langit harus menaikkan stres isolasi');
+tickN(skyPlanet, 105);
+const quietSky = { ...skyPlanet.eco.sky };
+assert(quietSky.seasonId === 'quiet-sky', 'tick 325 harus masuk langit tenang');
+assert(quietSky.connectivity > windSky.connectivity, 'langit tenang harus memulihkan konektivitas');
+tickN(skyPlanet, 36);
+assert(skyPlanet.eco.sky.seasonId === 'blossom-season', 'tick 361 harus kembali ke musim mekar');
+assert(skyPlanet.eco.sky.connectivity > 0, 'pulau melayang harus tetap terhubung');
+assert(skyPlanet.eco.metrics.speciesCount === 11, 'ekosistem Sakura harus tetap memiliki 11 spesies');
+assertBoundedEco(skyPlanet, 'Sakura');
+const skyDeer = guildStatus(skyPlanet, 'deer');
+assert(skyDeer !== null && skyDeer.speciesIds.includes('sakura_blossom_deer'), 'guild deer Sakura harus memetakan kijang bunga');
+assert(guildFoodSourceIds(skyPlanet, 'fox').includes('sakura_sky_rabbit'), 'guild predator Sakura harus terhubung ke food web');
+assert(agentCount(skyPlanet, 'bird') > 0, 'Sakura harus memunculkan agen elang/kolibri');
+assert(agentCount(skyPlanet, 'insect') > 0, 'Sakura harus memunculkan agen kupu-kupu');
+const skyLoaded = deserializePlanet(serializePlanet(skyPlanet));
+assert(
+  skyLoaded?.planetId === 'sakura' &&
+    skyLoaded.eco.sky.seasonId === 'blossom-season' &&
+    !!skyLoaded.eco.populations.sakura_sky_hawk,
+  'save/load Sakura harus mempertahankan identitas, musim, dan populasi',
+);
+const skyTwin = createPlanet(5678, 'Sakura Uji', 'sakura');
+for (const type of ['tree', 'grass', 'flower', 'bush', 'rock', 'deer', 'fox', 'bird'] as const) {
+  placeObject(skyTwin, type, [0.5, 0.4, 0.75]);
+}
+tickN(skyTwin, 361);
+assert(JSON.stringify(skyPlanet.fauna) === JSON.stringify(skyTwin.fauna), 'fauna Sakura harus deterministik');
+assert(JSON.stringify(skyPlanet.eco) === JSON.stringify(skyTwin.eco), 'ekosistem Sakura harus deterministik');
 
 const rainPlanet = createPlanet(7001, 'Hujan');
 rainPlanet.weather = { type: 'rain', intensity: 0.8, remainingTicks: 5 };

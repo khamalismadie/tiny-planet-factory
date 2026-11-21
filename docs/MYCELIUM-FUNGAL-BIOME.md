@@ -12,9 +12,10 @@ Tujuan: menambahkan planet keenam dengan jaringan miselium, spora, bioluminesens
 | Inferna | aktif | 12 | `volcanic-eruption`, empat musim, lava/abu |
 | Aquaria | aktif | 12 | `coral-health`, empat musim, arus/plankton |
 | Mycelia | aktif di v0.11 | 11 | `fungal-network`, empat musim, spora/cahaya |
-| tiga planet lain | data-only | — | — |
+| Sakura | aktif di v0.12 | 11 | `floating-connectivity`, empat musim, mekar/angin |
+| dua planet lain | data-only | — | — |
 
-`isSupportedPlanet()` sekarang menerima `terra`, `dune`, `glaciere`, `inferna`, `aquaria`, `mycelia`.
+`isSupportedPlanet()` sekarang menerima `terra`, `dune`, `glaciere`, `inferna`, `aquaria`, `mycelia`, `sakura`.
 
 ## Musim dan jaringan
 
@@ -94,4 +95,4 @@ Kelelawar spora memakai proksi guild burung; ngengat spora memakai proksi serang
 - Belum ada warna bercahaya khusus di renderer; `fungal` saat ini memengaruhi sim/HUD.
 - Tidak ada partikel spora atau jaringan visual antar-prop.
 - Tidak ada UI selector planet permanen; akses lewat query param/debug hook untuk QA.
-- Sakura, Aurelia, dan Cosmos masih data-only.
+- Aurelia dan Cosmos masih data-only.

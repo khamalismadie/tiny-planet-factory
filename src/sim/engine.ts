@@ -244,6 +244,7 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
   const volcano = planet.eco.volcano;
   const ocean = planet.eco.ocean;
   const fungal = planet.eco.fungal;
+  const sky = planet.eco.sky;
   const random = mulberry32((planet.seed ^ (planet.tick * 2654435761)) >>> 0);
   const counts = Object.fromEntries(OBJECT_ORDER.map((type) => [type, 0])) as Record<ObjectType, number>;
   for (const object of planet.objects) counts[object.type] += 1;
@@ -417,11 +418,44 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
     fungal.networkStress = 0;
   }
 
+  if (planetConfig?.specialSystems.includes('floating-connectivity')) {
+    const windBase = season?.id === 'sky-winds' ? 90
+      : season?.id === 'petal-fall' ? 45
+        : season?.id === 'blossom-season' ? 35 : 30;
+    sky.wind = approach(sky.wind, clamp(windBase + (planet.weather.type === 'storm' ? 12 : 0)), 0.06);
+    const blossomBase = season?.id === 'blossom-season' ? 90
+      : season?.id === 'petal-fall' ? 55
+        : season?.id === 'sky-winds' ? 20 : 25;
+    sky.blossom = approach(sky.blossom, blossomBase, 0.05);
+    const connectivityBase = season?.id === 'sky-winds' ? 35
+      : season?.id === 'quiet-sky' ? 85 : season?.id === 'petal-fall' ? 70 : 75;
+    sky.connectivity = approach(sky.connectivity, clamp(connectivityBase + counts.tree * 1.5), 0.05);
+    const upliftBase = season?.id === 'sky-winds' ? 80 : season?.id === 'quiet-sky' ? 70 : 55;
+    sky.uplift = approach(sky.uplift, upliftBase, 0.05);
+    sky.isolationStress = approach(sky.isolationStress, clamp(
+      Math.max(0, sky.wind - 65) * 1.8 + Math.max(0, 55 - sky.connectivity),
+    ), 0.07);
+    sky.seasonId = season?.id ?? 'none';
+    sky.seasonName = season?.name ?? '';
+    sky.phase = seasonInfo?.phase ?? 0;
+  } else if (sky.seasonId !== 'none' || sky.connectivity || sky.wind || sky.blossom || sky.uplift || sky.isolationStress) {
+    sky.seasonId = 'none';
+    sky.seasonName = '';
+    sky.phase = 0;
+    sky.connectivity = 0;
+    sky.wind = 0;
+    sky.blossom = 0;
+    sky.uplift = 0;
+    sky.isolationStress = 0;
+  }
+
   const seasonalVegetation = clamp(1 + (season?.vegetationModifier ?? 0), 0.25, 1.6);
   const volcanicBiome = planetConfig?.specialSystems.includes('volcanic-eruption') ?? false;
   const aquaticBiome = planetConfig?.specialSystems.includes('coral-health') ?? false;
   const fungalBiome = planetConfig?.specialSystems.includes('fungal-network') ?? false;
+  const skyBiome = planetConfig?.specialSystems.includes('floating-connectivity') ?? false;
   const fungalFactor = fungalBiome ? 1 + (fungal.network - 50) * 0.003 - fungal.networkStress * 0.002 : 1;
+  const skyFactor = skyBiome ? 1 + (sky.connectivity - 50) * 0.003 - sky.wind * 0.0015 : 1;
   const coldFactor = cryo.seasonId !== 'none'
     ? 1 - cryo.freeze / 100 * 0.3
     : volcanicBiome
@@ -431,7 +465,7 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
         : e.temperature < 0 || e.temperature > 40 || e.water < 15 ? 0.5 : 1;
   const vegetationTarget = clamp(
     Math.min(100, counts.grass * 2 + counts.tree * 4 + counts.bush * 2 + e.water * 0.28 + e.fertility * 0.2) *
-      seasonalVegetation * coldFactor * fungalFactor,
+      seasonalVegetation * coldFactor * fungalFactor * skyFactor,
   );
   eco.vegetation = approach(eco.vegetation, vegetationTarget, 0.035);
 
@@ -439,10 +473,12 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
     6 + eco.vegetation * 0.52 + counts.tree * 0.9 + counts.bush * 0.35 + counts.grass * 0.15 - eco.wildlife * 0.12,
   );
   e.oxygen = approach(e.oxygen, oxygenTarget, 0.05);
+  if (skyBiome) e.oxygen = clamp(e.oxygen + sky.blossom * 0.01);
 
   const fertilityTarget = clamp(14 + e.water * 0.26 + eco.vegetation * 0.28 + counts.grass * 0.4 - counts.sand * 0.35);
   e.fertility = approach(e.fertility, fertilityTarget, 0.05);
   if (fungalBiome) e.fertility = clamp(e.fertility + fungal.nutrients * 0.02 + (fungal.network - 50) * 0.01);
+  if (skyBiome) e.fertility = clamp(e.fertility + sky.blossom * 0.01);
 
   const distinct = new Set(planet.objects.map((o) => o.type)).size;
   const discoveredSpecies = planet.fauna?.discovered.length ?? 0;

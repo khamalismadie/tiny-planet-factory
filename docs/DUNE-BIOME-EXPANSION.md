@@ -12,7 +12,8 @@ Tujuan: mengaktifkan planet kedua dengan ekosistemnya sendiri tanpa mengubah for
 | Inferna | aktif di v0.9 | 12 (lihat dokumen sendiri) |
 | Aquaria | aktif di v0.10 | 12 (lihat dokumen sendiri) |
 | Mycelia | aktif di v0.11 | 11 (lihat dokumen sendiri) |
-| tiga planet lain | config/data saja, belum disimulasikan | — |
+| Sakura | aktif di v0.12 | 11 (lihat dokumen sendiri) |
+| dua planet lain | config/data saja, belum disimulasikan | — |
 
 Daftar aktif berada di `GUILD_PROFILES`. `isSupportedPlanet()` dipakai oleh `createPlanet()` dan QA hook supaya planet yang belum aktif tidak menghasilkan state ekologis palsu.
 

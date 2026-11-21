@@ -49,26 +49,30 @@ const SPECIES = [
     [food('sakura_tree', 0.8, ['grazing']), food('sakura_cloud_grass', 0.6, ['grazing'])], {
       habitatPreferences: [CHERRY_HABITAT], migrationBehavior: 'seasonal',
       predatorSpecies: ['sakura_wind_fox'], populationCapacity: 52,
+      geneticTraits: ['blossom-season'], reproductionRate: 0.1, mortalityRate: 0.012,
     }),
   species(PLANET_ID, 'sakura_sky_rabbit', 'Kelinci Langit', 'primary-consumer', ['floating-islands', 'flower-fields'],
     [food('sakura_cloud_grass', 1, ['grazing']), food('sakura_sky_orchid', 0.35, ['grazing'])], {
-      habitatPreferences: [SKY_HABITAT], migrationBehavior: 'vertical', reproductionRate: 0.1,
+      habitatPreferences: [SKY_HABITAT], migrationBehavior: 'vertical', reproductionRate: 0.14,
       predatorSpecies: ['sakura_wind_fox', 'sakura_sky_hawk'], populationCapacity: 72,
+      geneticTraits: ['blossom-season'], mortalityRate: 0.012,
     }),
   species(PLANET_ID, 'sakura_cloud_goat', 'Kambing Awan', 'primary-consumer', ['floating-islands', 'sky-lakes'],
     [food('sakura_cloud_grass', 0.9, ['grazing']), food('sakura_tree', 0.3, ['grazing'])], {
-      habitatPreferences: [SKY_HABITAT], migrationBehavior: 'vertical', environmentalTolerance: 24,
-      populationCapacity: 40,
+      habitatPreferences: [SKY_HABITAT], migrationBehavior: 'vertical', environmentalTolerance: 30,
+      populationCapacity: 40, geneticTraits: ['wind-dispersal'], reproductionRate: 0.16, mortalityRate: 0.012,
     }),
   species(PLANET_ID, 'sakura_wind_fox', 'Rubah Angin', 'secondary-consumer', ['cherry-forest', 'floating-islands'],
     [food('sakura_sky_rabbit', 1, ['hunting']), food('sakura_blossom_deer', 0.3, ['hunting'])], {
       habitatPreferences: [CHERRY_HABITAT], migrationBehavior: 'vertical', activitySchedule: 'crepuscular',
       preySpecies: ['sakura_sky_rabbit'], populationCapacity: 24,
+      geneticTraits: ['wind-dispersal'], reproductionRate: 0.12, mortalityRate: 0.012,
     }),
   species(PLANET_ID, 'sakura_sky_hawk', 'Elang Langit', 'apex-predator', ['floating-islands', 'sky-lakes', 'cherry-forest'],
     [food('sakura_sky_rabbit', 0.9, ['hunting']), food('sakura_cloud_goat', 0.4, ['hunting'])], {
       habitatPreferences: [SKY_HABITAT], migrationBehavior: 'vertical', rarity: 'uncommon',
-      preySpecies: ['sakura_sky_rabbit', 'sakura_cloud_goat'], populationCapacity: 12,
+      preySpecies: ['sakura_sky_rabbit', 'sakura_cloud_goat'], populationCapacity: 16,
+      geneticTraits: ['wind-dispersal'], reproductionRate: 0.16, mortalityRate: 0.012,
     }),
   species(PLANET_ID, 'sakura_petal_butterfly', 'Kupu-Kupu Kelopak', 'pollinator', ['flower-fields', 'cherry-forest'],
     [food('sakura_sky_orchid', 1, ['pollination']), food('nectar', 0.8, ['pollination'])], {

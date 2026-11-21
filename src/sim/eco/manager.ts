@@ -3,6 +3,7 @@ import { duneConfig } from '../../content/planets/dune';
 import { glaciereConfig } from '../../content/planets/glaciera';
 import { infernaConfig } from '../../content/planets/inferna';
 import { myceliaConfig } from '../../content/planets/mycelia';
+import { sakuraConfig } from '../../content/planets/sakura';
 import { terraConfig } from '../../content/planets/terra';
 import { hashString, mulberry32 } from '../rng';
 import type { PlanetState } from '../types';
@@ -220,9 +221,15 @@ export function habitatContextFor(planet: PlanetState, config: PlanetConfig): Ha
                           ? 'spora-beracun'
                           : (planet.eco.fungal?.seasonId !== 'none' && planet.environment.humidity > 95)
                             ? 'kelembapan-ekstrem'
-                            : planet.environment.water < 25
-                        ? 'kekeringan-musiman'
-                        : null;
+                            : (planet.eco.sky?.isolationStress ?? 0) > 60
+                              ? 'putusnya-pulau-melayang'
+                              : (planet.eco.sky?.wind ?? 0) > 75
+                                ? 'angin-kencang'
+                                : (planet.eco.sky?.seasonId !== 'none' && planet.environment.water < 45)
+                                  ? 'kekeringan-awan'
+                                  : planet.environment.water < 25
+                                    ? 'kekeringan-musiman'
+                                    : null;
   return {
     environment: planet.environment,
     ecosystem: planet.ecosystem,
@@ -324,6 +331,14 @@ export class EcosystemManager {
         trait === 'day-night-glow',
       );
       const networkMortality = networkStress * (fungalAdapted ? 0.004 : 0.014);
+      const isolationStress = (planet.eco.sky?.isolationStress ?? 0) / 100;
+      const skyAdapted = definition.geneticTraits.some((trait) =>
+        trait === 'wind-dispersal' ||
+        trait === 'blossom-season' ||
+        trait === 'vertical-growth' ||
+        trait === 'seed-dispersal',
+      );
+      const isolationMortality = isolationStress * (skyAdapted ? 0.004 : 0.014);
       const mortalityRate = definition.mortalityRate * 0.4
         + (1 - score) * 0.02
         + starvation
@@ -331,6 +346,7 @@ export class EcosystemManager {
         + heatMortality
         + reefMortality
         + networkMortality
+        + isolationMortality
         + predationPressure(definition, config, eco, capacity);
       const deaths = Math.min(
         population.estimate,
@@ -387,6 +403,7 @@ const ECOSYSTEM_MANAGERS = new Map<string, EcosystemManager>([
   [infernaConfig.id, new EcosystemManager(infernaConfig)],
   [aquariaConfig.id, new EcosystemManager(aquariaConfig)],
   [myceliaConfig.id, new EcosystemManager(myceliaConfig)],
+  [sakuraConfig.id, new EcosystemManager(sakuraConfig)],
 ]);
 
 export function ecosystemFor(planetId: string): EcosystemManager | null {

@@ -202,6 +202,23 @@ const fungalProbe = await page.evaluate(() => {
   };
 });
 
+// Sakura boot + sky telemetry.
+phase = 'sakura';
+await page.evaluate(() => {
+  window.__game.setPlanet('sakura', 5678);
+  window.__game.tick(50);
+});
+const skyProbe = await page.evaluate(() => {
+  const next = window.__game.state();
+  return {
+    planetId: next.planetId,
+    water: next.environment.water,
+    ecoSpecies: Object.keys(next.eco.populations).length,
+    sky: window.__game.sky(),
+    score: window.__game.ecoScore('sakura_blossom_deer'),
+  };
+});
+
 const contextLossErrors = boot.contextLost
   ? errors.filter((message) => /WebGL context may be lost|Could not initialize shader/.test(message))
   : [];
@@ -282,6 +299,14 @@ const checks = {
     fungalProbe.fungal.glow > 70 &&
     fungalProbe.fungal.network > 50 &&
     fungalProbe.score !== null,
+  sakuraPlanetActive:
+    skyProbe.planetId === 'sakura' &&
+    skyProbe.water > 50 &&
+    skyProbe.ecoSpecies === 11 &&
+    skyProbe.sky.seasonId === 'blossom-season' &&
+    skyProbe.sky.blossom > 60 &&
+    skyProbe.sky.connectivity > 50 &&
+    skyProbe.score !== null,
 };
 
 console.log(JSON.stringify({ boot, initialTick: initialState.tick, placementActive, contextLossErrors, appErrors, grown: {
@@ -293,7 +318,7 @@ console.log(JSON.stringify({ boot, initialTick: initialState.tick, placementActi
   objects: grown.objects.length,
   fauna: grownFauna,
   eco: ecoProbe,
-}, grownMetrics, reloadedTick: reloaded.tick, reloadedObjects: reloaded.objects.length, sw, dune: duneProbe, glaciere: iceProbe, inferna: fireProbe, aquaria: waterProbe, mycelia: fungalProbe, errors, checks }, null, 2));
+}, grownMetrics, reloadedTick: reloaded.tick, reloadedObjects: reloaded.objects.length, sw, dune: duneProbe, glaciere: iceProbe, inferna: fireProbe, aquaria: waterProbe, mycelia: fungalProbe, sakura: skyProbe, errors, checks }, null, 2));
 
 await browser.close();
 const failed = Object.entries(checks).filter(([, ok]) => !ok).map(([name]) => name);

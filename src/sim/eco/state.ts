@@ -1,4 +1,4 @@
-import type { CryosphereState, EcoEventRecord, EcoStateV3, FungalState, OceanState, PopulationRecord, VolcanoState } from './types';
+import type { CryosphereState, EcoEventRecord, EcoStateV3, FungalState, OceanState, PopulationRecord, SkyState, VolcanoState } from './types';
 
 export const CURRENT_ECOSYSTEM_VERSION = 1;
 
@@ -55,6 +55,20 @@ function normalizeFungal(raw: unknown): FungalState {
     glow: bounded(record.glow, 0),
     nutrients: bounded(record.nutrients, 0),
     networkStress: bounded(record.networkStress, 0),
+  };
+}
+
+function normalizeSky(raw: unknown): SkyState {
+  const record = isRecord(raw) ? raw : {};
+  return {
+    seasonId: typeof record.seasonId === 'string' ? record.seasonId : 'none',
+    seasonName: typeof record.seasonName === 'string' ? record.seasonName : '',
+    phase: Math.max(0, Math.min(1, finite(record.phase, 0))),
+    connectivity: bounded(record.connectivity, 0),
+    wind: bounded(record.wind, 0),
+    blossom: bounded(record.blossom, 0),
+    uplift: bounded(record.uplift, 0),
+    isolationStress: bounded(record.isolationStress, 0),
   };
 }
 
@@ -160,6 +174,16 @@ export function createEcoState(planetId = 'terra'): EcoStateV3 {
       nutrients: 0,
       networkStress: 0,
     },
+    sky: {
+      seasonId: 'none',
+      seasonName: '',
+      phase: 0,
+      connectivity: 0,
+      wind: 0,
+      blossom: 0,
+      uplift: 0,
+      isolationStress: 0,
+    },
   };
 }
 
@@ -211,5 +235,6 @@ export function normalizeEcoState(raw: unknown, planetId: string): EcoStateV3 {
     volcano: normalizeVolcano(raw.volcano),
     ocean: normalizeOcean(raw.ocean),
     fungal: normalizeFungal(raw.fungal),
+    sky: normalizeSky(raw.sky),
   };
 }

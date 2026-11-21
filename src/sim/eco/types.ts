@@ -222,6 +222,17 @@ export interface FungalState {
   networkStress: number;
 }
 
+export interface SkyState {
+  seasonId: string;
+  seasonName: string;
+  phase: number;
+  connectivity: number;
+  wind: number;
+  blossom: number;
+  uplift: number;
+  isolationStress: number;
+}
+
 export interface EcoStateV3 {
   planetId: string;
   ecosystemVersion: number;
@@ -235,6 +246,7 @@ export interface EcoStateV3 {
   volcano: VolcanoState;
   ocean: OceanState;
   fungal: FungalState;
+  sky: SkyState;
 }
 
 export interface HabitatContext {

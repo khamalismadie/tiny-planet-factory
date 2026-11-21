@@ -143,6 +143,18 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [ ] Terra, Dune, Glaciera, Inferna, dan Aquaria tidak berubah secara numerik dari gate v0.10.
 - [ ] App chunk <100 kB.
 
+## 2m. Sakura + Floral Biome (v0.12)
+
+- [ ] `?planet=sakura` dan `setPlanet('sakura')` menghasilkan 11 populasi Sakura.
+- [ ] Empat musim berjalan deterministik: blossom-season → petal-fall → sky-winds → quiet-sky.
+- [ ] Mekar turun saat Gugur Kelopak, angin/stres isolasi naik saat Angin Langit, konektivitas pulih saat Langit Tenang.
+- [ ] 11 spesies tetap hidup setelah satu siklus 360 tick.
+- [ ] Guild Sakura memetakan kijang bunga, elang, dan kupu-kupu; predator terhubung ke food web.
+- [ ] Save/load mempertahankan `eco.sky`.
+- [ ] DNA lengkap mempertahankan `planetId` Sakura.
+- [ ] Enam planet sebelumnya tidak berubah secara numerik dari gate v0.11.
+- [ ] App chunk <100 kB.
+
 ## 3. QA perangkat nyata
 
 Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:

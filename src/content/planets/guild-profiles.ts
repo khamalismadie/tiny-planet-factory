@@ -3,6 +3,7 @@ import { duneConfig } from './dune';
 import { glaciereConfig } from './glaciera';
 import { infernaConfig } from './inferna';
 import { myceliaConfig } from './mycelia';
+import { sakuraConfig } from './sakura';
 import { terraConfig } from './terra';
 import type { PlanetConfig } from '../../sim/eco/types';
 import type { ObjectType, SpeciesId } from '../../sim/types';
@@ -178,6 +179,32 @@ const MYCELIA_PROFILE: GuildProfile = {
   },
 };
 
+const SAKURA_PROFILE: GuildProfile = {
+  config: sakuraConfig,
+  guilds: {
+    deer: ['sakura_blossom_deer', 'sakura_sky_rabbit', 'sakura_cloud_goat'],
+    fox: ['sakura_wind_fox'],
+    bird: ['sakura_sky_hawk', 'sakura_hummingbird'],
+    fish: [],
+    insect: ['sakura_petal_butterfly'],
+  },
+  divisors: { deer: 10, fox: 3, bird: 4, fish: 10, insect: 8 },
+  prey: { fox: ['deer'], bird: ['deer', 'insect'] },
+  foodObjects: {
+    sakura_tree: ['tree', 'bush'],
+    sakura_cloud_grass: ['grass'],
+    sakura_sky_orchid: ['flower', 'bush'],
+    sakura_blossom_deer: ['deer', 'bush'],
+    sakura_sky_rabbit: ['deer', 'grass'],
+    sakura_cloud_goat: ['deer', 'grass', 'bush'],
+    sakura_wind_fox: ['fox', 'deer'],
+    sakura_sky_hawk: ['bird', 'mountain'],
+    sakura_petal_butterfly: ['flower', 'bush'],
+    sakura_hummingbird: ['bird', 'flower'],
+    sakura_sky_mushroom: ['rock', 'bush'],
+  },
+};
+
 export const GUILD_PROFILES: Record<string, GuildProfile> = {
   terra: TERRA_PROFILE,
   dune: DUNE_PROFILE,
@@ -185,4 +212,5 @@ export const GUILD_PROFILES: Record<string, GuildProfile> = {
   inferna: INFERNA_PROFILE,
   aquaria: AQUARIA_PROFILE,
   mycelia: MYCELIA_PROFILE,
+  sakura: SAKURA_PROFILE,
 };
