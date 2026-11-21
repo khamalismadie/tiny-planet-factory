@@ -180,6 +180,16 @@ export interface EcoMetrics {
   stability: number;
 }
 
+export interface CryosphereState {
+  seasonId: string;
+  seasonName: string;
+  phase: number;
+  freeze: number;
+  iceCoverage: number;
+  snowCover: number;
+  thawStress: number;
+}
+
 export interface EcoStateV3 {
   planetId: string;
   ecosystemVersion: number;
@@ -189,6 +199,7 @@ export interface EcoStateV3 {
   discovered: EcoSpeciesId[];
   eventHistory: EcoEventRecord[];
   metrics: EcoMetrics;
+  cryo: CryosphereState;
 }
 
 export interface HabitatContext {

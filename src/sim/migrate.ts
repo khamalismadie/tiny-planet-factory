@@ -1,8 +1,8 @@
 import { ensureEventState } from '../content/missions';
 import { OBJECT_ORDER } from '../content/objects';
 import { SPECIES_ORDER } from '../content/species';
-import { PLANET_IDS } from '../content/planets/ids';
 import { BIOMES, inferBiome } from './biome';
+import { isSupportedPlanet } from './eco/guilds';
 import { initializeEcosystem } from './eco/manager';
 import { CURRENT_ECOSYSTEM_VERSION, normalizeEcoState } from './eco/state';
 import { createPlanet, planetNameFromSeed } from './engine';
@@ -131,12 +131,12 @@ function normalizeFauna(value: unknown): FaunaState {
   };
 }
 
-export function migratePlanet(raw: unknown): PlanetState | null {
+export function migratePlanet(raw: unknown, fallbackPlanetId = 'terra'): PlanetState | null {
   if (!isRecord(raw)) return null;
   const seed = num(raw.seed, 1) >>> 0;
   const name = str(raw.name, planetNameFromSeed(seed));
-  const rawPlanetId = str(raw.planetId, 'terra');
-  const planetId = PLANET_IDS.includes(rawPlanetId) ? rawPlanetId : 'terra';
+  const rawPlanetId = str(raw.planetId, fallbackPlanetId);
+  const planetId = isSupportedPlanet(rawPlanetId) ? rawPlanetId : 'terra';
   const base = createPlanet(seed, name, planetId);
   const eco = normalizeEcoState(raw.eco, planetId);
   const rawEnvironment = mergeEnvironment(raw.environment, base.environment);

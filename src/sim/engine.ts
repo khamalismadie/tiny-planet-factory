@@ -6,6 +6,7 @@ import { appendEvent, makePlanetEvent, nextEventIndex } from './events';
 import { initializeEcosystem, stepEcosystem } from './eco/manager';
 import { ecosystemConfigFor, ecosystemConfigOf, isSupportedPlanet } from './eco/guilds';
 import { CURRENT_ECOSYSTEM_VERSION, createEcoState } from './eco/state';
+import type { PlanetConfig, SeasonConfig } from './eco/types';
 import { hashString, mulberry32 } from './rng';
 import { createFauna, simulateWildlife } from './wildlife';
 import type {
@@ -63,6 +64,21 @@ function inIdeal(planet: PlanetState, key: EnvKey): boolean {
   const [min, max] = idealFor(planet, key);
   const value = planet.environment[key];
   return value >= min && value <= max;
+}
+
+function activeSeason(
+  planet: PlanetState,
+  config: PlanetConfig | null,
+): { season: SeasonConfig; phase: number } | null {
+  const seasons = config?.climate.seasons ?? [];
+  if (!seasons.length) return null;
+  const total = seasons.reduce((sum, entry) => sum + entry.durationTicks, 0);
+  let cursor = planet.tick % total;
+  for (const season of seasons) {
+    if (cursor < season.durationTicks) return { season, phase: cursor / season.durationTicks };
+    cursor -= season.durationTicks;
+  }
+  return null;
 }
 
 export function createPlanet(seed: number, name = 'Planet Baru', planetId = 'terra'): PlanetState {
@@ -222,6 +238,9 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
   const atm = planet.atmosphere;
   const planetConfig = ecosystemConfigOf(planet);
   const legacyClimate = planet.planetId === 'terra' || !planetConfig;
+  const seasonInfo = legacyClimate ? null : activeSeason(planet, planetConfig);
+  const season = seasonInfo?.season ?? null;
+  const cryo = planet.eco.cryo;
   const random = mulberry32((planet.seed ^ (planet.tick * 2654435761)) >>> 0);
   const counts = Object.fromEntries(OBJECT_ORDER.map((type) => [type, 0])) as Record<ObjectType, number>;
   for (const object of planet.objects) counts[object.type] += 1;
@@ -248,21 +267,56 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
   }
 
   const tempShift = legacyClimate || !planetConfig ? 0 : planetConfig.climate.baseTemperature - 18;
-  const targetTemp = 12 + sunlight * 7 + tempShift + counts.sand * 0.08 - counts.mountain * 0.12 - counts.ocean * 0.08;
-  e.temperature = clamp(approach(e.temperature, targetTemp, 0.04) + weather.tempDelta * intensity, -10, 50);
+  const targetTemp = 12 + sunlight * 7 + tempShift + (season?.temperatureModifier ?? 0)
+    + counts.sand * 0.08 - counts.mountain * 0.12 - counts.ocean * 0.08;
+  e.temperature = clamp(
+    approach(e.temperature, targetTemp, 0.04) + weather.tempDelta * intensity,
+    legacyClimate ? -10 : -20,
+    50,
+  );
 
   const evaporation = 0.1 + Math.max(0, e.temperature - 18) * 0.012 - atm.cloudCoverage * 0.001;
   const rainfall = weather.rain * intensity * 1.4 + atm.precipitation * 0.004;
   e.water = clamp(e.water + rainfall - evaporation);
-  if (!legacyClimate && planetConfig) e.water = approach(e.water, planetConfig.climate.baseWater, 0.025);
+  if (!legacyClimate && planetConfig) {
+    e.water = approach(e.water, planetConfig.climate.baseWater + (season?.waterModifier ?? 0), 0.025);
+  }
 
-  const humidityBase = legacyClimate || !planetConfig ? 18 : planetConfig.climate.baseHumidity;
+  const humidityBase = (legacyClimate || !planetConfig ? 18 : planetConfig.climate.baseHumidity)
+    + (season?.humidityModifier ?? 0);
   const humidityTarget = humidityBase + e.water * 0.42 + counts.ocean * 1.2 + counts.lake * 0.7 + counts.tree * 0.4 - e.temperature * 0.25;
   e.humidity = approach(e.humidity, humidityTarget, 0.06);
 
+  if (planetConfig?.specialSystems.includes('freeze-thaw')) {
+    const previousFreeze = cryo.freeze;
+    const freezeTarget = clamp(50 - e.temperature * 2.5 + (season?.temperatureModifier ?? 0) * -1.5);
+    cryo.freeze = approach(previousFreeze, freezeTarget, 0.08);
+    const waterObjects = counts.ocean + counts.lake;
+    const iceTarget = clamp(cryo.freeze * 0.55 + waterObjects * 3 + (season?.id === 'freeze-up' ? 8 : 0));
+    cryo.iceCoverage = approach(cryo.iceCoverage, iceTarget, 0.06);
+    const snowTarget = clamp(cryo.freeze * 0.75 + e.humidity * 0.18 - 8);
+    cryo.snowCover = approach(cryo.snowCover, snowTarget, 0.06);
+    cryo.thawStress = approach(cryo.thawStress, clamp(Math.abs(cryo.freeze - previousFreeze) * 4), 0.3);
+    cryo.seasonId = season?.id ?? 'none';
+    cryo.seasonName = season?.name ?? '';
+    cryo.phase = seasonInfo?.phase ?? 0;
+  } else if (cryo.seasonId !== 'none' || cryo.freeze || cryo.iceCoverage || cryo.snowCover || cryo.thawStress) {
+    cryo.seasonId = 'none';
+    cryo.seasonName = '';
+    cryo.phase = 0;
+    cryo.freeze = 0;
+    cryo.iceCoverage = 0;
+    cryo.snowCover = 0;
+    cryo.thawStress = 0;
+  }
+
+  const seasonalVegetation = clamp(1 + (season?.vegetationModifier ?? 0), 0.25, 1.6);
+  const coldFactor = cryo.seasonId !== 'none'
+    ? 1 - cryo.freeze / 100 * 0.3
+    : e.temperature < 0 || e.temperature > 40 || e.water < 15 ? 0.5 : 1;
   const vegetationTarget = clamp(
     Math.min(100, counts.grass * 2 + counts.tree * 4 + counts.bush * 2 + e.water * 0.28 + e.fertility * 0.2) *
-      (e.temperature < 0 || e.temperature > 40 || e.water < 15 ? 0.5 : 1),
+      seasonalVegetation * coldFactor,
   );
   eco.vegetation = approach(eco.vegetation, vegetationTarget, 0.035);
 

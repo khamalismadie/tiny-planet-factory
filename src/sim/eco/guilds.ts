@@ -1,4 +1,5 @@
 import { duneConfig } from '../../content/planets/dune';
+import { glaciereConfig } from '../../content/planets/glaciera';
 import { terraConfig } from '../../content/planets/terra';
 import type { FoodWebLink, PlanetConfig } from './types';
 import type { ObjectType, PlanetState, SpeciesId } from '../types';
@@ -67,9 +68,37 @@ const DUNE_PROFILE: GuildProfile = {
   },
 };
 
+const GLACIERE_PROFILE: GuildProfile = {
+  config: glaciereConfig,
+  guilds: {
+    deer: ['glaciere_reindeer', 'glaciere_arctic_hare', 'glaciere_musk_ox'],
+    fox: ['glaciere_arctic_fox', 'glaciere_polar_bear'],
+    bird: ['glaciere_snow_owl'],
+    fish: ['glaciere_ice_fish', 'glaciere_seal'],
+    insect: ['glaciere_cold_fungi'],
+  },
+  divisors: { deer: 10, fox: 6, bird: 3, fish: 8, insect: 10 },
+  prey: { fox: ['deer', 'fish'], bird: ['deer'] },
+  foodObjects: {
+    glaciere_arctic_moss: ['rock', 'sand', 'bush'],
+    glaciere_ice_grass: ['grass', 'ocean', 'lake'],
+    glaciere_frozen_pine: ['tree', 'mountain'],
+    glaciere_reindeer: ['deer', 'bush'],
+    glaciere_arctic_hare: ['deer', 'grass'],
+    glaciere_musk_ox: ['deer', 'rock'],
+    glaciere_ice_fish: ['ocean', 'lake'],
+    glaciere_arctic_fox: ['fox', 'rock'],
+    glaciere_seal: ['ocean', 'lake'],
+    glaciere_snow_owl: ['bird', 'mountain'],
+    glaciere_polar_bear: ['fox', 'deer', 'lake'],
+    glaciere_cold_fungi: ['rock', 'sand', 'bush'],
+  },
+};
+
 export const GUILD_PROFILES: Record<string, GuildProfile> = {
   terra: TERRA_PROFILE,
   dune: DUNE_PROFILE,
+  glaciere: GLACIERE_PROFILE,
 };
 
 const FOOD_INTERACTIONS = new Set(['grazing', 'hunting', 'scavenging', 'pollination']);

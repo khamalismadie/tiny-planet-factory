@@ -292,6 +292,9 @@ export class Hud {
     }).join('');
     this.ecoDetail.innerHTML =
       `<strong>Ekologi ${config.name}</strong><br>` +
+      (planet.eco.cryo.seasonId !== 'none'
+        ? `Musim ${planet.eco.cryo.seasonName} · es ${planet.eco.cryo.iceCoverage.toFixed(0)}% · salju ${planet.eco.cryo.snowCover.toFixed(0)}% · stres ${planet.eco.cryo.thawStress.toFixed(0)}%<br>`
+        : '') +
       `Spesies ${metrics.speciesCount} · Populasi ${metrics.totalPopulation}<br>` +
       `Habitat ${Math.round(metrics.habitatHealth)} · Pangan ${Math.round(metrics.foodAvailability)} · Detritus ${planet.eco.detritus.toFixed(1)}<br>` +
       `<div class="eco-list">${rows}</div>` +

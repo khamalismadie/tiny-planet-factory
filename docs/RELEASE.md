@@ -96,6 +96,17 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [ ] Save/load dan determinisme seed Dune lolos.
 - [ ] App chunk <100 kB dengan `planet-configs` sebagai chunk terpisah.
 
+## 2i. Glaciera + Cold Biome (v0.8)
+
+- [ ] `?planet=glaciere` dan `setPlanet('glaciere')` menghasilkan 12 populasi Glaciera.
+- [ ] Empat musim berjalan deterministik dari tick: polar-night → thaw → short-summer → freeze-up.
+- [ ] `freeze` turun dari polar-night ke thaw ke short-summer.
+- [ ] `iceCoverage > 0` saat danau/samudra ditempatkan.
+- [ ] DNA lengkap mempertahankan `planetId` untuk Dune dan Glaciera; DNA v2 lawas tetap Terra.
+- [ ] Save/load mempertahankan `eco.cryo`.
+- [ ] Terra tidak berubah secara numerik dari gate v0.7.
+- [ ] App chunk <100 kB.
+
 ## 3. QA perangkat nyata
 
 Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:

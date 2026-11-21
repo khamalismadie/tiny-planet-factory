@@ -1,4 +1,4 @@
-import type { EcoEventRecord, EcoStateV3, PopulationRecord } from './types';
+import type { CryosphereState, EcoEventRecord, EcoStateV3, PopulationRecord } from './types';
 
 export const CURRENT_ECOSYSTEM_VERSION = 1;
 
@@ -12,6 +12,23 @@ function finite(value: unknown, fallback: number): number {
 
 function nonNegative(value: unknown, fallback: number): number {
   return Math.max(0, finite(value, fallback));
+}
+
+function bounded(value: unknown, fallback: number): number {
+  return Math.max(0, Math.min(100, finite(value, fallback)));
+}
+
+function normalizeCryosphere(raw: unknown): CryosphereState {
+  const record = isRecord(raw) ? raw : {};
+  return {
+    seasonId: typeof record.seasonId === 'string' ? record.seasonId : 'none',
+    seasonName: typeof record.seasonName === 'string' ? record.seasonName : '',
+    phase: Math.max(0, Math.min(1, finite(record.phase, 0))),
+    freeze: bounded(record.freeze, 0),
+    iceCoverage: bounded(record.iceCoverage, 0),
+    snowCover: bounded(record.snowCover, 0),
+    thawStress: bounded(record.thawStress, 0),
+  };
 }
 
 function normalizePopulation(raw: unknown, capacity: number): PopulationRecord {
@@ -64,6 +81,15 @@ export function createEcoState(planetId = 'terra'): EcoStateV3 {
       predatorPreyBalance: 0,
       stability: 0,
     },
+    cryo: {
+      seasonId: 'none',
+      seasonName: '',
+      phase: 0,
+      freeze: 0,
+      iceCoverage: 0,
+      snowCover: 0,
+      thawStress: 0,
+    },
   };
 }
 
@@ -111,5 +137,6 @@ export function normalizeEcoState(raw: unknown, planetId: string): EcoStateV3 {
     discovered,
     eventHistory,
     metrics,
+    cryo: normalizeCryosphere(raw.cryo),
   };
 }

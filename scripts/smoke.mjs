@@ -131,6 +131,24 @@ const duneProbe = await page.evaluate(() => {
   };
 });
 
+// Glaciera boot + freeze/thaw telemetry.
+phase = 'glaciere';
+await page.evaluate(() => {
+  window.__game.setPlanet('glaciere', 7777);
+  window.__game.tick(30);
+});
+const iceProbe = await page.evaluate(() => {
+  const next = window.__game.state();
+  return {
+    planetId: next.planetId,
+    temperature: next.environment.temperature,
+    water: next.environment.water,
+    ecoSpecies: Object.keys(next.eco.populations).length,
+    cryo: window.__game.cryo(),
+    score: window.__game.ecoScore('glaciere_ice_fish'),
+  };
+});
+
 const contextLossErrors = boot.contextLost
   ? errors.filter((message) => /WebGL context may be lost|Could not initialize shader/.test(message))
   : [];
@@ -166,6 +184,7 @@ const checks = {
   newPlanetReset: newState.objects.length === 0,
   dnaRoundTrip:
     dnaState.seed === beforeDnaState.seed &&
+    dnaState.planetId === beforeDnaState.planetId &&
     dnaState.tick === beforeDnaState.tick &&
     dnaState.objects.length === beforeDnaState.objects.length &&
     dnaState.progression.level === beforeDnaState.progression.level &&
@@ -178,6 +197,14 @@ const checks = {
     duneProbe.water < 25 &&
     duneProbe.ecoSpecies === 12 &&
     duneProbe.score !== null,
+  glacierePlanetActive:
+    iceProbe.planetId === 'glaciere' &&
+    iceProbe.temperature < 0 &&
+    iceProbe.water > 55 &&
+    iceProbe.ecoSpecies === 12 &&
+    iceProbe.cryo.seasonId === 'polar-night' &&
+    iceProbe.cryo.freeze > 40 &&
+    iceProbe.score !== null,
 };
 
 console.log(JSON.stringify({ boot, initialTick: initialState.tick, placementActive, contextLossErrors, appErrors, grown: {
@@ -189,7 +216,7 @@ console.log(JSON.stringify({ boot, initialTick: initialState.tick, placementActi
   objects: grown.objects.length,
   fauna: grownFauna,
   eco: ecoProbe,
-}, grownMetrics, reloadedTick: reloaded.tick, reloadedObjects: reloaded.objects.length, sw, dune: duneProbe, errors, checks }, null, 2));
+}, grownMetrics, reloadedTick: reloaded.tick, reloadedObjects: reloaded.objects.length, sw, dune: duneProbe, glaciere: iceProbe, errors, checks }, null, 2));
 
 await browser.close();
 const failed = Object.entries(checks).filter(([, ok]) => !ok).map(([name]) => name);

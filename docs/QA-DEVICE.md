@@ -13,16 +13,17 @@ http://<host>/?debug=1&perf=1&quality=medium
 - `perf=1` menampilkan overlay FPS/p50/p95/draw call/quality.
 - `quality=low|medium|high` mengunci tier awal (default terdeteksi otomatis).
 - `eco=1` menampilkan panel diagnostic ekosistem + guild food web di stats panel.
-- `planet=dune` mengaktifkan Dune; tanpa parameter ini save Terra dipakai bila ada.
+- `planet=dune|glaciere` mengaktifkan planet tersebut; tanpa parameter ini save Terra dipakai bila ada.
 - `debug=1` membuka `window.__game`:
   - `metrics()` — frame stats, quality tier, adaptive downgrade count, context loss state, orbit distance
   - `camera()`, `orbitDebug()`
   - `place(type, dir)`, `tick(n)`, `reset(seed)`
   - `setQuality(tier)`, `loseContext()`, `restoreContext()` — **hati-hati, hanya untuk QA**
   - `wildlife()` — jumlah agen, spesies ditemukan/punah, dan breakdown per spesies
-  - `eco()`, `ecoScore(id)` — state ekosistem dan faktor habitat spesies Terra
+  - `eco()`, `ecoScore(id)` — state ekosistem dan faktor habitat spesies planet aktif
+  - `cryo()` — musim, freeze, es, salju, dan thaw stress (Glaciera)
   - `foodWeb()` — status 5 guild visual, jumlah agen, dan link food web planet aktif
-  - `setPlanet(id, seed?)` — pindah ke planet aktif (`terra` atau `dune`)
+  - `setPlanet(id, seed?)` — pindah ke planet aktif (`terra`, `dune`, atau `glaciere`)
   - `qaReport()` — laporan performa + status fauna terbaru
 
 Quality tier:

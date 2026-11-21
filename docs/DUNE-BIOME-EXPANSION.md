@@ -8,7 +8,8 @@ Tujuan: mengaktifkan planet kedua dengan ekosistemnya sendiri tanpa mengubah for
 |---|---|---|
 | Terra | aktif sejak v0.5 | 12 |
 | Dune | aktif di v0.7 | 12 |
-| tujuh planet lain | config/data saja, belum disimulasikan | — |
+| Glaciera | aktif di v0.8 | 12 (lihat dokumen sendiri) |
+| enam planet lain | config/data saja, belum disimulasikan | — |
 
 Daftar aktif berada di `GUILD_PROFILES`. `isSupportedPlanet()` dipakai oleh `createPlanet()` dan QA hook supaya planet yang belum aktif tidak menghasilkan state ekologis palsu.
 

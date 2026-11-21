@@ -1,4 +1,5 @@
 import { duneConfig } from '../../content/planets/dune';
+import { glaciereConfig } from '../../content/planets/glaciera';
 import { terraConfig } from '../../content/planets/terra';
 import { hashString, mulberry32 } from '../rng';
 import type { PlanetState } from '../types';
@@ -192,9 +193,11 @@ export function habitatContextFor(planet: PlanetState, config: PlanetConfig): Ha
     ? 'badai-hujan'
     : planet.weather.type === 'snow'
       ? 'gelombang-dingin'
-      : planet.environment.water < 25
-        ? 'kekeringan-musiman'
-        : null;
+      : (planet.eco.cryo?.thawStress ?? 0) > 55
+        ? 'pencairan-glasial'
+        : planet.environment.water < 25
+          ? 'kekeringan-musiman'
+          : null;
   return {
     environment: planet.environment,
     ecosystem: planet.ecosystem,
@@ -257,9 +260,15 @@ export class EcosystemManager {
           * growthNoise,
       );
       const starvation = resource < 0.4 ? (0.4 - resource) * 0.08 : 0;
+      const coldStress = (planet.eco.cryo?.thawStress ?? 0) / 100;
+      const coldAdapted = definition.geneticTraits.some(
+        (trait) => trait === 'freeze-tolerance' || trait === 'cold-dormancy',
+      );
+      const coldMortality = coldStress * (coldAdapted ? 0.003 : 0.015);
       const mortalityRate = definition.mortalityRate * 0.4
         + (1 - score) * 0.02
         + starvation
+        + coldMortality
         + predationPressure(definition, config, eco, capacity);
       const deaths = Math.min(
         population.estimate,
@@ -312,6 +321,7 @@ export class EcosystemManager {
 const ECOSYSTEM_MANAGERS = new Map<string, EcosystemManager>([
   [terraConfig.id, new EcosystemManager(terraConfig)],
   [duneConfig.id, new EcosystemManager(duneConfig)],
+  [glaciereConfig.id, new EcosystemManager(glaciereConfig)],
 ]);
 
 export function ecosystemFor(planetId: string): EcosystemManager | null {

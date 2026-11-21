@@ -2,6 +2,7 @@ import { EVENT_DEFS } from '../content/missions';
 import { OBJECT_ORDER } from '../content/objects';
 import { SPECIES_INDEX, SPECIES_ORDER } from '../content/species';
 import { BIOMES } from './biome';
+import { PLANET_IDS } from '../content/planets/ids';
 import { createPlanet, decodeDna as decodeLegacyDna, planetNameFromSeed, unlockedForLevel } from './engine';
 import { migratePlanet } from './migrate';
 import { createFauna } from './wildlife';
@@ -216,7 +217,7 @@ function encodeShort(state: PlanetState): string {
   return formatCode(withChecksum(writer.payload()));
 }
 
-function encodeFull(state: PlanetState): string {
+function encodeFull(state: PlanetState, includePlanetId = true): string {
   const writer = new ByteWriter();
   writer.u8(FULL_KIND).u32(state.seed);
   writer.string(state.name);
@@ -269,11 +270,17 @@ function encodeFull(state: PlanetState): string {
   writer.u32(clamp(fauna.nextId, 0, 0xffffffff));
 
   writer.u32(clamp(state.tick, 0, 0xffffffff));
+  if (includePlanetId) writer.u8(Math.max(0, PLANET_IDS.indexOf(state.planetId)));
   return formatCode(withChecksum(writer.payload()));
 }
 
 export function encodePlanetDna(state: PlanetState): PlanetDnaCodes {
   return { short: encodeShort(state), full: encodeFull(state) };
+}
+
+/** Legacy v2 fixture writer: same payload without the trailing planet id. */
+export function encodePlanetDnaLegacy(state: PlanetState): string {
+  return encodeFull(state, false);
 }
 
 function decodeFull(bytes: Uint8Array): PlanetState | null {
@@ -357,9 +364,11 @@ function decodeFull(bytes: Uint8Array): PlanetState | null {
     fauna.nextId = reader.u32();
 
     const tick = reader.u32();
+    const planetId = reader.remaining > 0 ? PLANET_IDS[reader.u8()] ?? 'terra' : 'terra';
     if (reader.remaining !== 0) return null;
 
     const planet = migratePlanet({
+      planetId,
       seed,
       name,
       tick,

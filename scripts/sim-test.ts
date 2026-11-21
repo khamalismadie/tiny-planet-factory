@@ -2,7 +2,7 @@ import { QUALITY, suggestQuality } from '../src/app/quality.ts';
 import { ensureEventState } from '../src/content/missions.ts';
 import { SPECIES_ORDER } from '../src/content/species.ts';
 import { PLANET_CONFIGS, PLANET_IDS } from '../src/content/planets/index.ts';
-import { decodePlanetDna, encodePlanetDna } from '../src/sim/dna.ts';
+import { decodePlanetDna, encodePlanetDna, encodePlanetDnaLegacy } from '../src/sim/dna.ts';
 import { ecosystemConfigFor, guildAgentCapacity, guildFoodSourceIds, guildStatus, isSupportedPlanet } from '../src/sim/eco/guilds.ts';
 import { HabitatManager } from '../src/sim/eco/habitat.ts';
 import { validateAllPlanetConfigs, speciesRegistry } from '../src/sim/eco/registry.ts';
@@ -126,6 +126,18 @@ assert(
 );
 const restoredShort = decodePlanetDna(codes.short);
 assert(restoredShort?.seed === planet.seed, 'kode pendek harus menghasilkan seed yang sama');
+const legacyRestored = decodePlanetDna(encodePlanetDnaLegacy(planet));
+assert(legacyRestored?.planetId === 'terra', 'DNA v2 tanpa planet id harus tetap terbaca sebagai Terra');
+const dnaDune = createPlanet(321, 'DNA Dune', 'dune');
+const dnaGlaciere = createPlanet(322, 'DNA Es', 'glaciere');
+for (const [source, id] of [[dnaDune, 'dune'], [dnaGlaciere, 'glaciere']] as const) {
+  const roundTrip = decodePlanetDna(encodePlanetDna(source).full);
+  assert(roundTrip?.planetId === id, `DNA lengkap ${id} harus mempertahankan planetId`);
+  assert(
+    Object.keys(roundTrip?.eco.populations ?? {}).length === 12,
+    `DNA lengkap ${id} harus memulihkan 12 populasi`,
+  );
+}
 const brokenBody = codes.full.slice(4);
 const brokenCode = `TPF-${(brokenBody[0] === 'A' ? 'B' : 'A') + brokenBody.slice(1)}`;
 assert(decodePlanetDna(brokenCode) === null, 'checksum rusak harus ditolak');
@@ -390,7 +402,7 @@ assert(foxSupplyAfter < foxSupplyBefore, 'runtuhnya mangsa harus menurunkan supl
 assert(agentCount(predatorPlanet, 'fox') <= foxBefore, 'jumlah predator tidak boleh naik saat mangsa habis');
 
 // Dune is the second active ecosystem with its own climate and guild mapping.
-assert(isSupportedPlanet('dune') && !isSupportedPlanet('glaciere'), 'hanya Terra dan Dune yang aktif saat ini');
+assert(isSupportedPlanet('dune') && isSupportedPlanet('glaciere') && !isSupportedPlanet('inferna'), 'Terra, Dune, dan Glaciera aktif; planet lain belum');
 const duneConfig = ecosystemConfigFor('dune');
 assert(duneConfig !== null && duneConfig.species.length === 12, 'Dune harus membawa 12 spesies');
 const dunePlanet = createPlanet(6161, 'Dune Uji', 'dune');
@@ -421,6 +433,50 @@ for (const type of ['sand', 'rock', 'grass', 'tree', 'bush', 'fox', 'bird'] as c
 tickN(duneTwin, 200);
 assert(JSON.stringify(dunePlanet.fauna) === JSON.stringify(duneTwin.fauna), 'fauna Dune harus deterministik untuk seed sama');
 assert(JSON.stringify(dunePlanet.eco) === JSON.stringify(duneTwin.eco), 'ekosistem Dune harus deterministik untuk seed sama');
+
+// Glaciera is the third active ecosystem with seasons and freeze/thaw state.
+const iceConfig = ecosystemConfigFor('glaciere');
+assert(iceConfig !== null && iceConfig.species.length === 12, 'Glaciera harus membawa 12 spesies');
+assert(iceConfig.climate.seasons.length === 4, 'Glaciera harus membawa empat musim');
+const icePlanet = createPlanet(7777, 'Glaciera Uji', 'glaciere');
+assert(icePlanet.planetId === 'glaciere', 'createPlanet harus mempertahankan planetId Glaciera');
+assert(icePlanet.environment.temperature < 0, 'Glaciera harus mulai dengan suhu below zero');
+assert(icePlanet.environment.water > 55, 'Glaciera harus mulai dengan cadangan air es');
+assert(icePlanet.eco.populations.glaciere_ice_fish, 'populasi Glaciera harus diinisialisasi');
+assert(!icePlanet.eco.populations.terra_oak && !icePlanet.eco.populations.dune_camel, 'tidak boleh ada kebocoran spesies planet lain');
+for (const type of ['grass', 'tree', 'rock', 'lake', 'ocean', 'deer', 'fox', 'bird'] as const) {
+  assert(placeObject(icePlanet, type, [0.5, 0.4, 0.75]), `${type} harus bisa ditempatkan di Glaciera`);
+}
+tickN(icePlanet, 30);
+const polarCryo = { ...icePlanet.eco.cryo };
+assert(polarCryo.seasonId === 'polar-night', '30 tick pertama harus musim polar night');
+assert(polarCryo.freeze > 40, 'polar night harus membekukan permukaan');
+tickN(icePlanet, 130);
+const thawCryo = { ...icePlanet.eco.cryo };
+assert(thawCryo.seasonId === 'thaw', 'tick 160 harus masuk musim cair');
+assert(thawCryo.freeze < polarCryo.freeze, 'musim cair harus menurunkan freeze');
+tickN(icePlanet, 70);
+assert(icePlanet.eco.cryo.seasonId === 'short-summer', 'tick 230 harus musim panas singkat');
+assert(icePlanet.eco.cryo.freeze < thawCryo.freeze, 'musim panas singkat harus mencairkan lebih lanjut');
+assert(icePlanet.eco.cryo.iceCoverage > 0, 'danau beku harus menghasilkan ice coverage');
+const iceFishStatus = guildStatus(icePlanet, 'fish');
+assert(iceFishStatus !== null && iceFishStatus.speciesIds.includes('glaciere_ice_fish'), 'guild fish Glaciera harus memetakan ikan es');
+assert(guildFoodSourceIds(icePlanet, 'fox').includes('glaciere_arctic_hare'), 'rubah arktik harus berburu kelinci dari food web');
+assert(agentCount(icePlanet, 'fish') <= 10, 'agen akuatik Glaciera harus bounded');
+const iceLoaded = deserializePlanet(serializePlanet(icePlanet));
+assert(
+  iceLoaded?.planetId === 'glaciere' &&
+    iceLoaded.eco.cryo.seasonId === 'short-summer' &&
+    !!iceLoaded.eco.populations.glaciere_polar_bear,
+  'save/load Glaciera harus mempertahankan identitas, musim, dan populasi',
+);
+const iceTwin = createPlanet(7777, 'Glaciera Uji', 'glaciere');
+for (const type of ['grass', 'tree', 'rock', 'lake', 'ocean', 'deer', 'fox', 'bird'] as const) {
+  placeObject(iceTwin, type, [0.5, 0.4, 0.75]);
+}
+tickN(iceTwin, 230);
+assert(JSON.stringify(icePlanet.fauna) === JSON.stringify(iceTwin.fauna), 'fauna Glaciera harus deterministik');
+assert(JSON.stringify(icePlanet.eco) === JSON.stringify(iceTwin.eco), 'ekosistem Glaciera harus deterministik');
 
 const rainPlanet = createPlanet(7001, 'Hujan');
 rainPlanet.weather = { type: 'rain', intensity: 0.8, remainingTicks: 5 };

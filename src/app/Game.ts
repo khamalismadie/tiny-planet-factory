@@ -236,6 +236,7 @@ export class Game {
       (window as unknown as Record<string, unknown>).__game = {
         state: () => this.state,
         eco: () => this.state.eco,
+        cryo: () => this.state.eco.cryo,
         foodWeb: () => ({
           guilds: SPECIES_ORDER.map((species) => ({
             species,
