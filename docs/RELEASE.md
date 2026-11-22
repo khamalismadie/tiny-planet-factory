@@ -2,7 +2,7 @@
 
 Gunakan checklist ini sebelum publish build produksi.
 
-> **Status pembacaan v0.15.9:** angka 360 tick pada phase v0.10–v0.14 adalah spesifikasi historis. Sejak v0.15.4, semua siklus musim aktif berada pada **106–120 tick** (divalidasi `test:sim`). Bagian bertanda v0.4–v0.14 adalah catatan rilis, bukan klaim kondisi saat ini; lihat §2u–§2z untuk status terkini.
+> **Status pembacaan v0.15.9:** angka 360 tick pada phase v0.10–v0.14 adalah spesifikasi historis. Sejak v0.15.4, semua siklus musim aktif berada pada **106–120 tick** (divalidasi `test:sim`). Bagian bertanda v0.4–v0.14 adalah catatan rilis, bukan klaim kondisi saat ini; lihat §2u–§2ab untuk status terkini. `main` adalah v0.17.0 (unreleased); produksi masih v0.16.0.
 
 ## 1. Prasyarat
 
@@ -19,7 +19,7 @@ npm run build
 PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 ```
 
-- [ ] `npm run build` tanpa error. Chunk vendor: `pixi-core` + `pixi-3d`, app chunk < 100 kB (v0.16.0: 73,33 kB / gzip 23,96 kB).
+- [ ] `npm run build` tanpa error. Chunk vendor: `pixi-core` + `pixi-3d`, app chunk < 100 kB (v0.17.0: 75,00 kB / gzip 24,55 kB; produksi v0.16.0: 73,33 kB).
 - [ ] `PASS: sim`
 - [ ] `PASS: art scale`
 - [ ] `PASS: terrain render`
@@ -315,6 +315,23 @@ Ringkasan status P0 pasca-v0.16.0:
 | p95 device ≤ 33 ms | OPEN | baseline Itel S686LN 33,40 ms |
 | PWA fisik install/offline/update | OPEN | baru lolos headless |
 | Landscape, cold start 4G, context loss/restore | OPEN | wajib di perangkat nyata |
+
+## 2ab. Campaign & Leveling (v0.17.0 — unreleased di `main`)
+
+- [x] Kurva XP kuadratik `100+25(L-1)+5(L-1)^2`, 100 level, 10 era, ambang kumulatif 1.723.920 XP (masih `u32`).
+- [x] Save/DNA lama dinormalisasi ke ambang level lama; `schemaVersion` tetap 3 dan tidak ada field DNA baru.
+- [x] 100 main mission / 10 era / 6 tipe quest di `src/sim/campaignRules.ts`; teks target di `src/content/campaignCopy.ts`.
+- [x] Misi 1–60 dievaluasi dari state sim yang ada; misi 61–100 locked, tidak memberi XP, dan tidak ditandai selesai.
+- [x] DNA Points dan Bio Energy masih **derived**, bukan field tersimpan.
+- [x] HUD menampilkan era, `Level x/100`, judul misi, dan progres; panel `?campaign=1` menampilkan 100 baris.
+- [x] Hook QA `?debug=1` → `window.__game.campaign()`.
+- [x] `npm test` lokal 8/8 PASS; `test:sim` memverifikasi rumus, era, 100 misi unik, migrasi, reward, dan misi terkunci.
+- [x] Build lokal app chunk 75,00 kB (gzip 24,55 kB); cache SW `tpf-shell-v0-17-0`.
+- [x] Chunk DNA digabung ke `planet-configs` untuk menghilangkan inisialisasi circular `dna ↔ planet-configs`.
+- [ ] **Belum di-deploy.** Produksi tetap bundle v0.16.0 `index-Cl2SK4zO.js` / cache `tpf-shell-v0-16-0`.
+- [ ] QA perangkat nyata v0.17.0 tidak dijalankan; P0 Sprint 09 tetap OPEN.
+
+Status jujur: fitur campaign sudah ada di `main`, tetapi klaim produksi dan real-device masih mengacu ke v0.16.0.
 
 ## 3. QA perangkat nyata
 

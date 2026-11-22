@@ -29,17 +29,19 @@ Yang **tidak** boleh terjadi:
 
 | Area | Kondisi awal | Sumber |
 |---|---|---|
-| Versi | `v0.16.0` | `package.json` |
+| Versi | `v0.17.0` di `main` (unreleased); produksi `v0.16.0` | `package.json`, `README.md` |
 | Deploy | Netlify produksi aktif, commit `e71e6c1`, bundle `index-Cl2SK4zO.js` | `README.md`, `docs/RELEASE.md` §2aa, `docs/QA-DEVICE.md` |
 | Test lokal | 8/8 PASS | log lokal 2026-11-22 |
 | Test remote | 8/8 PASS | log produksi 2026-11-22 |
 | PWA headless | manifest/sw 200, offline reload PASS | QA remote 2026-11-22 |
-| QA device | **OPEN** — baseline pra-v0.15.6, belum diulang untuk v0.16.0 | `docs/QA-DEVICE.md` |
+| QA device | **OPEN** — baseline pra-v0.15.6, belum diulang untuk v0.16.0/v0.17.0 | `docs/QA-DEVICE.md` |
 | p95 device | **33,40 ms**, target ≤33 ms | `docs/QA-DEVICE.md` |
 | Draw call | 20 saat Hujan, sama dengan baseline; ≤18 saat Cerah | `test:qa-load`, baseline |
-| Fitur baru | v0.16.0 variants sudah aktif; planet/biome tetap ditahan | keputusan Nine Worlds QA-first |
+| Fitur baru | v0.17.0 campaign di `main`; planet/biome tetap ditahan | keputusan Nine Worlds QA-first |
 
 > **Catatan v0.16.0:** 49 varian aset diimplementasikan di luar Sprint 09 sesuai persetujuan user. Ini tidak menambah planet/biome, tipe objek, atau schema DNA, dan **tidak menutup P0** SPR-01…SPR-05. SPR-06 dan SPR-08 sudah Done; deploy v0.16.0 aktif.
+>
+> **Catatan v0.17.0:** 100 level/10 era dan 100 main mission dikerjakan di luar Sprint 09 setelah persetujuan user, lewat issues #22–#26. Tidak menambah planet/biome/tipe objek/schema DNA; tidak menutup P0 SPR-01…SPR-05. Belum di-deploy. Detail: `docs/CAMPAIGN.md`.
 
 ### Mapping GitHub Issues ↔ Sprint 09
 
@@ -53,6 +55,11 @@ Yang **tidak** boleh terjadi:
 | #14 | SPR-08 | Closed |
 | #15 | Snapshot & mapping ini | Closed |
 | #19 | Rapikan catatan pasca-SPR-06/08 | Closed |
+| #22 | Campaign — kurva 100 level | Closed |
+| #23 | Campaign — katalog 100 misi | Closed |
+| #24 | Campaign — runtime misi | Closed |
+| #25 | Campaign — HUD & panel QA | Closed |
+| #26 | Campaign — test & docs | Closed |
 
 ---
 

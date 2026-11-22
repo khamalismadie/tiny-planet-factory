@@ -93,9 +93,13 @@ for (const c of [
   const game = await page.evaluate(() => ({
     topbarOverflow: [...document.querySelectorAll('#topbar button')].some((button) => button.getBoundingClientRect().right > innerWidth + 1),
     bodyUnlocked: !document.body.classList.contains('menu-open'),
+    levelLabel: document.getElementById('level-label')?.textContent ?? '',
+    campaignHidden: document.getElementById('campaign-modal')?.classList.contains('hidden'),
   }));
   check(`${c.name}: no topbar overflow`, !game.topbarOverflow);
   check(`${c.name}: body unlocked`, game.bodyUnlocked);
+  check(`${c.name}: level scale shows 100`, /\/100/.test(game.levelLabel));
+  check(`${c.name}: campaign panel hidden by default`, game.campaignHidden);
 
   await page.click('#pause-btn');
   await page.click('#menu-btn');
