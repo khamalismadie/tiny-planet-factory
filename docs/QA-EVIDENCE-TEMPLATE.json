@@ -1,0 +1,67 @@
+{
+  "app": "Tiny Planet Factory",
+  "appVersion": "<ISI: versi dari laporan Salin hasil QA, mis. 0.21.0>",
+  "collectedAt": "<ISI: timestamp ISO asli dari perangkat>",
+  "durationMs": 0,
+  "frames": 0,
+  "p50ms": 0,
+  "p95ms": 0,
+  "fps": 0,
+  "bootMs": 0,
+  "quality": {
+    "tier": "<ISI: low|medium|high>",
+    "downgrades": 0
+  },
+  "scene": {
+    "drawCalls": 0,
+    "objects": 0,
+    "stage": 0,
+    "mission": "<ISI: id/status misi dari laporan>",
+    "completedEvents": 0,
+    "wildlifeAgents": 0,
+    "discoveredSpecies": 0,
+    "extinctSpecies": 0,
+    "contextLost": null
+  },
+  "save": {
+    "tick": 0,
+    "objects": 0,
+    "level": 0,
+    "persistent": null
+  },
+  "network": {
+    "online": null,
+    "visibility": "<ISI: visible|hidden dari laporan>"
+  },
+  "orientation": {
+    "type": "<ISI: portrait|landscape>",
+    "angle": 0
+  },
+  "layout": {
+    "topbarBottom": null,
+    "buildTop": null,
+    "objective": null,
+    "inventory": null,
+    "centerElement": null,
+    "planetCenterVisible": null,
+    "objectiveOverlapsInventory": null,
+    "topbarOverlapsBuild": null
+  },
+  "runtime": {
+    "scriptSrc": "<ISI: URL script modul dari laporan>",
+    "serviceWorker": {
+      "controller": null,
+      "scriptUrl": "<ISI: URL service worker dari laporan>"
+    }
+  },
+  "device": {
+    "userAgent": "<ISI: user agent asli>",
+    "cores": 0,
+    "memoryGb": null,
+    "dpr": 0,
+    "viewport": "<ISI: lebarx tinggi, mis. 360x678>",
+    "standalone": null,
+    "serviceWorker": null,
+    "installPromptSeen": null
+  }
+}

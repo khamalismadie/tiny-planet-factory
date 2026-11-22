@@ -50,6 +50,8 @@ npm run qa:evidence -- laporan-dari-perangkat.json --standalone --offline --land
 
 Flag opsional: `--standalone` menuntut `device.standalone === true`, `--offline` menuntut `network.online === false`, `--landscape` menuntut orientasi landscape dan `layout.planetCenterVisible === true` tanpa overlap panel. Validator tetap mengingatkan bahwa laporan harus dilampirkan ke issue; ia tidak menutup issue.
 
+Gunakan `docs/QA-EVIDENCE-TEMPLATE.json` sebagai wadah isi laporan dan `docs/QA-EVIDENCE-TEMPLATE.md` sebagai checklist lampiran #5–#8. Template sengaja gagal divalidasi sampai diisi dengan data perangkat nyata.
+
 Quality tier:
 
 | Tier | Icosphere detail | Prop capacity | Fauna capacity | Cloud | Drop |
