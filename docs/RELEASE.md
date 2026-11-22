@@ -442,6 +442,7 @@ Catatan 2026-11-21: lima run QA nyata di **Itel S686LN / Android 15**, termasuk 
 - [ ] Catat commit/tag build di release notes.
 - [ ] Service worker versi lama masih bisa melayani app shell bila update gagal.
 - [ ] Jika crash pasca-update: matikan service worker lama lewat mekanisme hosting/CDN, lalu deploy ulang artefak sebelumnya.
+- [ ] Untuk v0.21.0, rollback berarti kembali ke produksi v0.16.0 (`e71e6c1`, `index-Cl2SK4zO.js`, `tpf-shell-v0-16-0`), bukan ke preview #41. Detail ada di `docs/PRODUCT-TO-PRODUCTION.md` §11a.
 
 ## 6. Publish
 
