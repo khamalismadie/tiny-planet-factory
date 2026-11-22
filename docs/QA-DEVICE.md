@@ -107,9 +107,9 @@ Status ditutup hanya bila laporan + screenshot asli ada di issue terkait dan ang
 
 ## Gate beban deterministik
 
-`npm run test:qa-load` membuka `?debug=1&qa=1&qaObjects=94&qaSeconds=12&quality=medium&seed=1`, memajukan 16 tick agar cuaca Hujan aktif, lalu mengunci p95 ≤ 33,40 ms, tier medium tanpa downgrade, 94 objek, dan draw call ≤ 20 pada cuaca **Hujan/Badai/Salju** (≤ 18 saat Cerah). Tidak ada weather state “Berawan”. Angka 20 adalah baseline seed 1 pra-facet; jangan disamakan dengan 18 pada run cerah.
+`npm run test:qa-load` membuka `?debug=1&qa=1&qaObjects=94&qaSeconds=12&quality=medium&seed=1`, memajukan 16 tick agar cuaca Hujan aktif, lalu mengunci p95 ≤ 33 ms, tier medium tanpa downgrade, 94 objek, dan draw call ≤ 20 pada cuaca **Hujan/Badai/Salju** (≤ 18 saat Cerah). Tidak ada weather state “Berawan”. Angka 20 adalah baseline seed 1 pra-facet; jangan disamakan dengan 18 pada run cerah.
 
-Untuk mengukur ulang p95 pada kandidat v0.21.0, gunakan `docs/QA-P95-REMEASURE.md`. Target issue #7 tetap **≤ 33 ms**; angka 33,40 ms pada gate beban hanyalah baseline headless, bukan kriteria lulus perangkat nyata.
+Untuk mengukur ulang p95 pada kandidat v0.21.0, gunakan `docs/QA-P95-REMEASURE.md`. Target issue #7 tetap **≤ 33 ms**. Gate headless kini memakai batas yang sama; angka 33,40 ms pada tabel device di bawah adalah baseline historis, bukan kriteria lulus.
 
 ## Catatan headless
 

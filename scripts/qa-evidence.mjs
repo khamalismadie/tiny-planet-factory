@@ -30,6 +30,10 @@ const checks = {
   tanpaContextLoss: report.scene?.contextLost === false,
 };
 
+const telemetryHint = typeof report.appVersion !== 'string' && Array.isArray(report.events)
+  ? 'Input tampak seperti telemetry opt-in, bukan qaReport(). Jalankan JSON.stringify(window.__game.qaReport(), null, 2).'
+  : null;
+
 if (flags.has('--standalone')) {
   checks.standaloneDariIkon = report.device?.standalone === true;
 }
@@ -64,10 +68,12 @@ console.log(JSON.stringify({
   layout: report.layout ?? null,
   budgets,
   checks,
+  telemetryHint,
 }, null, 2));
 
 const failed = Object.entries(checks).filter(([, ok]) => !ok).map(([name]) => name);
 if (failed.length || !budgets.p95.ok) {
+  if (telemetryHint) console.error(telemetryHint);
   console.error(`EVIDENCE REVIEW: ${[...failed, budgets.p95.ok ? '' : 'p95MasihDiAtas33ms'].filter(Boolean).join(', ')}`);
   console.error('Validator hanya membaca bukti; jangan menutup issue #5-#8 tanpa verifikasi perangkat nyata.');
   process.exit(1);
