@@ -3,6 +3,7 @@ import { OBJECT_ORDER } from '../content/objects';
 import { SPECIES_INDEX, SPECIES_ORDER } from '../content/species';
 import { BIOMES } from './biome';
 import { PLANET_IDS } from '../content/planets/ids';
+import { campaignMissionForLevel } from './campaignRules';
 import { createPlanet, decodeDna as decodeLegacyDna, planetNameFromSeed, unlockedForLevel } from './engine';
 import { migratePlanet } from './migrate';
 import { preserveLegacyProgression } from './progression';
@@ -386,7 +387,7 @@ function decodeFull(bytes: Uint8Array): PlanetState | null {
       atmosphere,
       weather,
       progression: { level, xp, unlockedObjects: unlockedForLevel(level) },
-      mission: { id: 'mission-hijaukan', status: missionStatus, holdTicks },
+      mission: { id: campaignMissionForLevel(level).id, status: missionStatus, holdTicks },
       events,
       warning,
       stage,

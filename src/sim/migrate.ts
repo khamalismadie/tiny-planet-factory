@@ -2,6 +2,7 @@ import { ensureEventState } from '../content/missions';
 import { OBJECT_ORDER } from '../content/objects';
 import { SPECIES_ORDER } from '../content/species';
 import { BIOMES, inferBiome } from './biome';
+import { campaignMissionForLevel } from './campaignRules';
 import { isSupportedPlanet } from './eco/guilds';
 import { initializeEcosystem } from './eco/manager';
 import { CURRENT_ECOSYSTEM_VERSION, normalizeEcoState } from './eco/state';
@@ -150,6 +151,8 @@ export function migratePlanet(raw: unknown, fallbackPlanetId = 'terra'): PlanetS
     num(rawProgression.xp, base.progression.xp),
   );
   const rawMission = isRecord(raw.mission) ? raw.mission : {};
+  const rawMissionId = str(rawMission.id, campaignMissionForLevel(progression.level).id);
+  const missionId = rawMissionId.startsWith('era') ? rawMissionId : campaignMissionForLevel(progression.level).id;
   const terrainConfig = mergeTerrain(raw.terrainConfig);
   const weatherType = WEATHER_TYPES.includes(rawWeather.type as WeatherType)
     ? (rawWeather.type as WeatherType)
@@ -211,7 +214,7 @@ export function migratePlanet(raw: unknown, fallbackPlanetId = 'terra'): PlanetS
         : base.progression.unlockedObjects,
     },
     mission: {
-      id: str(rawMission.id, base.mission.id),
+      id: missionId,
       status: rawMission.status === 'complete' ? 'complete' : 'active',
       holdTicks: num(rawMission.holdTicks, base.mission.holdTicks),
     },
