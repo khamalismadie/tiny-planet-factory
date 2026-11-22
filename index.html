@@ -94,6 +94,18 @@
       .objective-goal { color: var(--text); }
       .objective-mission { margin-left: auto; color: var(--muted); font: 10px/1.4 var(--mono); text-align: right; }
       .objective-mission.done { color: var(--mint); }
+      .tutorial-focus {
+        outline: 2px solid var(--mint);
+        outline-offset: 2px;
+        box-shadow: 0 0 0 4px rgba(93, 214, 178, .14);
+        animation: tutorial-pulse 1.8s ease-in-out 2;
+      }
+      @keyframes tutorial-pulse {
+        50% { box-shadow: 0 0 0 9px rgba(93, 214, 178, 0); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .tutorial-focus { animation: none; }
+      }
       #hint { position: fixed; z-index: 5; bottom: calc(max(10px, env(safe-area-inset-bottom)) + 136px); left: 50%; transform: translateX(-50%); font-size: 11px; color: var(--muted); pointer-events: none; text-align: center; }
       #perf { position: fixed; z-index: 20; left: 10px; bottom: 140px; display: none; padding: 8px 10px; border-radius: 8px; background: rgba(5, 10, 16, .9); border: 1px solid var(--line); color: var(--mint); font: 11px/1.5 var(--mono); white-space: pre-line; pointer-events: none; }
       #perf.show { display: block; }
@@ -395,6 +407,7 @@
           <div><span>Bawah</span><p>Alat yang dipilih, sasaran misi, dan petunjuk gestur.</p></div>
         </div>
         <div class="row">
+          <button id="guide-replay">Ulangi panduan</button>
           <button id="guide-close">Mengerti</button>
         </div>
       </div>

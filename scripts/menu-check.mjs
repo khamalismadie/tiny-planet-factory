@@ -113,6 +113,23 @@ for (const c of [
     modalVisible: !document.getElementById('dna-modal').classList.contains('hidden'),
   }));
   check(`${c.name}: DNA opens from menu`, dna.menuHidden && dna.modalVisible);
+
+  await page.click('#dna-close');
+  await page.click('#menu-btn');
+  await page.click('#menu-guide');
+  const replayVisible = await page.evaluate(() => {
+    const button = document.getElementById('guide-replay');
+    return !!button && button.getBoundingClientRect().width > 0;
+  });
+  check(`${c.name}: guide replay button visible`, replayVisible);
+  await page.click('#guide-replay');
+  const replayed = await page.evaluate(() => ({
+    guideHidden: document.getElementById('guide-modal').classList.contains('hidden'),
+    menuHidden: document.getElementById('main-menu').classList.contains('hidden'),
+    objective: document.getElementById('objective-strip')?.textContent ?? '',
+  }));
+  check(`${c.name}: replay closes guide and menu`, replayed.guideHidden && replayed.menuHidden);
+  check(`${c.name}: replay starts tutorial`, replayed.objective.includes('Panduan 1/3'));
   check(`${c.name}: no page errors`, errors.length === 0);
   await context.close();
 }

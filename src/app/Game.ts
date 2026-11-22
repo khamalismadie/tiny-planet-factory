@@ -19,6 +19,7 @@ import { PerfMonitor } from './PerfMonitor';
 import { QaProbe, type QaReport } from './QaProbe';
 import { Hud } from '../ui/Hud';
 import { MainMenu, type MainMenuInfo, type PlanetChoice } from '../ui/MainMenu';
+import { Tutorial, type TutorialSignals } from '../ui/tutorial';
 import { SurfaceInput } from '../input/SurfaceInput';
 import { SaveStore } from '../persistence/SaveStore';
 import { GameScene } from '../render/Scene';
@@ -31,6 +32,7 @@ export class Game {
   private readonly app: Application;
   private readonly store = new SaveStore();
   private readonly telemetry = new Telemetry();
+  private readonly tutorial = new Tutorial();
   private scene!: GameScene;
   private hud!: Hud;
   private menu!: MainMenu;
@@ -119,6 +121,11 @@ export class Game {
       });
       document.getElementById('qa-close')?.addEventListener('click', () => this.qaPanel?.classList.remove('show'));
     }
+    const skipMenu = params.has('debug') || params.has('qa') || params.has('campaign') || params.has('planet') || params.get('menu') === '0';
+    const tutorialParam = params.get('tutorial');
+    if (tutorialParam === '1') this.tutorial.reset();
+    else if (tutorialParam === '0' || skipMenu) this.tutorial.disable();
+    else if (!this.tutorial.isCompleted && (!this.hadSave || this.tutorial.isStarted)) this.tutorial.start();
     this.buildScene();
     this.buildHud();
     this.buildMenu();
@@ -132,7 +139,6 @@ export class Game {
 
     registerPwa((message) => this.hud.notify(message, true));
 
-    const skipMenu = params.has('debug') || params.has('qa') || params.has('campaign') || params.has('planet') || params.get('menu') === '0';
     if (skipMenu) this.menu.hide();
     else this.openMenu();
   }
@@ -191,6 +197,10 @@ export class Game {
       },
       onMenu: () => this.openMenu(),
       onCopyDna: () => this.dnaCodes(),
+      onDnaOpened: () => {
+        const tip = this.tutorial.markTip('dna');
+        if (tip) this.hud.notify(tip);
+      },
       onLoadDna: (code) => this.loadDna(code),
       onPreviewDna: (code) => this.previewDna(code),
       onCloseDna: () => this.restorePreview(),
@@ -202,7 +212,7 @@ export class Game {
       onTelemetryClear: () => this.telemetry.clear(),
     });
     this.hud.setTelemetryEnabled(this.telemetry.optedIn);
-    this.hud.update(this.state, this.selected);
+    this.syncHud();
   }
 
   private buildMenu(): void {
@@ -225,6 +235,7 @@ export class Game {
         this.menu?.update(this.menuInfo());
       },
       onQuality: (tier) => this.setQuality(tier),
+      onReplayTutorial: () => this.replayTutorial(),
       onClose: () => this.closeMenu(),
     });
   }
@@ -402,6 +413,7 @@ export class Game {
             systems: advancedSnapshot(this.state),
           };
         },
+        tutorial: () => ({ ...this.tutorial.view, completed: this.tutorial.isCompleted }),
         variants: () => ({ indices: this.scene.variantIndices(), labels: this.scene.variantLabels() }),
         eco: () => this.state.eco,
         cryo: () => this.state.eco.cryo,
@@ -456,7 +468,7 @@ export class Game {
           this.state = createPlanet(seed >>> 0, planetNameFromSeed(seed >>> 0), this.state.planetId);
           this.selected = 'grass';
           this.rebuildScene();
-          this.hud.update(this.state, this.selected);
+          this.syncHud();
           this.queueSave();
         },
         setPlanet: (planetId: string, seed?: number) => this.switchPlanet(planetId, seed),
@@ -479,13 +491,38 @@ export class Game {
     }
   }
 
+  private syncHud(): void {
+    const tip = this.tutorial.update(this.tutorialSignals());
+    this.hud.setTutorialView(this.tutorial.view);
+    this.hud.update(this.state, this.selected);
+    if (tip) this.hud.notify(tip);
+  }
+
+  private tutorialSignals(): TutorialSignals {
+    return {
+      objects: this.state.objects.length,
+      tick: this.state.tick,
+      missionStatus: this.state.mission.status,
+      level: this.state.progression.level,
+      weather: this.state.weather.type,
+      faunaAgents: this.state.fauna?.agents.length ?? 0,
+    };
+  }
+
+  private replayTutorial(): void {
+    this.tutorial.reset();
+    this.closeMenu();
+    this.syncHud();
+    this.hud.notify('Panduan dimulai lagi.');
+  }
+
   private select(type: ObjectType): void {
     if (!this.state.progression.unlockedObjects.includes(type)) {
       this.hud.notify(`${OBJECT_DEFS[type].label} terbuka di level ${UNLOCK_LEVEL[type]}.`, true);
       return;
     }
     this.selected = type;
-    this.hud.update(this.state, this.selected);
+    this.syncHud();
     this.hud.notify(`${OBJECT_DEFS[type].label} dipilih. Ketuk permukaan planet.`);
   }
 
@@ -497,7 +534,7 @@ export class Game {
     }
     this.scene.syncObjects(this.state.objects, this.state.environment);
     this.scene.flashPlacement(dir);
-    this.hud.update(this.state, this.selected);
+    this.syncHud();
     this.telemetry.record('placement', { type, total: this.state.objects.length, tick: this.state.tick });
     this.queueSave();
   }
@@ -516,7 +553,7 @@ export class Game {
     const seasonBefore = this.currentSeasonId();
     const result = simulateTick(this.state);
     this.refreshScene();
-    this.hud.update(this.state, this.selected);
+    this.syncHud();
     if (this.state.warning) this.hud.notify(this.state.warning, true);
     else if (result.events.length) this.hud.notify(result.events[result.events.length - 1]);
     if (missionBefore === 'active' && this.state.mission.status === 'complete') {
@@ -607,7 +644,7 @@ export class Game {
     this.state = planet;
     this.selected = 'grass';
     this.rebuildScene();
-    this.hud.update(this.state, this.selected);
+    this.syncHud();
     this.hud.setPreviewing(false);
     this.queueSave();
     this.hud.notify(message);
@@ -635,7 +672,7 @@ export class Game {
     this.state = planet;
     this.selected = 'grass';
     this.rebuildScene();
-    this.hud.update(this.state, this.selected);
+    this.syncHud();
     this.hud.setPreviewing(true);
     this.telemetry.record('dna_preview', { objects: planet.objects.length });
     this.hud.notify('Pratinjau aktif. Tutup panel untuk kembali ke planet asli.');
@@ -646,7 +683,7 @@ export class Game {
     this.state = this.previewBackup;
     this.previewBackup = null;
     this.rebuildScene();
-    this.hud.update(this.state, this.selected);
+    this.syncHud();
     this.hud.setPreviewing(false);
     this.hud.notify('Pratinjau ditutup; planet asli dikembalikan.');
   }
@@ -676,7 +713,7 @@ export class Game {
     this.state = createPlanet(seed >>> 0, planetNameFromSeed(seed >>> 0), planetId);
     this.selected = 'grass';
     this.rebuildScene();
-    this.hud.update(this.state, this.selected);
+    this.syncHud();
     this.telemetry.record('planet_switch', this.telemetryContext({ from }));
     this.queueSave();
     this.hud.notify(`Planet ${planetId} siap dibangun.`);
@@ -697,7 +734,7 @@ export class Game {
     this.state = createPlanet(seed, planetNameFromSeed(seed), this.state.planetId);
     this.selected = 'grass';
     this.rebuildScene();
-    this.hud.update(this.state, this.selected);
+    this.syncHud();
     this.queueSave();
     this.hud.notify('Planet baru siap dibangun.');
   }

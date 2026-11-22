@@ -14,7 +14,7 @@ npm test           # 8 gate: sim, scale, terrain, smoke, device, qa-load, menu, 
 
 Build memakai `NODE_OPTIONS=--max-old-space-size=4096` karena bundler PixiJS 3D membutuhkan heap lebih besar dari default Node.
 
-Kode `main` adalah `v0.18.0` (**belum di-deploy**). Rilisan produksi aktif tetap `v0.16.0` di <https://tinyplanetfactory.netlify.app/>. Hook QA: `?debug=1`, `?perf=1`, `?quality=low|medium|high`, `?eco=1`, `?menu=0`, `?campaign=1`, `?planet=...`, `?seed=N`, dan `?qa=1&qaSeconds=45&qaObjects=N` (`qaObjects` maks 96, `qaSeconds` maks 180). Saat `?debug=1`, varian dibaca lewat `window.__game.variants()` dan progresi lewat `window.__game.campaign()`.
+Kode `main` adalah `v0.19.0` (**belum di-deploy**). Rilisan produksi aktif tetap `v0.16.0` di <https://tinyplanetfactory.netlify.app/>. Hook QA: `?debug=1`, `?perf=1`, `?quality=low|medium|high`, `?eco=1`, `?menu=0`, `?campaign=1`, `?planet=...`, `?seed=N`, `?tutorial=0|1`, dan `?qa=1&qaSeconds=45&qaObjects=N` (`qaObjects` maks 96, `qaSeconds` maks 180). Saat `?debug=1`, varian dibaca lewat `window.__game.variants()`, progresi lewat `window.__game.campaign()`, dan status panduan lewat `window.__game.tutorial()`.
 
 ### Cek cepat varian
 
@@ -39,10 +39,24 @@ npm run preview
 
 ```js
 window.__game.campaign()
-// { level, maxLevel: 100, era, mission: {...}, total: 100, eras: 10, lockedFrom: 61 }
+// { level, maxLevel: 100, era, mission: {...}, total: 100, eras: 10, lockedFrom: null, systems: {...} }
 ```
 
 Dengan seed `1`, Dune memakai `sand: Dune`, `rock: Sandstone`, `tree: Oak`, dan `bush: Cactus`. Katalog lengkap ada di `docs/ASSET-CATALOG.md`.
+
+### Cek cepat tutorial
+
+```bash
+npm run preview
+# Buka http://127.0.0.1:4173/?debug=1&tutorial=1&menu=0
+```
+
+```js
+window.__game.tutorial()
+// { active, step, total: 3, label, instruction, focus, completed }
+```
+
+FTUE otomatis berjalan untuk save baru. `?tutorial=1` memaksa ulang dari langkah 1, `?tutorial=0` mematikan panduan untuk QA. Modal **Menu → Cara pakai UI → Ulangi panduan** juga bisa memulai ulang.
 
 ## Kontrol
 
@@ -64,16 +78,17 @@ Dengan seed `1`, Dune memakai `sand: Dune`, `rock: Sandstone`, `tree: Oak`, dan 
 - Agen fauna otonom (kijang, rubah, burung, ikan, serangga) dari `seed + tick`: habitat, migrasi, energi, reproduksi, rantai makanan, penemuan spesies, dan kepunahan. Tidak ada `Math.random()` di runtime sim.
 - 4 cuaca (cerah, hujan, salju, badai) dengan awan, presipitasi, dan perubahan pencahayaan.
 - Misi **Hijaukan Planet**, 3 event opsional (hujan pertama, uji badai, pemulihan kekeringan), dan indikator ekosistem/cuaca waktu nyata.
+- FTUE 3 langkah untuk player baru + tips one-shot saat cuaca, fauna, unlock level, era lanjutan, dan DNA pertama; status disimpan terpisah di `localStorage` `tpf.tutorial.v1`, bukan di DNA.
 - Save/load otomatis ke IndexedDB (fallback memori bila tidak tersedia).
 - Planet DNA v2: payload binary ringkas + Crockford base32 + CRC16, termasuk agen fauna, `planetId`, dan CRC; kode base64 v1 serta DNA v2 tanpa `planetId` tetap bisa dibaca sebagai Terra.
 - Sembilan ekosistem aktif (Nine Worlds lengkap): Terra, Dune, Glaciera, Inferna, Aquaria, Mycelia, Sakura, Aurelia, dan Cosmos. Akses QA lewat `?planet=terra|dune|glaciere|inferna|aquaria|mycelia|sakura|aurelia|cosmos` atau `window.__game.setPlanet(id, seed?)`.
 - `schemaVersion`, `revision`, `terrainConfig`, `biome`, dan `eventLog` di state; migrasi otomatis untuk save lama.
 - Event mutasi deterministik (`planet.created`, `object.placed`, `clock.tick`) yang bisa di-replay.
-- PWA: manifest, ikon 192/512, service worker cache-first/stale-while-revalidate dengan cache `tpf-shell-v0-17-0` di kode `main` (produksi v0.16.0 masih memakai `tpf-shell-v0-16-0`), precache seluruh chunk, fallback offline, dan notifikasi pembaruan.
+- PWA: manifest, ikon 192/512, service worker cache-first/stale-while-revalidate dengan cache `tpf-shell-v0-19-0` di kode `main` (produksi v0.16.0 masih memakai `tpf-shell-v0-16-0`), precache seluruh chunk, fallback offline, dan notifikasi pembaruan.
 - Responsive portrait/landscape; UI memakai overlay DOM di atas kanvas PixiJS.
 - Quality tier (`low`/`medium`/`high`) + adaptive downgrade otomatis bila p95 frame time > 34 ms.
 - Overlay performa (`?perf=1`), hook QA (`?debug=1`), dan probe `?qa=1&qaSeconds=45` yang menghasilkan laporan p50/p95 + info perangkat siap disalin.
-- Vendor PixiJS dipisah menjadi `pixi-core` + `pixi-3d`; data konten dan codec DNA berbagi chunk `planet-configs` untuk menghindari inisialisasi circular. App chunk v0.18.0 adalah 75,00 kB (gzip 24,55 kB).
+- Vendor PixiJS dipisah menjadi `pixi-core` + `pixi-3d`; data konten dan codec DNA berbagi chunk `planet-configs` untuk menghindari inisialisasi circular. App chunk v0.19.0 adalah 79,07 kB (gzip 25,88 kB).
 - Telemetri opt-in (tersimpan lokal, tanpa server) dengan modal penjelasan, ekspor JSON, dan hapus data.
 - Visual polish v0.15.9: satu merged geometry per tipe dengan warna per-facet, AO vertikal + bayangan kontak baked, shade lereng planet, awan 10×6, ground contact dari ekstent geometri, rim light, dan topbar mobile tanpa overflow. Standar visual ada di `docs/ART-DIRECTION.md`.
 - Asset varian v0.16.0: 49 pilihan (39 prop + 10 fauna) dari 43 builder unik, dipilih deterministik dari `seed + planetId`, satu geometri aktif per tipe, bias visual 9 planet, tanpa tekstur/DNA/draw call baru. Katalog ada di `docs/ASSET-CATALOG.md`.
