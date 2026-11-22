@@ -306,6 +306,16 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [x] Deploy produksi `main` @ `e71e6c1` ke <https://tinyplanetfactory.netlify.app/>; bundle `index-Cl2SK4zO.js`; remote `npm test` 8/8 PASS; cache `tpf-shell-v0-16-0` dan offline reload PASS.
 - [ ] QA perangkat nyata untuk v0.16.0 belum dijalankan; P0 Sprint 09 tetap OPEN.
 
+Ringkasan status P0 pasca-v0.16.0:
+
+| Gate | Status | Bukti / catatan |
+|---|---|---|
+| Build, 8 gate lokal, 8 gate remote | PASS | bundle `index-Cl2SK4zO.js`, cache `tpf-shell-v0-16-0` |
+| Regresi determinisme/DNA/batching | PASS | tidak ada perubahan sim, schema, atau draw call |
+| p95 device ≤ 33 ms | OPEN | baseline Itel S686LN 33,40 ms |
+| PWA fisik install/offline/update | OPEN | baru lolos headless |
+| Landscape, cold start 4G, context loss/restore | OPEN | wajib di perangkat nyata |
+
 ## 3. QA perangkat nyata
 
 Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:
