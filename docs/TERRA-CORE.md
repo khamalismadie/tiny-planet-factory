@@ -1,6 +1,6 @@
 # Terra Core — v0.5
 
-## Status saat ini (v0.15.9)
+## Status saat ini (v0.16.0)
 
 - Dokumen ini adalah spesifikasi historis v0.5.
 - Engine kini memanggil `stepEcosystem(planet)` → `ecosystemFor(planetId)` untuk **9 manager**, bukan `terraEcosystem.step()`.

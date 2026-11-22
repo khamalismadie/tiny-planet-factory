@@ -1,6 +1,6 @@
 # Mycelia + Fungal Biome — v0.11.0
 
-## Status saat ini (v0.15.9)
+## Status saat ini (v0.16.0)
 
 - Spesifikasi v0.11 tetap berlaku untuk jaringan, spora, bioluminesensi, dan hazard fungal.
 - Siklus aktual Mycelia adalah **120 tick**: 0–27, 28–59, 60–89, 90–119 (360 tick di bawah adalah spec historis).

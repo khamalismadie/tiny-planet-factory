@@ -1,6 +1,6 @@
 # Food Web + Wildlife AI — v0.6.0
 
-## Status saat ini (v0.15.9)
+## Status saat ini (v0.16.0)
 
 - Spesifikasi v0.6 tetap berlaku untuk 5 guild visual; tidak ada aset fauna per-biome baru.
 - Format DNA kemudian berubah: byte `planetId` ditambahkan sebelum CRC16.

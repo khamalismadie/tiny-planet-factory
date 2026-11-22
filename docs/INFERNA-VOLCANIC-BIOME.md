@@ -1,6 +1,6 @@
 # Inferna + Volcanic Biome — v0.9.0
 
-## Status saat ini (v0.15.9)
+## Status saat ini (v0.16.0)
 
 - Spesifikasi v0.9 tetap berlaku untuk volcano, panas/lava/abu, dan guild vulkanik.
 - Siklus aktual Inferna adalah **106 tick**: 0–32, 33–57, 58–75 (erupsi), 76–105 (rentang 235 di bawah adalah spec historis).

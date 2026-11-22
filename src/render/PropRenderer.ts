@@ -9,7 +9,7 @@ import {
 } from '@pixi/3d';
 import { OBJECT_DEFS, OBJECT_ORDER } from '../content/objects';
 import { DEFAULT_TERRAIN_CONFIG, type Environment, type ObjectType, type PlacedObject, type TerrainConfig } from '../sim/types';
-import { ASSET_GEOMETRY } from './assetGeometry';
+import { ASSET_GEOMETRY, type AssetGeometry, type PropResolver } from './assetGeometry';
 import { terrainRadius } from './terrain';
 
 const CAPACITY = 96;
@@ -32,6 +32,7 @@ interface Batch {
 
 export class PropRenderer {
   private readonly batches = new Map<ObjectType, Batch>();
+  private assets: Record<ObjectType, AssetGeometry>;
   private readonly capacity: number;
   private readonly up = new Vector3(0, 1, 0);
   private readonly q = new Quaternion();
@@ -43,10 +44,19 @@ export class PropRenderer {
   private seed: number;
   private terrain: TerrainConfig = { ...DEFAULT_TERRAIN_CONFIG };
 
-  constructor(view: View3D, seed: number, capacity = CAPACITY, terrain: TerrainConfig = DEFAULT_TERRAIN_CONFIG) {
+  constructor(
+    view: View3D,
+    seed: number,
+    capacity = CAPACITY,
+    terrain: TerrainConfig = DEFAULT_TERRAIN_CONFIG,
+    resolver: PropResolver = (type) => ASSET_GEOMETRY[type],
+  ) {
     this.seed = seed;
     this.terrain = { ...terrain };
     this.capacity = capacity;
+    this.assets = Object.fromEntries(
+      OBJECT_ORDER.map((type) => [type, resolver(type)]),
+    ) as Record<ObjectType, AssetGeometry>;
     for (const type of OBJECT_ORDER) {
       const material = new Material3D({
         baseColor: 0xffffff,
@@ -55,7 +65,7 @@ export class PropRenderer {
         flatShading: true,
       });
       const batch = new BatchedMesh3D({ size: this.capacity });
-      const asset = ASSET_GEOMETRY[type];
+      const asset = this.assets[type];
       const ages = new Float32Array(this.capacity).fill(POP_DURATION);
       for (let slot = 0; slot < this.capacity; slot++) {
         batch.setGeometryAt(slot, asset.geometry);
@@ -80,6 +90,19 @@ export class PropRenderer {
     this.terrain = { ...terrain };
   }
 
+  setAssets(resolver: PropResolver): void {
+    this.assets = Object.fromEntries(
+      OBJECT_ORDER.map((type) => [type, resolver(type)]),
+    ) as Record<ObjectType, AssetGeometry>;
+    for (const type of OBJECT_ORDER) {
+      const entry = this.batches.get(type)!;
+      const asset = this.assets[type];
+      for (let slot = 0; slot < this.capacity; slot++) {
+        entry.batch.setGeometryAt(slot, asset.geometry);
+      }
+    }
+  }
+
   sync(objects: PlacedObject[], env: Environment, animateNew = true): void {
     const byType = new Map<ObjectType, PlacedObject[]>();
     for (const type of OBJECT_ORDER) byType.set(type, []);
@@ -90,7 +113,7 @@ export class PropRenderer {
     for (const type of OBJECT_ORDER) {
       const entry = this.batches.get(type)!;
       const list = byType.get(type)!;
-      const asset = ASSET_GEOMETRY[type];
+      const asset = this.assets[type];
       for (let slot = 0; slot < this.capacity; slot++) {
         const object = list[slot];
         if (!object) {

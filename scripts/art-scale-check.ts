@@ -1,7 +1,15 @@
 import { getAttributeData } from '@pixi/3d';
+import { PLANET_IDS } from '../src/content/planets/ids';
 import { OBJECT_DEFS, OBJECT_ORDER } from '../src/content/objects';
 import { SPECIES_ORDER } from '../src/content/species';
-import { ASSET_GEOMETRY, SPECIES_GEOMETRY, SPECIES_SCALE } from '../src/render/assetGeometry';
+import {
+  ASSET_BUILDERS,
+  PROP_VARIANT_LABELS,
+  SPECIES_BUILDERS,
+  SPECIES_SCALE,
+  SPECIES_VARIANT_LABELS,
+  createAssetResolvers,
+} from '../src/render/assetGeometry';
 import { WEATHER_VISUAL } from '../src/render/WeatherFx';
 
 function assert(condition: unknown, message: string): void {
@@ -91,18 +99,24 @@ const facetRanges: Record<string, [number, number]> = {
 
 const props: Record<string, { height: number; footprint: number; triangles: number; facets: number; textures: number }> = {};
 for (const type of OBJECT_ORDER) {
-  const asset = measure(ASSET_GEOMETRY[type].geometry);
-  const scale = OBJECT_DEFS[type].scale;
-  const height = asset.localH * scale;
-  const footprint = asset.localW * scale;
-  props[type] = { height, footprint, triangles: asset.triangles, facets: asset.distinctNormals, textures: asset.textures };
-  const target = targets[type];
-  const range = facetRanges[type];
-  assert(Math.abs(height - target) <= target * 0.05, `${type} tinggi ${height.toFixed(4)} menyimpang dari target ${target}`);
-  assert(asset.triangles >= range[0] && asset.triangles <= range[1], `${type} triangle ${asset.triangles} di luar budget ${range[0]}-${range[1]}`);
-  assert(asset.distinctNormals >= asset.triangles * 0.2, `${type} sudut facet terlalu sedikit: ${asset.distinctNormals}/${asset.triangles}`);
-  assert(asset.textures === 0, `${type} tidak boleh memakai tekstur`);
-  assert(OBJECT_DEFS[type].spacingRadius >= footprint * 0.475, `${type} spacingRadius terlalu kecil untuk footprint ${footprint.toFixed(4)}`);
+  const variants = ASSET_BUILDERS[type];
+  for (let index = 0; index < variants.length; index++) {
+    const label = `${type}[${index}] ${PROP_VARIANT_LABELS[type][index] ?? ''}`.trim();
+    const asset = measure(variants[index]().geometry);
+    const scale = OBJECT_DEFS[type].scale;
+    const height = asset.localH * scale;
+    const footprint = asset.localW * scale;
+    const target = targets[type];
+    const range = facetRanges[type];
+    assert(Math.abs(height - target) <= target * 0.05, `${label} tinggi ${height.toFixed(4)} menyimpang dari target ${target}`);
+    assert(asset.triangles >= range[0] && asset.triangles <= range[1], `${label} triangle ${asset.triangles} di luar budget ${range[0]}-${range[1]}`);
+    assert(asset.distinctNormals >= asset.triangles * 0.2, `${label} sudut facet terlalu sedikit: ${asset.distinctNormals}/${asset.triangles}`);
+    assert(asset.textures === 0, `${label} tidak boleh memakai tekstur`);
+    assert(OBJECT_DEFS[type].spacingRadius >= footprint * 0.475, `${label} spacingRadius terlalu kecil untuk footprint ${footprint.toFixed(4)}`);
+    if (index === 0) {
+      props[type] = { height, footprint, triangles: asset.triangles, facets: asset.distinctNormals, textures: asset.textures };
+    }
+  }
 }
 
 const order = [
@@ -158,24 +172,56 @@ assert(weatherRatios.dropStartPerCloudOuter >= 0.95 && weatherRatios.dropStartPe
   `hujan tidak mulai di lapisan awan: ${weatherRatios.dropStartPerCloudOuter.toFixed(2)}`);
 
 for (const species of SPECIES_ORDER) {
-  const asset = measure(SPECIES_GEOMETRY[species].geometry);
-  const wildlifeHeight = asset.localH * SPECIES_SCALE[species];
-  if (species in props) {
-    assert(Math.abs(wildlifeHeight - props[species].height) < 1e-6, `${species} wildlife harus sama dengan prop`);
+  const variants = SPECIES_BUILDERS[species];
+  for (let index = 0; index < variants.length; index++) {
+    const label = `${species}[${index}] ${SPECIES_VARIANT_LABELS[species][index] ?? ''}`.trim();
+    const asset = measure(variants[index]().geometry);
+    const wildlifeHeight = asset.localH * SPECIES_SCALE[species];
+    if (species in props) {
+      assert(Math.abs(wildlifeHeight - props[species].height) < 1e-6, `${label} wildlife harus sama dengan prop`);
+    }
+    assert(wildlifeHeight < props.tree.height, `${label} wildlife tidak boleh lebih tinggi dari pohon`);
+    const range = facetRanges[species];
+    assert(asset.triangles >= range[0] && asset.triangles <= range[1],
+      `${label} triangle ${asset.triangles} di luar budget ${range[0]}-${range[1]}`);
+    assert(asset.distinctNormals >= asset.triangles * 0.2,
+      `${label} sudut facet terlalu sedikit: ${asset.distinctNormals}/${asset.triangles}`);
+    assert(asset.textures === 0, `${label} tidak boleh memakai tekstur`);
   }
-  assert(wildlifeHeight < props.tree.height, `${species} wildlife tidak boleh lebih tinggi dari pohon`);
-  const assetFacetRange = facetRanges[species];
-  const assetFacet = measure(SPECIES_GEOMETRY[species].geometry);
-  assert(assetFacet.triangles >= assetFacetRange[0] && assetFacet.triangles <= assetFacetRange[1],
-    `${species} triangle ${assetFacet.triangles} di luar budget ${assetFacetRange[0]}-${assetFacetRange[1]}`);
-  assert(assetFacet.distinctNormals >= assetFacet.triangles * 0.2,
-    `${species} sudut facet terlalu sedikit: ${assetFacet.distinctNormals}/${assetFacet.triangles}`);
 }
+
+for (const seed of [1, 1337]) {
+  for (const planetId of PLANET_IDS) {
+    const first = createAssetResolvers(seed, planetId);
+    const second = createAssetResolvers(seed, planetId);
+    assert(JSON.stringify(first.indices) === JSON.stringify(second.indices),
+      `resolver tidak deterministik untuk seed ${seed} planet ${planetId}`);
+    for (const type of OBJECT_ORDER) {
+      const index = first.indices.props[type];
+      assert(index >= 0 && index < ASSET_BUILDERS[type].length, `${planetId}/${type} indeks varian di luar rentang`);
+      assert(first.labels.props[type] === PROP_VARIANT_LABELS[type][index], `${planetId}/${type} label varian tidak cocok`);
+    }
+    for (const species of SPECIES_ORDER) {
+      const index = first.indices.species[species];
+      assert(index >= 0 && index < SPECIES_BUILDERS[species].length, `${planetId}/${species} indeks varian di luar rentang`);
+      assert(first.labels.species[species] === SPECIES_VARIANT_LABELS[species][index], `${planetId}/${species} label varian tidak cocok`);
+    }
+  }
+}
+
+const propVariantCount = OBJECT_ORDER.reduce((sum, type) => sum + ASSET_BUILDERS[type].length, 0);
+const speciesVariantCount = SPECIES_ORDER.reduce((sum, id) => sum + SPECIES_BUILDERS[id].length, 0);
+const uniqueBuilders = propVariantCount + SPECIES_BUILDERS.fish.length + SPECIES_BUILDERS.insect.length;
+const sample = Object.fromEntries(
+  ['terra', 'dune', 'aquaria'].map((id) => [id, createAssetResolvers(1, id).labels]),
+);
 
 console.log(JSON.stringify({
   props: Object.fromEntries(Object.entries(props).map(([type, value]) => [type, +value.height.toFixed(4)])),
   facets: Object.fromEntries(Object.entries(props).map(([type, value]) => [type, `${value.triangles}t/${value.facets}f`])),
   ratios: Object.fromEntries(Object.entries(ratios).map(([key, value]) => [key, +value.toFixed(2)])),
   weather: Object.fromEntries(Object.entries(weatherRatios).map(([key, value]) => [key, +value.toFixed(3)])),
+  variants: { props: propVariantCount, species: speciesVariantCount, uniqueBuilders },
+  seed1: sample,
 }, null, 2));
 console.log('PASS: art scale');

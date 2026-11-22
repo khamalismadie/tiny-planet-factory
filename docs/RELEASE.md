@@ -19,7 +19,7 @@ npm run build
 PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 ```
 
-- [ ] `npm run build` tanpa error. Chunk vendor: `pixi-core` + `pixi-3d`, app chunk < 100 kB (v0.15.9: 65,43 kB / gzip 21,47 kB).
+- [ ] `npm run build` tanpa error. Chunk vendor: `pixi-core` + `pixi-3d`, app chunk < 100 kB (v0.16.0: 73,33 kB / gzip 23,96 kB).
 - [ ] `PASS: sim`
 - [ ] `PASS: art scale`
 - [ ] `PASS: terrain render`
@@ -292,6 +292,18 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [x] App chunk 65,43 kB (gzip 21,47 kB) dan cache service worker `tpf-shell-v0-15-9`.
 - [ ] QA perangkat nyata untuk bentuk planet, cuaca, landscape, dan PWA offline/update belum diulang.
 - [x] Deploy produksi `main` @ `ea8f9b9` ke <https://tinyplanetfactory.netlify.app/>; remote `npm test` 8/8 PASS dan PWA check 200 + offline reload PASS.
+
+## 2aa. Deterministic Asset Variants (v0.16.0)
+
+- [x] 49 pilihan varian (39 prop + 10 fauna) dari 43 builder unik, tanpa GLB/GLTF/R3F dan tanpa tipe objek/DNA baru.
+- [x] Resolver `createAssetResolvers(seed, planetId)` deterministik; satu geometri aktif per tipe dibangun lazy dan di-cache.
+- [x] Bias visual 9 planet di-pin untuk varian kunci; sisanya hash `seed + planetId + type`.
+- [x] `PropRenderer` / `WildlifeRenderer` menerima resolver; `GameScene.reseed(..., planetId)` mengganti varian saat reset/switch planet; `View3D` tidak di-destroy.
+- [x] `test:scale` diperpanjang untuk semua varian: tinggi ±5%, budget triangle/facet, tekstur 0, spacing, wildlife = prop, dan determinisme 9 planet × 2 seed.
+- [x] Hook QA `?debug=1` → `window.__game.variants()` (indices + labels); katalog di `docs/ASSET-CATALOG.md`.
+- [x] App chunk 73,33 kB (gzip 23,96 kB) dan cache service worker `tpf-shell-v0-16-0`.
+- [x] `npm test` lokal 8/8 PASS; draw call Hujan tetap 20, p95 headless 16,80 ms.
+- [ ] QA perangkat nyata untuk v0.16.0 belum dijalankan; P0 Sprint 09 tetap OPEN. Deploy produksi menyusul setelah commit ini.
 
 ## 3. QA perangkat nyata
 

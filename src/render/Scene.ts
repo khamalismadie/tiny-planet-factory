@@ -2,6 +2,7 @@ import { AmbientLight, DirectionalLight, View3D } from '@pixi/3d';
 import { OrbitCamera } from '@pixi/3d/extras';
 import type { QualitySettings } from '../app/quality';
 import { DEFAULT_TERRAIN_CONFIG, type Environment, type PlacedObject, type TerrainConfig, type WeatherType, type WildlifeAgent } from '../sim/types';
+import { createAssetResolvers, type AssetResolvers } from './assetGeometry';
 import { PlanetMesh } from './PlanetMesh';
 import { PlacementFx } from './PlacementFx';
 import { PropRenderer } from './PropRenderer';
@@ -16,18 +17,27 @@ export class GameScene {
   readonly quality: QualitySettings;
   private readonly props: PropRenderer;
   private readonly wildlife: WildlifeRenderer;
+  private resolvers: AssetResolvers;
   private readonly weatherFx: WeatherFx;
   private readonly placementFx: PlacementFx;
   private seed: number;
+  private planetId: string;
   private terrainConfig: TerrainConfig = { ...DEFAULT_TERRAIN_CONFIG };
   private readonly sun: DirectionalLight;
   private readonly rim: DirectionalLight;
 
-  constructor(seed: number, settings: QualitySettings, terrain: TerrainConfig = DEFAULT_TERRAIN_CONFIG) {
+  constructor(
+    seed: number,
+    settings: QualitySettings,
+    terrain: TerrainConfig = DEFAULT_TERRAIN_CONFIG,
+    planetId = 'terra',
+  ) {
     const renderTerrain = normalizeTerrainForRender(terrain);
     this.quality = settings;
     this.seed = seed;
+    this.planetId = planetId;
     this.terrainConfig = renderTerrain;
+    this.resolvers = createAssetResolvers(seed, planetId);
     this.view = new View3D({
       autoResize: true,
       toneMapping: 'aces',
@@ -62,20 +72,36 @@ export class GameScene {
     this.view.root.addChild(this.sun, this.rim, new AmbientLight({ color: 0x8090ff, intensity: 0.3 }));
 
     this.planet = new PlanetMesh(seed, settings.planetDetail, renderTerrain);
-    this.props = new PropRenderer(this.view, seed, settings.propCapacity, renderTerrain);
-    this.wildlife = new WildlifeRenderer(this.view, settings.wildlifeCapacity);
+    this.props = new PropRenderer(this.view, seed, settings.propCapacity, renderTerrain, this.resolvers.props);
+    this.wildlife = new WildlifeRenderer(this.view, settings.wildlifeCapacity, this.resolvers.species);
     this.weatherFx = new WeatherFx(this.view, seed, settings.maxClouds, settings.maxDrops);
     this.placementFx = new PlacementFx(this.view);
     this.view.root.addChild(this.planet.mesh);
   }
 
-  reseed(seed: number, terrain: TerrainConfig = DEFAULT_TERRAIN_CONFIG): void {
+  reseed(
+    seed: number,
+    terrain: TerrainConfig = DEFAULT_TERRAIN_CONFIG,
+    planetId = this.planetId,
+  ): void {
     const renderTerrain = normalizeTerrainForRender(terrain);
     this.seed = seed;
+    this.planetId = planetId;
     this.terrainConfig = renderTerrain;
+    this.resolvers = createAssetResolvers(seed, planetId);
     this.planet.reseed(seed, renderTerrain);
     this.props.setSeed(seed, renderTerrain);
+    this.props.setAssets(this.resolvers.props);
+    this.wildlife.setAssets(this.resolvers.species);
     this.placementFx.reset();
+  }
+
+  variantIndices(): AssetResolvers['indices'] {
+    return this.resolvers.indices;
+  }
+
+  variantLabels(): AssetResolvers['labels'] {
+    return this.resolvers.labels;
   }
 
   setQuality(settings: QualitySettings): void {

@@ -9,7 +9,7 @@ import {
 } from '@pixi/3d';
 import { SPECIES_ORDER } from '../content/species';
 import type { SpeciesId, TerrainConfig, WildlifeAgent } from '../sim/types';
-import { SPECIES_GEOMETRY, SPECIES_SCALE } from './assetGeometry';
+import { SPECIES_GEOMETRY, SPECIES_SCALE, type AssetGeometry, type SpeciesResolver } from './assetGeometry';
 import { terrainRadius } from './terrain';
 
 const PER_SPECIES_CAPACITY = 12;
@@ -21,6 +21,7 @@ interface Batch {
 
 export class WildlifeRenderer {
   private readonly batches = new Map<SpeciesId, Batch>();
+  private assets: Record<SpeciesId, AssetGeometry>;
   private readonly up = new Vector3(0, 1, 0);
   private readonly q = new Quaternion();
   private readonly matrix = new Matrix4();
@@ -29,8 +30,15 @@ export class WildlifeRenderer {
   private readonly scale = new Vector3();
   private budget: number;
 
-  constructor(view: View3D, capacity: number) {
+  constructor(
+    view: View3D,
+    capacity: number,
+    resolver: SpeciesResolver = (id) => SPECIES_GEOMETRY[id],
+  ) {
     this.budget = capacity;
+    this.assets = Object.fromEntries(
+      SPECIES_ORDER.map((id) => [id, resolver(id)]),
+    ) as Record<SpeciesId, AssetGeometry>;
     for (const species of SPECIES_ORDER) {
       const material = new Material3D({
         baseColor: 0xffffff,
@@ -39,7 +47,7 @@ export class WildlifeRenderer {
         flatShading: true,
       });
       const batch = new BatchedMesh3D({ size: PER_SPECIES_CAPACITY });
-      const asset = SPECIES_GEOMETRY[species];
+      const asset = this.assets[species];
       for (let slot = 0; slot < PER_SPECIES_CAPACITY; slot++) {
         batch.setGeometryAt(slot, asset.geometry);
         batch.setMaterialAt(slot, material);
@@ -55,6 +63,19 @@ export class WildlifeRenderer {
     this.budget = capacity;
   }
 
+  setAssets(resolver: SpeciesResolver): void {
+    this.assets = Object.fromEntries(
+      SPECIES_ORDER.map((id) => [id, resolver(id)]),
+    ) as Record<SpeciesId, AssetGeometry>;
+    for (const species of SPECIES_ORDER) {
+      const entry = this.batches.get(species)!;
+      const asset = this.assets[species];
+      for (let slot = 0; slot < PER_SPECIES_CAPACITY; slot++) {
+        entry.batch.setGeometryAt(slot, asset.geometry);
+      }
+    }
+  }
+
   sync(agents: WildlifeAgent[], terrain: TerrainConfig, seed: number): void {
     const bySpecies = new Map<SpeciesId, WildlifeAgent[]>();
     for (const species of SPECIES_ORDER) bySpecies.set(species, []);
@@ -66,7 +87,7 @@ export class WildlifeRenderer {
     for (const species of SPECIES_ORDER) {
       const entry = this.batches.get(species)!;
       const list = bySpecies.get(species)!;
-      const asset = SPECIES_GEOMETRY[species];
+      const asset = this.assets[species];
       for (let slot = 0; slot < PER_SPECIES_CAPACITY; slot++) {
         const agent = list[slot];
         if (!agent || rendered >= this.budget) {

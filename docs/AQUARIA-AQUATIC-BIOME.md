@@ -1,6 +1,6 @@
 # Aquaria + Aquatic Biome — v0.10.0
 
-## Status saat ini (v0.15.9)
+## Status saat ini (v0.16.0)
 
 - Spesifikasi v0.10 tetap berlaku untuk ocean, arus, terumbu, plankton, dan guild laut.
 - Siklus aktual Aquaria adalah **120 tick**: 0–32, 33–64, 65–91, 92–119 (360 tick di bawah adalah spec historis).

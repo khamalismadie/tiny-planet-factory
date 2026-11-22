@@ -1,6 +1,6 @@
 # Aurelia + Autumn Biome — v0.13.0
 
-## Status saat ini (v0.15.9)
+## Status saat ini (v0.16.0)
 
 - Spesifikasi v0.13 tetap berlaku untuk forest, serasah, simpanan, hibernasi, dan embun beku.
 - Siklus aktual Aurelia adalah **120 tick**: 0–27, 28–59, 60–89, 90–119 (360 tick di bawah adalah spec historis).

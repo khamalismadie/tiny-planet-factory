@@ -1,4 +1,4 @@
-# Tiny Planet Factory — Vertical Slice v0.15.9
+# Tiny Planet Factory — Vertical Slice v0.16.0
 
 Prototipe web 3D tempat pemain membangun planet bulat kecil, mengubah permukaannya, dan menjaga ekosistemnya tetap hidup. Fokus slice ini adalah satu transformasi yang terasa jelas dalam ~3–5 menit: batu tandus → planet berair dan hijau.
 
@@ -14,7 +14,7 @@ npm test           # 8 gate: sim, scale, terrain, smoke, device, qa-load, menu, 
 
 Build memakai `NODE_OPTIONS=--max-old-space-size=4096` karena bundler PixiJS 3D membutuhkan heap lebih besar dari default Node.
 
-Rilisan aktif `v0.15.9`. Deploy produksi HTTPS di <https://tinyplanetfactory.netlify.app/> melalui auto-deploy Netlify dari `main`. Hook QA di produksi: `?debug=1`, `?perf=1`, `?quality=low|medium|high`, `?eco=1`, `?menu=0`, `?planet=...`, `?seed=N`, dan `?qa=1&qaSeconds=45&qaObjects=N` (`qaObjects` maks 96, `qaSeconds` maks 180).
+Rilisan aktif `v0.16.0`. Deploy produksi HTTPS di <https://tinyplanetfactory.netlify.app/> melalui auto-deploy Netlify dari `main`. Hook QA di produksi: `?debug=1`, `?perf=1`, `?quality=low|medium|high`, `?eco=1`, `?menu=0`, `?planet=...`, `?seed=N`, dan `?qa=1&qaSeconds=45&qaObjects=N` (`qaObjects` maks 96, `qaSeconds` maks 180). Varian aktif bisa dibaca lewat `window.__game.variants()` (indices + labels) saat `?debug=1`.
 
 ## Kontrol
 
@@ -41,13 +41,14 @@ Rilisan aktif `v0.15.9`. Deploy produksi HTTPS di <https://tinyplanetfactory.net
 - Sembilan ekosistem aktif (Nine Worlds lengkap): Terra, Dune, Glaciera, Inferna, Aquaria, Mycelia, Sakura, Aurelia, dan Cosmos. Akses QA lewat `?planet=terra|dune|glaciere|inferna|aquaria|mycelia|sakura|aurelia|cosmos` atau `window.__game.setPlanet(id, seed?)`.
 - `schemaVersion`, `revision`, `terrainConfig`, `biome`, dan `eventLog` di state; migrasi otomatis untuk save lama.
 - Event mutasi deterministik (`planet.created`, `object.placed`, `clock.tick`) yang bisa di-replay.
-- PWA v0.15.9: manifest, ikon 192/512, service worker cache-first/stale-while-revalidate dengan cache `tpf-shell-v0-15-9`, precache seluruh chunk, fallback offline, dan notifikasi pembaruan.
+- PWA v0.16.0: manifest, ikon 192/512, service worker cache-first/stale-while-revalidate dengan cache `tpf-shell-v0-16-0`, precache seluruh chunk, fallback offline, dan notifikasi pembaruan.
 - Responsive portrait/landscape; UI memakai overlay DOM di atas kanvas PixiJS.
 - Quality tier (`low`/`medium`/`high`) + adaptive downgrade otomatis bila p95 frame time > 34 ms.
 - Overlay performa (`?perf=1`), hook QA (`?debug=1`), dan probe `?qa=1&qaSeconds=45` yang menghasilkan laporan p50/p95 + info perangkat siap disalin.
-- Vendor PixiJS dipisah menjadi `pixi-core` + `pixi-3d`; data konten `planet-configs` dan codec DNA `dna` adalah chunk terpisah. App chunk v0.15.9 adalah 65,43 kB (gzip 21,47 kB).
+- Vendor PixiJS dipisah menjadi `pixi-core` + `pixi-3d`; data konten `planet-configs` dan codec DNA `dna` adalah chunk terpisah. App chunk v0.16.0 adalah 73,33 kB (gzip 23,96 kB).
 - Telemetri opt-in (tersimpan lokal, tanpa server) dengan modal penjelasan, ekspor JSON, dan hapus data.
 - Visual polish v0.15.9: satu merged geometry per tipe dengan warna per-facet, AO vertikal + bayangan kontak baked, shade lereng planet, awan 10×6, ground contact dari ekstent geometri, rim light, dan topbar mobile tanpa overflow. Standar visual ada di `docs/ART-DIRECTION.md`.
+- Asset varian v0.16.0: 49 pilihan (39 prop + 10 fauna) dari 43 builder unik, dipilih deterministik dari `seed + planetId`, satu geometri aktif per tipe, bias visual 9 planet, tanpa tekstur/DNA/draw call baru. Katalog ada di `docs/ASSET-CATALOG.md`.
 
 ## Arsitektur
 
@@ -68,7 +69,7 @@ src/
 `npm test` menjalankan 8 gate:
 
 1. **Unit simulasi** — penempatan objek, 150 ticks, misi selesai, level minimal, satwa/populasi, 3 event opsional, kemunculan fauna, determinisme fauna, kepunahan, migrasi state lama, DNA v1/v2 round-trip termasuk fauna, checksum rusak, replay event deterministik, 9 planet, dan siklus musim 100–120 tick.
-2. **Art scale** — budget triangle per tipe, metrik facet sudut unik, tekstur nol, hierarki ukuran, dan rasio cuaca.
+2. **Art scale** — budget triangle, facet, tekstur nol, spacing, dan determinisme untuk 49 varian (43 builder unik) di 9 planet.
 3. **Terrain render** — normalisasi idempoten dan radius 0,85–1,15 untuk kesembilan planet.
 4. **Smoke browser** (Chromium headless) — WebGL2 boot, 13 tombol objek, klik menanam objek, feedback placement aktif, akselerasi 120 ticks, fauna muncul, misi selesai, HUD berubah, persistensi setelah reload, DNA round-trip lewat UI, service worker terdaftar, resize mobile, dan boot/simulasi untuk kesembilan planet.
 5. **Device check** (emulasi mobile Chromium) — quality override, overlay performa, pinch dua jari lewat CDP, dan adaptive downgrade. Context loss/restore tetap diverifikasi manual di perangkat nyata (checklist `docs/QA-DEVICE.md` #6).
@@ -85,7 +86,7 @@ npm run capture:visual -- /tmp/opencode/after.png 1337   # screenshot determinis
 npm run audit:layout                                   # bounding box UI pada 360x640, 390x844, dan 844x390
 ```
 
-Angka headless terbaru (v0.15.9, `test:qa-load`, seed 1/medium/94 objek/Hujan): p50 16,70 ms, p95 16,80 ms, 59,9 FPS, draw call 20, boot 335–359 ms tergantung run, tanpa downgrade. Smoke grown scene masih ~15 draw call dengan 26 objek dan 41 agen fauna. **Ini bukan bukti performa Android.**
+Angka headless terbaru (v0.16.0, `test:qa-load`, seed 1/medium/94 objek/Hujan): p50 16,70 ms, p95 16,80 ms, 59,9 FPS, draw call 20, boot 386–561 ms tergantung run, tanpa downgrade. Smoke grown scene masih ~15 draw call dengan 26 objek dan 41 agen fauna. **Ini bukan bukti performa Android.**
 
 Catatan: Chromium headless di lingkungan ini dapat melepaskan konteks WebGL (`CONTEXT_LOST_WEBGL`), sehingga muncul error shader saat variant baru dikompilasi. Error tersebut difilter hanya ketika `contextLost === true`; error aplikasi lain tetap menggagalkan tes. Belum ada gate otomatis untuk restore sungguhan; hook `restoreContext()` tersedia untuk QA, tetapi checklist #6 di `docs/QA-DEVICE.md` wajib di perangkat nyata.
 
@@ -127,11 +128,12 @@ Program Nine Worlds menggantikan roadmap lama: Terra diselesaikan lebih dulu, la
 | `v0.15.6` | **Planet Shape Fix** — normalisasi terrain di renderer, silhouette semua planet seukuran kamera dan prop. *(selesai)* |
 | `v0.15.7` | **Menu & Tutorial** — menu observatorium, pemilih 9 planet, panduan UI 4 langkah. *(selesai)* |
 | `v0.15.8` | **Weather Scale Fix** — badai proporsional, lebih basah & gelap dari hujan, gate rasio cuaca. *(selesai)* |
-| `v0.15.9` | **Faceted Diorama Polish** — facet lowpoly + AO per-facet, kontak baked, warna lereng, awan 10×6; 8 gate test, chunk 65,43 kB, cache `tpf-shell-v0-15-9`, deploy aktif. *(selesai)* |
+| `v0.15.9` | **Faceted Diorama Polish** — facet lowpoly + AO per-facet, kontak baked, warna lereng, awan 10×6; 8 gate test, chunk 65,43 kB, cache `tpf-shell-v0-15-9`. *(selesai)* |
+| `v0.16.0` | **Deterministic Asset Variants** — 49 pilihan varian, 43 builder unik, resolver `seed + planetId`, bias visual per planet, satu geometri aktif per tipe, tanpa draw call baru; chunk 72,65 kB, cache `tpf-shell-v0-16-0`. *(implemented; QA real-device still open)* |
 
 ## Langkah berikutnya
 
 1. Yang tersisa adalah QA Android nyata: p50/p95, cold start 4G dari ikon PWA, pinch, context loss/restore, landscape, dan PWA offline/update. Verifikasi localhost **dan** remote HTTPS sudah PASS, tetapi bukan pengganti perangkat nyata.
 2. Ulangi `?debug=1&qa=1&qaSeconds=45&seed=1&qaObjects=94&quality=medium` dari Android menengah; untuk target 5 menit, jalankan dua sesi 180 s karena aplikasi memotong `qaSeconds` ke maks 180.
-3. Ikuti `docs/SPRINT.md` (Sprint 09) dan jangan tambah biome sebelum P0 QA ditutup.
-4. Baru setelah QA ditutup, evaluasi ulang Supabase cloud/gallery/social sebagai fase terpisah.
+3. Ikuti `docs/SPRINT.md` (Sprint 09) dan jangan tambah biome sebelum P0 QA ditutup. Varian v0.16.0 tidak menambah tipe objek/DNA.
+4. Setelah QA ditutup, evaluasi Supabase cloud/gallery/social dan katalog referensi lanjutan di `docs/ASSET-CATALOG.md` sebagai fase terpisah.

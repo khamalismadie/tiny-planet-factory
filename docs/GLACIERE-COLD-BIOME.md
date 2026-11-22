@@ -1,6 +1,6 @@
 # Glaciera + Cold Biome — v0.8.0
 
-## Status saat ini (v0.15.9)
+## Status saat ini (v0.16.0)
 
 - Spesifikasi v0.8 tetap berlaku untuk cryosphere, hazard `pencairan-glasial`, guild es, dan DNA sadar planet.
 - Siklus aktual Glaciera adalah **120 tick**: 0–36, 37–63, 64–86, 87–119 (tabel 360 tick di bawah adalah spec historis).

@@ -1,11 +1,11 @@
 # Product → Production Pipeline — Tiny Planet Factory
 
 > **Status:** living document  
-> **Versi produk terkait:** `v0.15.9`  
+> **Versi produk terkait:** `v0.16.0`  
 > **Terakhir diverifikasi:** 2026-11-22  
 > **Production:** <https://tinyplanetfactory.netlify.app/>  
-> **Commit aplikasi terakhir:** `ea8f9b9`  
-> **Commit dokumentasi QA terakhir:** `0c6b658`  
+> **Commit rilis v0.15.9:** `ea8f9b9`  
+> **Commit dokumentasi QA v0.15.9:** `0c6b658`  
 > **Commit docs pipeline & sprint:** `421c8d6`
 
 Dokumen ini adalah satu jalur resmi dari ide/product backlog sampai rilis produksi. Ia tidak menggantikan doc fitur yang sudah ada, tetapi menyatukan gate, artefak, dan aturan keputusan agar setiap perubahan bisa dilacak dari product requirement ke bukti produksi.
@@ -100,6 +100,7 @@ Setiap konflik yang ditemukan harus dicatat di bagian **Known documentation drif
 - Telemetri **opt-in**, local-only, tanpa server.
 - Hook QA: `?debug=1`, `?perf=1`, `?qa=1`, `?qaObjects=N`, `?eco=1`, `?planet=...`, `?menu=0`, `?seed=N`, `window.__game`.
 - Low-poly v0.15.9: satu merged geometry per tipe, vertex colors, AO per-facet, bayangan kontak baked, facet bertahap, warna lereng, awan 10×6.
+- Asset variants v0.16.0: 49 pilihan / 43 builder unik, resolver `seed + planetId`, bias visual 9 planet, satu geometri aktif per tipe, tanpa perubahan sim/DNA/schema. Katalog: `docs/ASSET-CATALOG.md`.
 
 ### 3.2 Backlog terbuka
 
@@ -113,6 +114,7 @@ Setiap konflik yang ditemukan harus dicatat di bagian **Known documentation drif
 | P0 | Verifikasi visual real-device + konfirmasi screenshot before/after v0.15.9 oleh manusia | **Open** |
 | P2 | Cloud save / gallery / social via Supabase | **Deferred** |
 | P2 | Planet baru | **Ditahan sampai QA ditutup** |
+| P2 | Katalog referensi 1.000 aset aktif + wind sway | **Deferred** |
 
 Aturan backlog: **tidak ada planet atau biome baru sebelum checklist P0 selesai.** Eksekusi dan status terkini tercatat di `docs/SPRINT.md`.
 
@@ -250,6 +252,7 @@ Contoh:
 ```text
 v0.15.9: faceted diorama polish
 docs: record v0.15.9 remote QA
+v0.16.0: deterministic asset variants (49 pilihan / 43 builder)
 ```
 
 ### Versioning

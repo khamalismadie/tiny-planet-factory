@@ -29,7 +29,7 @@ Yang **tidak** boleh terjadi:
 
 | Area | Kondisi awal | Sumber |
 |---|---|---|
-| Versi | `v0.15.9` | `package.json` |
+| Versi | `v0.16.0` | `package.json` |
 | Deploy | Netlify produksi aktif, commit `ea8f9b9` | `README.md` (deploy), `docs/RELEASE.md` §2z + `docs/QA-DEVICE.md` (commit) |
 | Test lokal | 8/8 PASS | log lokal 2026-11-22 |
 | Test remote | 8/8 PASS | log produksi 2026-11-22 |
@@ -38,6 +38,8 @@ Yang **tidak** boleh terjadi:
 | p95 device | **33,40 ms**, target ≤33 ms | `docs/QA-DEVICE.md` |
 | Draw call | 20 saat Hujan, sama dengan baseline; ≤18 saat Cerah | `test:qa-load`, baseline |
 | Fitur baru | Ditahan | keputusan Nine Worlds QA-first |
+
+> **Catatan v0.16.0:** 49 varian aset diimplementasikan di luar Sprint 09 sesuai persetujuan user. Ini tidak menambah planet/biome, tipe objek, atau schema DNA, dan **tidak menutup** SPR-01…SPR-08. Deploy produksi menyusul setelah P0 QA atau rilis eksplisit.
 
 ---
 

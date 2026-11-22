@@ -111,3 +111,11 @@ Catatan interpretasi:
 - Ini hasil Chromium headless; checklist perangkat nyata #1–#15 belum dinyatakan lulus hanya dari angka ini. Sebagian (#9 save/load, #13 responsive) hanya teruji di headless.
 
 Remote produksi v0.15.9 (`https://tinyplanetfactory.netlify.app/`, commit `ea8f9b9`): `npm test` 8/8 PASS; manifest/sw 200, cache `tpf-shell-v0-15-9`, offline reload menampilkan canvas + menu. Ini bukan pengganti install fisik → airplane mode → update pada Android.
+
+## Hasil lokal v0.16.0 — asset variants (2026-11-22)
+
+- `npm test` lokal: 8/8 PASS; `test:scale` mengaudit 39 varian prop + 10 varian fauna (43 builder unik), tinggi ±5%, triangle/facet, tekstur 0, spacing, dan determinisme resolver untuk seed 1/1337 di 9 planet.
+- `test:qa-load` seed 1, 94 objek, medium, Hujan: p50 16,70 ms, p95 16,80 ms, 59,9 FPS, draw call 20, boot 386–561 ms bergantung run, tanpa downgrade. Tidak ada perubahan draw call dibanding baseline v0.15.9.
+- Varian aktif seed 1: Terra = Oak/Granite/Tropical/Clear, Dune = Dune/Sandstone/Oak/Cactus, Aquaria = Coastal/Oak/Reef/Lotus. Bisa diverifikasi dengan `?debug=1` → `window.__game.variants()` (indices + labels).
+- Build lokal: app chunk 73,33 kB (gzip 23,96 kB); cache SW `tpf-shell-v0-16-0`.
+- **Belum diklaim lulus:** p95 device nyata masih 33,40 ms, install/offline fisik, landscape, cold start 4G, dan context loss/restore. Semua angka di atas Chromium headless.

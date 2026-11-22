@@ -41,7 +41,9 @@ Aturan: warna vegetasi berubah **bertahap** mengikuti `oxygen`/`water`, bukan XO
 - **Ground contact wajib**: setiap aset komposit dinormalisasi sehingga local `minY = 0`. Renderer hanya menambahkan `baseLift * scale` (0.004 untuk daratan, 0.012 untuk air) untuk menghindari z-fighting. Tidak ada lagi `GROUND_OFFSET`/`SHAPE_SCALE` per tipe.
 - Material: `roughness` 0,85–1,0 untuk benda alami (prop 0,9, fauna 0,85, planet 0,95); tanpa logam mengkilap. Warna per bagian disimpan sebagai **vertex colors** linear, sehingga satu batch tetap satu material, satu draw call.
 - Sejak v0.15.9: wajah tidak di-share; warna per-facet + AO vertikal dan bayangan kontak baked ditanam di vertex color. Tanpa tekstur, pass, atau draw call baru. Budget triangle per tipe dan metrik facet sudut unik dikunci `test:scale`.
-- `src/render/assetGeometry.ts` adalah satu-satunya sumber bentuk aset. `PropRenderer` dan `WildlifeRenderer` hanya mengonsumsi `ASSET_GEOMETRY` / `SPECIES_GEOMETRY`.
+- `src/render/assetGeometry.ts` adalah satu-satunya sumber bentuk aset. `PropRenderer` dan `WildlifeRenderer` mengonsumsi resolver hasil `createAssetResolvers(seed, planetId)`; `ASSET_GEOMETRY` / `SPECIES_GEOMETRY` tetap sebagai fallback indeks 0.
+- Sejak v0.16.0: satu varian aktif per tipe dipilih dari `seed + planetId`. Varian hanya mengubah X/Z, jumlah sudut, dan palet; tinggi `minY = 0`, `maxY` sesuai target lama, `OBJECT_DEFS[type].scale`, `spacingRadius`, tekstur, dan jumlah batch tidak berubah.
+- Bias planet mengunci varian kunci (mis. Sakura → Sakura tree, Glaciera → Frozen ocean). Tipe lain tetap deterministik lewat hash. Detail ada di `docs/ASSET-CATALOG.md`.
 
 ## 5. Pencahayaan
 

@@ -132,7 +132,7 @@ export class Game {
   }
 
   private buildScene(): void {
-    this.scene = new GameScene(this.state.seed, this.settings, this.state.terrainConfig);
+    this.scene = new GameScene(this.state.seed, this.settings, this.state.terrainConfig, this.state.planetId);
     this.app.stage.addChild(this.scene.view);
     this.scene.setEnvironment(this.state.environment);
     this.scene.syncObjects(this.state.objects, this.state.environment, false);
@@ -151,7 +151,7 @@ export class Game {
   private rebuildScene(): void {
     // Reuse the renderer and GPU buffers: recreating View3D during a context
     // loss can invalidate shader resources on constrained devices.
-    this.scene.reseed(this.state.seed, this.state.terrainConfig);
+    this.scene.reseed(this.state.seed, this.state.terrainConfig, this.state.planetId);
     this.refreshScene();
   }
 
@@ -346,6 +346,7 @@ export class Game {
     if (debug) {
       (window as unknown as Record<string, unknown>).__game = {
         state: () => this.state,
+        variants: () => ({ indices: this.scene.variantIndices(), labels: this.scene.variantLabels() }),
         eco: () => this.state.eco,
         cryo: () => this.state.eco.cryo,
         volcano: () => this.state.eco.volcano,

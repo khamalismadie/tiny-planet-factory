@@ -1,6 +1,6 @@
 # Dune + Biome Expansion — v0.7.0
 
-## Status saat ini (v0.15.9)
+## Status saat ini (v0.16.0)
 
 - Spesifikasi v0.7 tetap berlaku untuk iklim, guild, dan gate Dune.
 - `ecosystemFor(planetId)` kini memilih salah satu dari **9 manager**, bukan hanya Terra/Dune.

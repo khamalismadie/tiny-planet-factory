@@ -1,6 +1,6 @@
 # Sakura + Floral Biome — v0.12.0
 
-## Status saat ini (v0.15.9)
+## Status saat ini (v0.16.0)
 
 - Spesifikasi v0.12 tetap berlaku untuk sky, mekar, angin, dan konektivitas vertikal.
 - Siklus aktual Sakura adalah **120 tick**: 0–26, 27–51, 52–84, 85–119 (360 tick di bawah adalah spec historis).

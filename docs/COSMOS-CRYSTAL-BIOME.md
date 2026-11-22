@@ -1,6 +1,6 @@
 # Cosmos + Crystal Biome — v0.14.0
 
-## Status saat ini (v0.15.9)
+## Status saat ini (v0.16.0)
 
 - Spesifikasi v0.14 tetap berlaku untuk pemakaian ulang slot `eco.sky`, kristal, radiasi, gravitasi, dan fase meteor.
 - Siklus aktual Cosmos adalah **110 tick**: 0–29, 30–57, 58–84, 85–109. Angka 360 tick di bawah adalah spec historis dan tidak konsisten dengan tabelnya sendiri.
