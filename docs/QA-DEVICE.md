@@ -108,3 +108,5 @@ Catatan interpretasi:
 - `npm test` lokal: 8/8 PASS (termasuk `test:qa-load`).
 - QA deterministik seed 1, 94 objek, medium, Hujan: p50 16,70 ms, p95 16,80 ms, 59,9 FPS, draw call 20, boot 335 ms, tanpa downgrade.
 - Ini hasil Chromium headless; checklist perangkat nyata #1–#8 dan #13 belum dinyatakan lulus hanya dari angka ini.
+
+Remote produksi v0.15.9 (`https://tinyplanetfactory.netlify.app/`, commit `ea8f9b9`): `npm test` 8/8 PASS; manifest/sw 200, cache `tpf-shell-v0-15-9`, offline reload menampilkan canvas + menu. Ini bukan pengganti install fisik → airplane mode → update pada Android.

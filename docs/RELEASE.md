@@ -284,6 +284,7 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [x] QA deterministik memakai `?seed=N`; `test:qa-load` mengunci 94 objek, tier medium, seed 1, p95 ≤ 33,40 ms, dan budget draw call (≤18 cerah, ≤20 hujan/badai/salju).
 - [x] App chunk 65,43 kB (gzip 21,47 kB) dan cache service worker `tpf-shell-v0-15-9`.
 - [ ] QA perangkat nyata untuk bentuk planet, cuaca, landscape, dan PWA offline/update belum diulang.
+- [x] Deploy produksi `main` @ `ea8f9b9` ke <https://tinyplanetfactory.netlify.app/>; remote `npm test` 8/8 PASS dan PWA check 200 + offline reload PASS.
 
 ## 3. QA perangkat nyata
 
