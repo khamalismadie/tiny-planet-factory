@@ -300,7 +300,7 @@ Delapan gate yang dijalankan:
 | Device | `test:device` | mobile emulasi, quality, pinch sintetis, context loss |
 | QA load | `test:qa-load` | 94 objek, seed 1, p95 ≤33 ms, draw call budget |
 | Menu | `test:menu` | 9 planet, switching, tutorial, layout |
-| Layout | `test:layout` | bounding box UI 390×844 dan 1280×800 |
+| Layout | `test:layout` | bounding box UI 360×640, 390×844, dan 844×390 |
 
 Gate tambahan:
 
