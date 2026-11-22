@@ -405,6 +405,7 @@ Status jujur: instrumentasi dan runbook sudah siap, tetapi tidak ada klaim QA fi
 - [x] Perilaku reward saat XP pasif melompat level didokumentasikan di `docs/CAMPAIGN.md` dan diverifikasi `test:sim`: misi yang terlewat tidak dibayar mundur, misi aktif di level tujuan tetap memberi reward.
 - [x] Tidak ada planet, biome, objek, unlock, field DNA, atau `schemaVersion` baru.
 - [x] Build lokal app chunk 80,49 kB (gzip 26,42 kB); cache SW `tpf-shell-v0-21-0`.
+- [x] Paket ukur ulang p95 v0.21.0 tersedia di `docs/QA-P95-REMEASURE.md` memakai preview #41; target #7 tetap ≤ 33 ms dan baseline lama 33,40 ms tidak dipakai sebagai kriteria lulus.
 - [ ] **Belum di-deploy.** Produksi tetap bundle v0.16.0 `index-Cl2SK4zO.js` / cache `tpf-shell-v0-16-0`.
 - [ ] Issue #5–#8 tetap OPEN; perubahan ini tidak menutup QA perangkat nyata.
 
