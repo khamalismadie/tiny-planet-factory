@@ -1,4 +1,4 @@
-const CACHE = 'tpf-shell-v0-15-8';
+const CACHE = 'tpf-shell-v0-15-9';
 // Replaced at build time by the pwa-precache Vite plugin.
 const PRECACHE = [];
 const SCOPE = new URL('.', self.registration.scope);

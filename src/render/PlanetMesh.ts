@@ -200,8 +200,11 @@ export class PlanetMesh {
         mix = Math.max(0, Math.min(1, green * 1.2));
       }
       const offset = i * 4;
+      const upward = Math.max(0, this.normals[i * 3 + 1]);
+      const slopeShade = 0.93 + upward * 0.07;
       for (let channel = 0; channel < 3; channel++) {
-        this.colors[offset + channel] = from[channel] + (to[channel] - from[channel]) * mix;
+        const base = from[channel] + (to[channel] - from[channel]) * mix;
+        this.colors[offset + channel] = base * slopeShade;
       }
       this.colors[offset + 3] = 1;
     }

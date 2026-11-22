@@ -59,6 +59,8 @@ for (const c of [
   check(`${c.name}: planet chip switches`, switched.active === 'dune');
   check(`${c.name}: planet caption updates`, switched.caption.includes('pasir'));
   await page.click('.planet-chip[data-planet="terra"]');
+  await page.waitForSelector('#menu-guide', { state: 'visible' });
+  await page.waitForTimeout(150);
 
   await page.click('#menu-guide');
   const guide = await page.evaluate(() => ({

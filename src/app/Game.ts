@@ -77,8 +77,11 @@ export class Game {
 
   private async bootstrap(): Promise<void> {
     const saved = await this.store.load();
-    const seed = Math.floor(Math.random() * 0xffffffff);
     const params = new URLSearchParams(location.search);
+    const requestedSeed = Number(params.get('seed'));
+    const seed = params.has('seed') && Number.isFinite(requestedSeed)
+      ? requestedSeed >>> 0
+      : Math.floor(Math.random() * 0xffffffff);
     const requestedPlanet = params.get('planet');
     const planetId = isSupportedPlanet(requestedPlanet) ? requestedPlanet : 'terra';
     const usableSave = saved && (!requestedPlanet || saved.planetId === planetId) ? saved : null;

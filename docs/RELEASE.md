@@ -274,6 +274,17 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [x] Badai lebih basah dari hujan (`rain` 0.85 vs 0.55) dan lebih gelap; recovery 2 tick cerah tetap utuh.
 - [x] `test:scale` mengunci rasio cuaca terhadap pohon/planet; `test:sim` mengunci urutan logika badai > hujan.
 
+## 2z. Faceted Diorama Polish (v0.15.9)
+
+- [x] Geometry prop/spesies di-*de-index* menjadi satu merged mesh per tipe dengan warna per-facet; warna masih vertex color tanpa tekstur dan tanpa pass baru.
+- [x] Facet bertambah bertahap: rumput, pasir, batu, bukit, gunung, pohon, semak, bunga, fauna, dan awan; rasio tinggi/footprint tidak berubah melewati toleransi 5%.
+- [x] AO vertikal + bayangan kontak baked ditanam di geometry; bayangan tidak memakai transparansi, pass, atau draw call tambahan.
+- [x] PlanetMesh memberi shade lereng halus tanpa mengubah normalisasi terrain; awan naik ke 10×6 segmen.
+- [x] `test:scale` sekarang mengunci budget triangle per tipe, metrik sudut facet unik, tekstur nol, dan rasio cuaca.
+- [x] QA deterministik memakai `?seed=N`; `test:qa-load` mengunci 94 objek, tier medium, seed 1, p95 ≤ 33,40 ms, dan budget draw call (≤18 cerah, ≤20 hujan/badai/salju).
+- [x] App chunk 65,43 kB (gzip 21,47 kB) dan cache service worker `tpf-shell-v0-15-9`.
+- [ ] QA perangkat nyata untuk bentuk planet, cuaca, landscape, dan PWA offline/update belum diulang.
+
 ## 3. QA perangkat nyata
 
 Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:

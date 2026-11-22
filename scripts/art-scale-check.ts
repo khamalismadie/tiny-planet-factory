@@ -24,10 +24,32 @@ function measure(geometry: (typeof ASSET_GEOMETRY)[keyof typeof ASSET_GEOMETRY][
     minZ = Math.min(minZ, positions[i + 2]);
     maxZ = Math.max(maxZ, positions[i + 2]);
   }
+  // Face normals, not source vertex normals: flat shading uses actual triangle planes.
+  const distinctNormals = new Set<string>();
+  for (let f = 0; f < geometry.indices.length; f += 3) {
+    const ia = geometry.indices[f] * 3;
+    const ib = geometry.indices[f + 1] * 3;
+    const ic = geometry.indices[f + 2] * 3;
+    const e1x = positions[ib] - positions[ia];
+    const e1y = positions[ib + 1] - positions[ia + 1];
+    const e1z = positions[ib + 2] - positions[ia + 2];
+    const e2x = positions[ic] - positions[ia];
+    const e2y = positions[ic + 1] - positions[ia + 1];
+    const e2z = positions[ic + 2] - positions[ia + 2];
+    const nx = e1y * e2z - e1z * e2y;
+    const ny = e1z * e2x - e1x * e2z;
+    const nz = e1x * e2y - e1y * e2x;
+    const length = Math.hypot(nx, ny, nz) || 1;
+    const key = [nx / length, ny / length, nz / length]
+      .map((value) => Math.round(value * 10))
+      .join(',');
+    distinctNormals.add(key);
+  }
   return {
     localH: maxY - minY,
     localW: Math.max(maxX - minX, maxZ - minZ),
     triangles: geometry.indices.length / 3,
+    distinctNormals: distinctNormals.size,
     textures: Object.keys(geometry.textures ?? {}).length,
   };
 }
@@ -48,16 +70,37 @@ const targets: Record<string, number> = {
   bird: 0.004,
 };
 
-const props: Record<string, { height: number; footprint: number; triangles: number; textures: number }> = {};
+// Facet budgets naik dari gate lama 18-200, tapi tetap per tipe dan tanpa tekstur.
+const facetRanges: Record<string, [number, number]> = {
+  grass: [24, 80],
+  sand: [60, 140],
+  rock: [180, 260],
+  hill: [180, 280],
+  mountain: [160, 260],
+  ocean: [120, 200],
+  lake: [80, 140],
+  tree: [120, 220],
+  bush: [180, 280],
+  flower: [150, 240],
+  deer: [240, 320],
+  fox: [200, 280],
+  bird: [180, 260],
+  fish: [140, 220],
+  insect: [180, 260],
+};
+
+const props: Record<string, { height: number; footprint: number; triangles: number; facets: number; textures: number }> = {};
 for (const type of OBJECT_ORDER) {
   const asset = measure(ASSET_GEOMETRY[type].geometry);
   const scale = OBJECT_DEFS[type].scale;
   const height = asset.localH * scale;
   const footprint = asset.localW * scale;
-  props[type] = { height, footprint, triangles: asset.triangles, textures: asset.textures };
+  props[type] = { height, footprint, triangles: asset.triangles, facets: asset.distinctNormals, textures: asset.textures };
   const target = targets[type];
+  const range = facetRanges[type];
   assert(Math.abs(height - target) <= target * 0.05, `${type} tinggi ${height.toFixed(4)} menyimpang dari target ${target}`);
-  assert(asset.triangles >= 18 && asset.triangles <= 200, `${type} triangle ${asset.triangles} di luar budget 18-200`);
+  assert(asset.triangles >= range[0] && asset.triangles <= range[1], `${type} triangle ${asset.triangles} di luar budget ${range[0]}-${range[1]}`);
+  assert(asset.distinctNormals >= asset.triangles * 0.2, `${type} sudut facet terlalu sedikit: ${asset.distinctNormals}/${asset.triangles}`);
   assert(asset.textures === 0, `${type} tidak boleh memakai tekstur`);
   assert(OBJECT_DEFS[type].spacingRadius >= footprint * 0.475, `${type} spacingRadius terlalu kecil untuk footprint ${footprint.toFixed(4)}`);
 }
@@ -121,10 +164,17 @@ for (const species of SPECIES_ORDER) {
     assert(Math.abs(wildlifeHeight - props[species].height) < 1e-6, `${species} wildlife harus sama dengan prop`);
   }
   assert(wildlifeHeight < props.tree.height, `${species} wildlife tidak boleh lebih tinggi dari pohon`);
+  const assetFacetRange = facetRanges[species];
+  const assetFacet = measure(SPECIES_GEOMETRY[species].geometry);
+  assert(assetFacet.triangles >= assetFacetRange[0] && assetFacet.triangles <= assetFacetRange[1],
+    `${species} triangle ${assetFacet.triangles} di luar budget ${assetFacetRange[0]}-${assetFacetRange[1]}`);
+  assert(assetFacet.distinctNormals >= assetFacet.triangles * 0.2,
+    `${species} sudut facet terlalu sedikit: ${assetFacet.distinctNormals}/${assetFacet.triangles}`);
 }
 
 console.log(JSON.stringify({
   props: Object.fromEntries(Object.entries(props).map(([type, value]) => [type, +value.height.toFixed(4)])),
+  facets: Object.fromEntries(Object.entries(props).map(([type, value]) => [type, `${value.triangles}t/${value.facets}f`])),
   ratios: Object.fromEntries(Object.entries(ratios).map(([key, value]) => [key, +value.toFixed(2)])),
   weather: Object.fromEntries(Object.entries(weatherRatios).map(([key, value]) => [key, +value.toFixed(3)])),
 }, null, 2));

@@ -32,8 +32,8 @@ export class WeatherFx {
   private readonly drops: BatchedMesh3D;
   private readonly cloudGeometry = new SphereGeometry({
     radius: WEATHER_VISUAL.cloudRadius,
-    widthSegments: 8,
-    heightSegments: 5,
+    widthSegments: 10,
+    heightSegments: 6,
   });
   private readonly cloudLight = new Material3D({ baseColor: 0xf2f6ff, roughness: 1, flatShading: true });
   private readonly cloudDark = new Material3D({ baseColor: 0x69748a, roughness: 1, flatShading: true });

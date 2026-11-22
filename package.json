@@ -1,7 +1,7 @@
 {
   "name": "tiny-planet-factory",
   "private": true,
-  "version": "0.15.8",
+  "version": "0.15.9",
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
@@ -11,11 +11,12 @@
     "test:terrain": "esbuild scripts/terrain-render-check.ts --bundle --platform=node --format=esm --outfile=/tmp/opencode/terrain-render-check.mjs >/dev/null && node /tmp/opencode/terrain-render-check.mjs",
     "test:smoke": "node scripts/smoke.mjs",
     "test:device": "node scripts/device-check.mjs",
+    "test:qa-load": "node scripts/qa-load-check.mjs",
     "test:menu": "node scripts/menu-check.mjs",
     "test:layout": "node scripts/layout-audit.mjs",
     "capture:visual": "node scripts/capture-visual.mjs",
     "audit:layout": "node scripts/layout-audit.mjs",
-    "test": "npm run test:sim && npm run test:scale && npm run test:terrain && npm run test:smoke && npm run test:device && npm run test:menu && npm run test:layout",
+    "test": "npm run test:sim && npm run test:scale && npm run test:terrain && npm run test:smoke && npm run test:device && npm run test:qa-load && npm run test:menu && npm run test:layout",
     "preview": "vite preview --host 0.0.0.0"
   },
   "dependencies": {

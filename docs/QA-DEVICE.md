@@ -34,6 +34,7 @@ http://<host>/?debug=1&perf=1&quality=medium
   - `setPlanet(id, seed?)` — pindah ke planet aktif (`terra`, `dune`, `glaciere`, `inferna`, `aquaria`, `mycelia`, `sakura`, `aurelia`, atau `cosmos`)
   - `qaReport()` — laporan performa + status fauna terbaru
   - `qaObjects=N` — saat `qa=1`, menanam N objek (maks 96) dengan sebaran spiral sebelum pengukuran; dipakai untuk beban 25+ objek
+- `seed=N` — mengunci seed planet agar cuaca dan penempatan QA deterministik; dipakai `test:qa-load` dengan `seed=1`
 
 Quality tier:
 
@@ -71,6 +72,10 @@ Adaptive quality otomatis menurunkan tier bila p95 > 34 ms selama 120 frame. Tid
 - Desktop: Chrome/Edge terbaru dengan WebGL2.
 - Low-end (opsional): RAM 2 GB → paksa `quality=low`; terima detail geometri lebih rendah.
 
+## Gate beban deterministik
+
+`npm run test:qa-load` membuka `?debug=1&qa=1&qaObjects=94&qaSeconds=12&quality=medium&seed=1`, memajukan 16 tick agar cuaca Hujan aktif, lalu mengunci p95 ≤ 33,40 ms, tier medium tanpa downgrade, 94 objek, dan draw call ≤ 20 pada cuaca berawan/hujan (≤ 18 saat cerah). Angka 20 adalah baseline yang sama sebelum perubahan facet; jangan disamakan dengan 18 pada run cerah.
+
 ## Catatan headless
 
 `npm run test:device` sudah menguji pinch sintetis, quality override, adaptive downgrade, dan handler context loss/restore di Chromium headless. Namun Chromium headless tidak bisa mengembalikan konteks WebGL sungguhan setelah `WEBGL_lose_context.restoreContext()`, jadi **checklist #6 tetap wajib** dilakukan di perangkat nyata.
@@ -97,3 +102,9 @@ Catatan interpretasi:
 - Service worker aktif pada semua run. `installPromptSeen` terlihat pada sebagian run; `standalone: false` karena aplikasi dibuka dari browser, bukan dari ikon yang sudah dipasang. Baris #7–#8 (install → airplane mode, update) **masih belum terverifikasi**.
 - Tidak ada context loss pada semua run; ini melengkapi tetapi tidak menggantikan checklist #6 untuk background/GPU reset nyata.
 - Catatan v0.15.6: normalisasi bentuk planet mengubah skala kontak prop. Angka di atas adalah baseline sebelum perbaikan dan perlu diulang setelah build v0.15.6.
+
+## Hasil lokal v0.15.9 (2026-11-22)
+
+- `npm test` lokal: 8/8 PASS (termasuk `test:qa-load`).
+- QA deterministik seed 1, 94 objek, medium, Hujan: p50 16,70 ms, p95 16,80 ms, 59,9 FPS, draw call 20, boot 335 ms, tanpa downgrade.
+- Ini hasil Chromium headless; checklist perangkat nyata #1–#8 dan #13 belum dinyatakan lulus hanya dari angka ini.
