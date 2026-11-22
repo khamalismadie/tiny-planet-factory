@@ -753,6 +753,60 @@ export class Game {
       wildlifeAgents: this.state.fauna?.agents.length ?? 0,
       discoveredSpecies: this.state.fauna?.discovered.length ?? 0,
       extinctSpecies: this.state.fauna?.extinct.length ?? 0,
+      save: {
+        tick: this.state.tick,
+        objects: this.state.objects.length,
+        level: this.state.progression.level,
+        persistent: this.store.persistent,
+      },
+      network: {
+        online: navigator.onLine,
+        visibility: document.visibilityState,
+      },
+      orientation: {
+        type: screen.orientation?.type ?? 'unknown',
+        angle: screen.orientation?.angle ?? 0,
+      },
+      layout: this.qaLayout(),
+      scriptSrc: document.querySelector<HTMLScriptElement>('script[type="module"]')?.src ?? null,
+      sw: {
+        controller: !!navigator.serviceWorker?.controller,
+        scriptUrl: navigator.serviceWorker?.controller?.scriptURL ?? null,
+      },
+    };
+  }
+
+  private qaLayout() {
+    const rect = (element: HTMLElement | null) => {
+      if (!element) return null;
+      const r = element.getBoundingClientRect();
+      return {
+        x: Math.round(r.x),
+        y: Math.round(r.y),
+        w: Math.round(r.width),
+        h: Math.round(r.height),
+        right: Math.round(r.right),
+        bottom: Math.round(r.bottom),
+      };
+    };
+    const topbar = document.getElementById('topbar');
+    const build = document.getElementById('build-panel');
+    const objective = rect(document.getElementById('objective-strip'));
+    const inventory = rect(document.getElementById('inventory'));
+    const centerElement = document.elementsFromPoint(window.innerWidth / 2, window.innerHeight / 2)
+      .find((element) => !element.closest('#qa, .modal, #main-menu'))
+      ?.tagName ?? null;
+    return {
+      topbarBottom: topbar ? Math.round(topbar.getBoundingClientRect().bottom) : null,
+      buildTop: build ? Math.round(build.getBoundingClientRect().top) : null,
+      objective,
+      inventory,
+      centerElement,
+      planetCenterVisible: centerElement === 'CANVAS',
+      objectiveOverlapsInventory: objective && inventory ? objective.bottom > inventory.y + 1 : null,
+      topbarOverlapsBuild: topbar && build
+        ? topbar.getBoundingClientRect().bottom > build.getBoundingClientRect().top + 1
+        : null,
     };
   }
 

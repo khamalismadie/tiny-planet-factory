@@ -2,7 +2,7 @@
 
 Gunakan checklist ini sebelum publish build produksi.
 
-> **Status pembacaan v0.15.9:** angka 360 tick pada phase v0.10–v0.14 adalah spesifikasi historis. Sejak v0.15.4, semua siklus musim aktif berada pada **106–120 tick** (divalidasi `test:sim`). Bagian bertanda v0.4–v0.14 adalah catatan rilis, bukan klaim kondisi saat ini; lihat §2u–§2ab untuk status terkini. `main` adalah v0.19.0 (unreleased); produksi masih v0.16.0.
+> **Status pembacaan v0.15.9:** angka 360 tick pada phase v0.10–v0.14 adalah spesifikasi historis. Sejak v0.15.4, semua siklus musim aktif berada pada **106–120 tick** (divalidasi `test:sim`). Bagian bertanda v0.4–v0.14 adalah catatan rilis, bukan klaim kondisi saat ini; lihat §2u–§2ab untuk status terkini. `main` adalah v0.20.0 (unreleased); produksi masih v0.16.0.
 
 ## 1. Prasyarat
 
@@ -19,7 +19,7 @@ npm run build
 PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 ```
 
-- [ ] `npm run build` tanpa error. Chunk vendor: `pixi-core` + `pixi-3d`, app chunk < 100 kB (v0.19.0: 79,07 kB / gzip 25,88 kB; produksi v0.16.0: 73,33 kB).
+- [ ] `npm run build` tanpa error. Chunk vendor: `pixi-core` + `pixi-3d`, app chunk < 100 kB (v0.20.0: 80,49 kB / gzip 26,41 kB; produksi v0.16.0: 73,33 kB).
 - [ ] `PASS: sim`
 - [ ] `PASS: art scale`
 - [ ] `PASS: terrain render`
@@ -368,6 +368,19 @@ Status jujur: 100 misi sekarang aktif di `main`, tetapi produksi dan real-device
 - [ ] QA perangkat nyata v0.19.0 belum dijalankan; P0 Sprint 09 tetap OPEN.
 
 Status jujur: tutorial berjalan di `main`, tetapi produksi dan real-device masih mengacu ke v0.16.0.
+
+## 2ae. QA Device Enablement (v0.20.0 — unreleased di `main`)
+
+- [x] Laporan QA menyertakan `appVersion`, snapshot save, status jaringan/visibilitas, orientasi, geometri layout, `scriptSrc`, dan SW controller/script URL.
+- [x] Geometri layout membuktikan area planet tengah masih `CANVAS` dan panel tidak saling menimpa pada landscape.
+- [x] `docs/QA-DEVICE.md` memuat runbook 4 sesi untuk #5–#8, termasuk airplane mode, update PWA, dan context loss nyata.
+- [x] Validator manual `npm run qa:evidence -- <file> [--offline] [--standalone] [--landscape]` tidak masuk `npm test` dan tidak menutup issue otomatis.
+- [x] `npm test` lokal tetap 8/8 PASS; gate tidak ditambah.
+- [x] Build lokal app chunk 80,49 kB (gzip 26,41 kB); cache SW `tpf-shell-v0-20-0`.
+- [ ] **Belum di-deploy.** Produksi tetap bundle v0.16.0 `index-Cl2SK4zO.js` / cache `tpf-shell-v0-16-0`.
+- [ ] Issue #5–#8 tetap OPEN sampai laporan + screenshot perangkat nyata dilampirkan.
+
+Status jujur: instrumentasi dan runbook sudah siap, tetapi tidak ada klaim QA fisik baru.
 
 ## 3. QA perangkat nyata
 
