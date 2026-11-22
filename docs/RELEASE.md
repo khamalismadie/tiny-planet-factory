@@ -362,6 +362,8 @@ Status jujur: 100 misi sekarang aktif di `main`, tetapi produksi dan real-device
 - [x] `test:smoke` memverifikasi FTUE mulai, maju saat placement, selesai setelah misi/level, dan objective kembali normal.
 - [x] `test:menu` memverifikasi tombol **Ulangi panduan** dan `test:layout` memverifikasi objective tetap `53/53/48 px` dalam mode tutorial.
 - [x] Build lokal app chunk 79,07 kB (gzip 25,88 kB); cache SW `tpf-shell-v0-19-0`.
+- [x] PR #37 merge ke `main` @ `b540786`; issue #36 closed.
+- [x] Preview `https://deploy-preview-37--tinyplanetfactory.netlify.app/` memakai bundle `index-Dm3TBpoL.js` / cache `tpf-shell-v0-19-0`; remote `npm test` 8/8 PASS (log `/tmp/opencode/npm-test-preview-37.log`).
 - [ ] **Belum di-deploy.** Produksi tetap bundle v0.16.0 `index-Cl2SK4zO.js` / cache `tpf-shell-v0-16-0`.
 - [ ] QA perangkat nyata v0.19.0 belum dijalankan; P0 Sprint 09 tetap OPEN.
 
