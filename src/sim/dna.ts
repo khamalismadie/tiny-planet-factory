@@ -5,6 +5,7 @@ import { BIOMES } from './biome';
 import { PLANET_IDS } from '../content/planets/ids';
 import { createPlanet, decodeDna as decodeLegacyDna, planetNameFromSeed, unlockedForLevel } from './engine';
 import { migratePlanet } from './migrate';
+import { preserveLegacyProgression } from './progression';
 import { createFauna } from './wildlife';
 import type {
   Biome,
@@ -310,8 +311,11 @@ function decodeFull(bytes: Uint8Array): PlanetState | null {
       intensity: dequantize(reader.u16(), 0, 1),
       remainingTicks: dequantize(reader.u16(), 0, 1000),
     };
-    const level = reader.u8();
-    const xp = reader.u32();
+    const decodedLevel = reader.u8();
+    const decodedXp = reader.u32();
+    const progression = preserveLegacyProgression(decodedLevel, decodedXp);
+    const level = progression.level;
+    const xp = progression.xp;
     const missionStatus = reader.u8() === 1 ? 'complete' : 'active';
     const holdTicks = dequantize(reader.u16(), 0, 1000);
     const eventCount = reader.u8();

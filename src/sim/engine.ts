@@ -7,6 +7,7 @@ import { initializeEcosystem, stepEcosystem } from './eco/manager';
 import { ecosystemConfigFor, ecosystemConfigOf, isSupportedPlanet } from './eco/guilds';
 import { CURRENT_ECOSYSTEM_VERSION, createEcoState } from './eco/state';
 import type { PlanetConfig, SeasonConfig } from './eco/types';
+import { levelForXp, MAX_LEVEL, sanitizeLevel } from './progression';
 import { hashString, mulberry32 } from './rng';
 import { createFauna, simulateWildlife } from './wildlife';
 import type {
@@ -42,8 +43,6 @@ const IDEAL_TOLERANCE: Record<EnvKey, number> = {
   energy: 20,
   stability: 20,
 };
-
-const LEVEL_XP = [0, 0, 40, 100, 160, 260];
 
 export function clamp(value: number, min = 0, max = 100): number {
   return Math.max(min, Math.min(max, value));
@@ -137,15 +136,10 @@ export function unlockedForLevel(level: number): ObjectType[] {
 
 function refreshProgression(planet: PlanetState): string[] {
   const events: string[] = [];
-  let level = 1;
-  for (let candidate = LEVEL_XP.length; candidate >= 1; candidate--) {
-    if (planet.progression.xp >= LEVEL_XP[candidate - 1]) {
-      level = candidate;
-      break;
-    }
-  }
-  if (level > planet.progression.level) {
-    events.push(`Level ${level} tercapai! Objek baru terbuka.`);
+  const stored = Math.min(MAX_LEVEL, sanitizeLevel(planet.progression.level));
+  const level = Math.max(levelForXp(planet.progression.xp), stored);
+  if (level !== planet.progression.level) {
+    if (level > stored) events.push(`Level ${level} tercapai! Progresi planet berkembang.`);
     planet.progression.level = level;
     planet.progression.unlockedObjects = unlockedForLevel(level);
   }
