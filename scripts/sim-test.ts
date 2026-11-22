@@ -24,7 +24,7 @@ import { migratePlanet, CURRENT_SCHEMA_VERSION } from '../src/sim/migrate.ts';
 import { cumulativeXp, eraForLevel, levelForXp, MAX_LEVEL, xpStep } from '../src/sim/progression.ts';
 import { replayEvents } from '../src/sim/replay.ts';
 import { deserializePlanet, serializePlanet } from '../src/sim/serialize.ts';
-import type { PlanetState } from '../src/sim/types.ts';
+import type { ObjectType, PlanetState, WeatherType } from '../src/sim/types.ts';
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -78,6 +78,31 @@ function goldenDirs(count: number): Array<[number, number, number]> {
     result.push([Math.cos(theta) * radius, y, Math.sin(theta) * radius]);
   }
   return result;
+}
+
+function buildAuditState(planetId: string, buildPlan: readonly ObjectType[], ticks: number, seed = 1337): PlanetState {
+  const planet = createPlanet(seed, 'Audit', planetId);
+  const placementDirs = goldenDirs(buildPlan.length);
+  for (let i = 0; i < buildPlan.length; i++) {
+    assert(placeObject(planet, buildPlan[i], placementDirs[i]), `audit: ${buildPlan[i]} gagal ditempatkan`);
+  }
+  tickN(planet, ticks);
+  return planet;
+}
+
+function findWeatherState(
+  planetId: string,
+  weather: WeatherType,
+  buildPlan: readonly ObjectType[],
+  maxTicks: number,
+  seed: number,
+): PlanetState {
+  const planet = buildAuditState(planetId, buildPlan, 0, seed);
+  for (let i = 0; i < maxTicks; i++) {
+    simulateTick(planet, false);
+    if (planet.weather.type === weather) return planet;
+  }
+  throw new Error(`audit: cuaca ${weather} tidak muncul di ${planetId} dalam ${maxTicks} tick`);
 }
 
 const plan = [
@@ -1039,5 +1064,78 @@ lockedPlanet.progression.level = 61;
 syncCampaignMission(lockedPlanet);
 assert(lockedPlanet.mission.id === 'era7-01', 'level 61 harus memakai misi era7-01');
 assert(completeCampaignMission(lockedPlanet) === null, 'misi terkunci tidak boleh memberi reward');
+
+// v0.17.0: setiap misi aktif harus bisa dicapai lewat aksi simulator nyata,
+// bukan hanya punya definisi yang valid. State-state ini dibangun dari
+// createPlanet + placeObject + simulateTick (atau pencarian cuaca deterministik).
+tickN(mastery, 40);
+const auditFaunaPlan: ObjectType[] = [
+  ...Array<ObjectType>(10).fill('ocean'), ...Array<ObjectType>(6).fill('lake'),
+  ...Array<ObjectType>(6).fill('rock'), ...Array<ObjectType>(6).fill('mountain'),
+  ...Array<ObjectType>(40).fill('tree'), ...Array<ObjectType>(30).fill('bush'),
+  ...Array<ObjectType>(30).fill('flower'), ...Array<ObjectType>(30).fill('grass'),
+  ...Array<ObjectType>(12).fill('deer'), ...Array<ObjectType>(8).fill('fox'),
+  ...Array<ObjectType>(15).fill('bird'),
+];
+const auditReefPlan: ObjectType[] = [
+  ...Array<ObjectType>(35).fill('ocean'), ...Array<ObjectType>(15).fill('lake'),
+  ...Array<ObjectType>(15).fill('rock'), ...Array<ObjectType>(5).fill('sand'),
+  ...Array<ObjectType>(10).fill('grass'),
+];
+const auditAquaPlan: ObjectType[] = [
+  ...Array<ObjectType>(15).fill('ocean'), ...Array<ObjectType>(8).fill('lake'),
+  ...Array<ObjectType>(8).fill('tree'), ...Array<ObjectType>(5).fill('bush'),
+  ...Array<ObjectType>(5).fill('flower'),
+];
+const auditStates: Array<{ name: string; state: PlanetState }> = [
+  { name: 'mastery', state: mastery },
+  { name: 'fauna', state: buildAuditState('mycelia', auditFaunaPlan, 28, 1337) },
+  { name: 'reef', state: buildAuditState('aquaria', auditReefPlan, 30, 1337) },
+  { name: 'aqua', state: buildAuditState('aquaria', auditAquaPlan, 180, 1337) },
+  {
+    name: 'rain',
+    state: findWeatherState('terra', 'rain', ['lake', 'tree'] as const, 80, 4242),
+  },
+  {
+    name: 'snow',
+    state: findWeatherState('glaciere', 'snow', ['rock', 'hill', 'tree'] as const, 80, 901),
+  },
+];
+const unreachableMissions: string[] = [];
+for (const mission of CAMPAIGN.slice(0, 60)) {
+  const check = mission.check;
+  let best = 0;
+  let source = '-';
+  if (check.kind === 'object') {
+    const planet = createPlanet(9000 + mission.level, `Objek ${mission.level}`);
+    const dirs = goldenDirs(check.target);
+    for (let i = 0; i < check.target; i++) {
+      assert(placeObject(planet, check.type, dirs[i]), `reachability: ${check.type} level ${mission.level} gagal dipasang`);
+    }
+    best = missionProgress(planet, mission);
+    source = 'placement';
+  } else {
+    for (const entry of auditStates) {
+      const value = missionProgress(entry.state, mission);
+      if (value > best) {
+        best = value;
+        source = entry.name;
+      }
+      if (best >= 1) break;
+    }
+  }
+  if (best < 1) {
+    unreachableMissions.push(`#${mission.level} ${mission.id} ${JSON.stringify(check)} best=${best.toFixed(2)} (${source})`);
+  }
+}
+console.log('campaign reachability', {
+  missions: 60,
+  states: auditStates.length,
+  unreachable: unreachableMissions.length,
+});
+assert(
+  unreachableMissions.length === 0,
+  `misi campaign aktif tidak reachable:\n${unreachableMissions.join('\n')}`,
+);
 
 console.log('PASS: sim');
