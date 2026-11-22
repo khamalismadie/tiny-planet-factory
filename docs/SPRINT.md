@@ -30,16 +30,28 @@ Yang **tidak** boleh terjadi:
 | Area | Kondisi awal | Sumber |
 |---|---|---|
 | Versi | `v0.16.0` | `package.json` |
-| Deploy | Netlify produksi aktif, commit `ea8f9b9` | `README.md` (deploy), `docs/RELEASE.md` §2z + `docs/QA-DEVICE.md` (commit) |
+| Deploy | Netlify produksi aktif, commit `e71e6c1`, bundle `index-Cl2SK4zO.js` | `README.md`, `docs/RELEASE.md` §2aa, `docs/QA-DEVICE.md` |
 | Test lokal | 8/8 PASS | log lokal 2026-11-22 |
 | Test remote | 8/8 PASS | log produksi 2026-11-22 |
 | PWA headless | manifest/sw 200, offline reload PASS | QA remote 2026-11-22 |
-| QA device | **OPEN** — terakhir tercatat v0.15.5 | `docs/QA-DEVICE.md` |
+| QA device | **OPEN** — baseline pra-v0.15.6, belum diulang untuk v0.16.0 | `docs/QA-DEVICE.md` |
 | p95 device | **33,40 ms**, target ≤33 ms | `docs/QA-DEVICE.md` |
 | Draw call | 20 saat Hujan, sama dengan baseline; ≤18 saat Cerah | `test:qa-load`, baseline |
-| Fitur baru | Ditahan | keputusan Nine Worlds QA-first |
+| Fitur baru | v0.16.0 variants sudah aktif; planet/biome tetap ditahan | keputusan Nine Worlds QA-first |
 
-> **Catatan v0.16.0:** 49 varian aset diimplementasikan di luar Sprint 09 sesuai persetujuan user. Ini tidak menambah planet/biome, tipe objek, atau schema DNA, dan **tidak menutup** SPR-01…SPR-08. Deploy produksi menyusul setelah P0 QA atau rilis eksplisit.
+> **Catatan v0.16.0:** 49 varian aset diimplementasikan di luar Sprint 09 sesuai persetujuan user. Ini tidak menambah planet/biome, tipe objek, atau schema DNA, dan **tidak menutup** SPR-01…SPR-08. Deploy v0.16.0 sudah aktif; P0 QA tetap OPEN.
+
+### Mapping GitHub Issues ↔ Sprint 09
+
+| Issue | SPR | Status |
+|---|---|---|
+| [#5](https://github.com/khamalismadie/tiny-planet-factory/issues/5) | SPR-01 + SPR-03 | Open |
+| [#6](https://github.com/khamalismadie/tiny-planet-factory/issues/6) | SPR-02 | Open |
+| [#7](https://github.com/khamalismadie/tiny-planet-factory/issues/7) | SPR-05 | Open |
+| [#8](https://github.com/khamalismadie/tiny-planet-factory/issues/8) | SPR-04 | Open |
+| #13 | SPR-06 | Closed |
+| #14 | SPR-08 | Closed |
+| #15 | Snapshot & mapping ini | Closed |
 
 ---
 
@@ -277,9 +289,9 @@ Sprint selesai jika:
 
 | Task | Bergantung pada |
 |---|---|
-| SPR-01 | Build produksi `v0.15.9`, perangkat Android, QA URL |
+| SPR-01 | Build produksi `v0.16.0`, perangkat Android, QA URL |
 | SPR-02 | SPR-01 install prompt dasar, HTTPS produksi |
-| SPR-03 | Screenshot before/after v0.15.9 |
+| SPR-03 | Screenshot v0.16.0 seed 1 + baseline facet v0.15.9 |
 | SPR-04 | Build dengan layout v0.15.4+ |
 | SPR-05 | Data SPR-01 |
 | SPR-06 | Selesai — baseline seed 1 v0.15.9 dipakai sebagai pembanding |
