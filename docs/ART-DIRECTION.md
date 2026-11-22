@@ -37,9 +37,10 @@ Aturan: warna vegetasi berubah **bertahap** mengikuti `oxygen`/`water`, bukan XO
 ## 4. Standar geometri & material
 
 - Semua prop memakai `BatchedMesh3D` dengan geometri/material yang **dibagi** per tipe.
-- Radius planet dasar ≈ 1; prop skala ±0.03–0.30 relatif terhadap radius.
+- Radius planet dasar ≈ 1; tinggi prop final 0,005–0,115 radius dengan hierarki gunung > bukit > pohon > fauna. Angka `scale` di `OBJECT_DEFS` bukan tinggi akhir; keduanya dikunci `test:scale`.
 - **Ground contact wajib**: setiap aset komposit dinormalisasi sehingga local `minY = 0`. Renderer hanya menambahkan `baseLift * scale` (0.004 untuk daratan, 0.012 untuk air) untuk menghindari z-fighting. Tidak ada lagi `GROUND_OFFSET`/`SHAPE_SCALE` per tipe.
-- Material: `roughness` tinggi (0.9–1.0) untuk benda alami; tanpa logam mengkilap. Warna per bagian disimpan sebagai **vertex colors** linear, sehingga satu batch tetap satu material, satu draw call.
+- Material: `roughness` 0,85–1,0 untuk benda alami (prop 0,9, fauna 0,85, planet 0,95); tanpa logam mengkilap. Warna per bagian disimpan sebagai **vertex colors** linear, sehingga satu batch tetap satu material, satu draw call.
+- Sejak v0.15.9: wajah tidak di-share; warna per-facet + AO vertikal dan bayangan kontak baked ditanam di vertex color. Tanpa tekstur, pass, atau draw call baru. Budget triangle per tipe dan metrik facet sudut unik dikunci `test:scale`.
 - `src/render/assetGeometry.ts` adalah satu-satunya sumber bentuk aset. `PropRenderer` dan `WildlifeRenderer` hanya mengonsumsi `ASSET_GEOMETRY` / `SPECIES_GEOMETRY`.
 
 ## 5. Pencahayaan
@@ -49,7 +50,7 @@ Aturan: warna vegetasi berubah **bertahap** mengikuti `oxygen`/`water`, bukan XO
 - Environment: `skyColor 0xcfe0ff`, `groundColor 0x6b6250`, intensity 0.8.
 - Rim light: aksen biru dingin dari arah berlawanan key light untuk memisahkan siluet planet dari background gelap.
 - Cuaca mengubah **intensity key light**, bukan mengganti seluruh skema: storm 1.6, snow 2, rain 2.3, sunny 3.
-- Tanpa shadow map Mahal; kontak visual dijamin oleh geometri + warna, bukan shadow renderer.
+- Tanpa shadow map; kontak visual dijamin geometri (contact patch baked) + vertex color/AO, bukan shadow renderer.
 
 ## 6. Kamera & framing
 
@@ -60,7 +61,7 @@ Aturan: warna vegetasi berubah **bertahap** mengikuti `oxygen`/`water`, bukan XO
 
 ## 7. VFX & cuaca
 
-- Awan: ellipsoid putih (cerah) / abu (storm), radius orbit ≈1.55, bergerak lambat.
+- Awan: ellipsoid putih (cerah) / abu (badai), radius 0,045, orbit 1,08 + langkah 0,028, lift 0,2, skala badai 1,32, segmen 10×6; bergerak lambat dan diikat `test:scale`.
 - Hujan: silinder biru tipis; salju: bola putih kecil. Keduanya memakai pool `BatchedMesh3D`.
 - Budget mengikuti quality tier: low 6 cloud/24 drop, medium 10/48, high 14/80.
 - Setiap efek harus bisa dimatikan lewat budget tanpa merusak gameplay.
@@ -71,13 +72,13 @@ Aturan: warna vegetasi berubah **bertahap** mengikuti `oxygen`/`water`, bukan XO
 
 - DOM overlay di atas canvas, bukan world-space text.
 - Mobile ≤820px: panel build ringkas di atas, stats di kanan, inventory di bawah.
-- **Mobile ≤480px**: brand text dan stage label disembunyikan; tombol topbar harus muat dalam satu baris tanpa overflow. Target sentuh ≥36px.
+- **Mobile ≤480px**: brand text dan stage label disembunyikan; tombol topbar harus muat dalam satu baris tanpa overflow. Target sentuh ≥48 dp (min 48×48 px); `test:layout` mengunci 360×640, 390×844, dan 844×390.
 - Toast tidak boleh menimpa header; posisi mobile di bawah topbar.
 - Semua panel punya `backdrop-filter: blur(8px)` dan border halus untuk hierarchy.
 
 ## 9. Acceptance criteria untuk perubahan visual
 
-1. Tidak ada kontrol yang keluar dari viewport pada 390×844 dan 1280×800.
+1. Tidak ada kontrol yang keluar dari viewport pada 360×640, 390×844, 844×390, dan 1280×800.
 2. Dasar setiap prop menyentuh permukaan planet (tidak melayang > 0.01 radius).
 3. Build, `npm test`, dan smoke tetap lolos setelah perubahan.
 4. Draw call tidak naik lebih dari +2 tanpa alasan terukur.

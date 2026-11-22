@@ -1,5 +1,14 @@
 # Inferna + Volcanic Biome — v0.9.0
 
+## Status saat ini (v0.15.9)
+
+- Spesifikasi v0.9 tetap berlaku untuk volcano, panas/lava/abu, dan guild vulkanik.
+- Siklus aktual Inferna adalah **106 tick**: 0–32, 33–57, 58–75 (erupsi), 76–105 (rentang 235 di bawah adalah spec historis).
+- Faktor mortalitas heat-adapted aktual `0,003` = **1/5** dari baseline `0,015`, bukan 1/3.
+- Kesembilan planet aktif; tidak ada lagi planet “data-only”.
+- Sejak v0.15.7, pemilih 9 planet tersedia permanen di menu utama. `?planet=` tetap hook QA.
+
+
 Tujuan: menambahkan planet keempat dengan musim letusan, panas ekstrem, lava, abu, dan food web sendiri tanpa mengubah ritual build atau format save.
 
 ## Status planet
@@ -10,9 +19,9 @@ Tujuan: menambahkan planet keempat dengan musim letusan, panas ekstrem, lava, ab
 | Dune | aktif | 12 | desert climate baseline |
 | Glaciera | aktif | 12 | `freeze-thaw`, empat musim, danau beku |
 | Inferna | aktif di v0.9 | 12 | `volcanic-eruption`, empat musim, lava/abu |
-| lima planet lain | data-only | — | — |
+| lima planet lain | aktif di v0.15.9 | — | — |
 
-`isSupportedPlanet()` sekarang menerima `terra`, `dune`, `glaciere`, `inferna`.
+`isSupportedPlanet()` sekarang menerima kesembilan `PLANET_IDS`.
 
 ## Musim dan gunung berapi
 
@@ -55,7 +64,7 @@ Karena pendekatan memakai caching suhu, `heat` masih bisa tinggi beberapa tick s
 ## Dampak ekologis
 
 - Vegetasi Inferna memakai faktor panas `1 - heat*0.35` dan modifier musim, bukan penalty generik `temperature > 40`.
-- `eruptionStress` menambah mortalitas. Trait `heat-resistance`, `heat-shield`, `thermophilic-enzymes`, `ash-deposition-recovery`, dan `post-eruption-regrowth` mengurangi faktor mortalities menjadi sepertiga.
+- `eruptionStress` menambah mortalitas. Trait `heat-resistance`, `heat-shield`, `thermophilic-enzymes`, `ash-deposition-recovery`, dan `post-eruption-regrowth` mengurangi faktor menjadi `0,003` (1/5 dari baseline `0,015`, bukan 1/3).
 - Hazard di `habitatContextFor()` mengikuti prioritas: erupsi gunung berapi → aliran lava → hujan abu → gelombang panas → kekeringan musiman.
 - Predator puncak diberi trait tahan panas dan reproduksi lebih cepat supaya siklus letusan tidak memusnahkan guild dalam satu putaran musim.
 - Misi tetap memakai batas ideal per planet; target Inferna tidak menyamakan suhu 72°C dengan standar Terra.
@@ -84,7 +93,7 @@ Elang api, serigala abu, dan kadal magma memakai proksi visual yang sudah ada. K
 - 12 populasi Inferna; tidak ada kebocoran Terra/Dune/Glaciera.
 - Suhu awal >60°C, air <25, empat musim terurut.
 - Abu naik di `ash-fall`, panas/lava/stres naik di `eruption-phase`, abu/stres turun di `regrowth`.
-- Suhu letusan >75°C; 12 spesies tetap hidup hingga tick 235.
+- Suhu letusan >75°C; 12 spesies tetap hidup hingga tick 105 pada siklus aktual (235 adalah angka spec v0.9).
 - `guildStatus('fish')` bernilai `null` dan jumlah agen ikan nol.
 - Save/load mempertahankan `planetId`, `eco.volcano`, dan populasi.
 - Fauna + ekosistem deterministik untuk seed sama.
@@ -95,5 +104,5 @@ Elang api, serigala abu, dan kadal magma memakai proksi visual yang sudah ada. K
 
 - Belum ada palette renderer khusus Inferna; warna lava masih memakai primary/accent config.
 - Belum ada partikel abu atau aliran lava visual; `volcano` saat ini memengaruhi sim/HUD.
-- Tidak ada UI selector planet permanen; akses lewat query param/debug hook untuk QA.
-- Aquaria, Mycelia, Sakura, Aurelia, dan Cosmos masih data-only.
+- Pemilih 9 planet tersedia permanen di menu utama sejak v0.15.7; `?planet=` tetap hook QA.
+- Aquaria, Mycelia, Sakura, Aurelia, dan Cosmos aktif sejak v0.10–v0.14.

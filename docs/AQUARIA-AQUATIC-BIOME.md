@@ -1,5 +1,14 @@
 # Aquaria + Aquatic Biome — v0.10.0
 
+## Status saat ini (v0.15.9)
+
+- Spesifikasi v0.10 tetap berlaku untuk ocean, arus, terumbu, plankton, dan guild laut.
+- Siklus aktual Aquaria adalah **120 tick**: 0–32, 33–64, 65–91, 92–119 (360 tick di bawah adalah spec historis).
+- Faktor mortalitas reef-adapted aktual `0,003` = **1/4** dari baseline `0,012`, bukan 1/3.
+- Kesembilan planet aktif; tidak ada lagi planet “data-only”.
+- Sejak v0.15.7, pemilih 9 planet tersedia permanen di menu utama. `?planet=` tetap hook QA.
+
+
 Tujuan: menambahkan planet kelima dengan arus, terumbu, plankton, pemutihan, dan food web laut tanpa mengubah renderer fauna atau ritual build.
 
 ## Status planet
@@ -11,13 +20,13 @@ Tujuan: menambahkan planet kelima dengan arus, terumbu, plankton, pemutihan, dan
 | Glaciera | aktif | 12 | `freeze-thaw`, empat musim, danau beku |
 | Inferna | aktif | 12 | `volcanic-eruption`, empat musim, lava/abu |
 | Aquaria | aktif di v0.10 | 12 | `coral-health`, empat musim, arus/plankton |
-| empat planet lain | data-only | — | — |
+| empat planet lain | aktif di v0.15.9 | — | — |
 
-`isSupportedPlanet()` sekarang menerima `terra`, `dune`, `glaciere`, `inferna`, `aquaria`.
+`isSupportedPlanet()` sekarang menerima kesembilan `PLANET_IDS`.
 
 ## Musim dan laut
 
-`activeSeason()` tetap menghitung fase dari `planet.tick % totalDurasi`. Total durasi Aquaria 360 tick. `eco.ocean` adalah ringkasan turunan, bukan state musim tersimpan.
+`activeSeason()` tetap menghitung fase dari `planet.tick % totalDurasi`. Total durasi Aquaria 360 tick pada spec v0.10; aktual v0.15.9 adalah 120 tick. `eco.ocean` adalah ringkasan turunan, bukan state musim tersimpan.
 
 | Musim | Tick | Modifikasi suhu | Efek |
 |---|---|---|---|
@@ -52,7 +61,7 @@ oxygenTarget    = dissolvedOxygen*10 + plankton*0.15 - temperature*0.6 - bleachi
 - `habitatContext.aquatic` Aquaria dinamis: `dissolvedOxygen`, `waterQuality`, `current`, dan `reefCoverage` mengikuti `eco.ocean`, bukan konstanta config.
 - Sumber `plankton` untuk ikan terumbu sekarang memakai `eco.ocean.plankton`; planet lain tetap memakai rumus lama sehingga angka Terra/Dune/Glaciera/Inferna tidak berubah.
 - Vegetasi memakai faktor `1 - bleaching*0.25` dan modifier musim.
-- `bleaching` menambah mortalitas. Trait `reef-building`, `salt-filter`, `current-anchoring`, dan `nutrient-recycling` mengurangi faktor menjadi sepertiga.
+- `bleaching` menambah mortalitas. Trait `reef-building`, `salt-filter`, `current-anchoring`, dan `nutrient-recycling` mengurangi faktor menjadi `0,003` (1/4 dari baseline `0,012`, bukan 1/3).
 - Hazard prioritas: badai laut → pemutihan karang → gelombang panas laut → kekeringan musiman, setelah hazard cuaca/kryosfer/volkanik.
 - Kapasitas agen visual untuk `bird` dan `insect` mendapat bonus dari objek `ocean`/`lake` hanya saat planet akuatik aktif.
 
@@ -78,7 +87,7 @@ Lumba-lumba memakai proksi guild burung permukaan; bakteri laut memakai proksi s
 ## Gate
 
 - 12 populasi Aquaria; tidak ada kebocoran Terra/Dune/Glaciera/Inferna.
-- Suhu awal tropis 20–32°C, air >80, empat musim terurut selama 360 tick.
+- Suhu awal tropis 20–32°C, air >80, empat musim terurut selama 120 tick pada v0.15.9 (spec historis: 360 tick).
 - Plankton naik saat bloom, pemutihan naik saat air hangat, arus naik saat badai laut.
 - Terumbu tetap >0 dan 12 spesies tetap hidup setelah satu siklus penuh.
 - Agen ikan dan mikroba muncul; guild predator terhubung ke ikan terumbu via food web.
@@ -91,5 +100,5 @@ Lumba-lumba memakai proksi guild burung permukaan; bakteri laut memakai proksi s
 
 - Belum ada animasi arus, partikel gelembung, atau shade terumbu khusus; `ocean` saat ini memengaruhi sim/HUD.
 - Palette Aquaria belum dipakai renderer secara khusus.
-- Tidak ada UI selector planet permanen; akses lewat query param/debug hook untuk QA.
-- Mycelia, Sakura, Aurelia, dan Cosmos masih data-only.
+- Pemilih 9 planet tersedia permanen di menu utama sejak v0.15.7; `?planet=` tetap hook QA.
+- Mycelia, Sakura, Aurelia, dan Cosmos aktif sejak v0.11–v0.14.

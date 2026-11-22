@@ -1,4 +1,4 @@
-# QA Perangkat — Tahap 8
+# QA Perangkat — Checklist & Baseline (Sprint 09)
 
 Target: **Android menengah** (30 FPS, p95 frame time ≤ 33 ms), desktop 60 FPS.
 
@@ -7,7 +7,7 @@ Target: **Android menengah** (30 FPS, p95 frame time ≤ 33 ms), desktop 60 FPS.
 Tambahkan query string saat membuka build produksi:
 
 ```
-http://<host>/?debug=1&perf=1&quality=medium
+https://<host>/?debug=1&perf=1&quality=medium
 ```
 
 - `perf=1` menampilkan overlay FPS/p50/p95/draw call/quality.
@@ -33,8 +33,9 @@ http://<host>/?debug=1&perf=1&quality=medium
   - `foodWeb()` — status 5 guild visual, jumlah agen, dan link food web planet aktif
   - `setPlanet(id, seed?)` — pindah ke planet aktif (`terra`, `dune`, `glaciere`, `inferna`, `aquaria`, `mycelia`, `sakura`, `aurelia`, atau `cosmos`)
   - `qaReport()` — laporan performa + status fauna terbaru
-  - `qaObjects=N` — saat `qa=1`, menanam N objek (maks 96) dengan sebaran spiral sebelum pengukuran; dipakai untuk beban 25+ objek
+- `qaObjects=N` — saat `qa=1`, menanam hingga 96 objek dengan sebaran spiral sebelum pengukuran; dipakai untuk beban 25+ objek
 - `seed=N` — mengunci seed planet agar cuaca dan penempatan QA deterministik; dipakai `test:qa-load` dengan `seed=1`
+- `qaSeconds=N` — durasi probe, dipotong aplikasi ke maksimal **180 s**
 
 Quality tier:
 
@@ -51,12 +52,12 @@ Adaptive quality otomatis menurunkan tier bila p95 > 34 ms selama 120 frame. Tid
 | # | Skenario | Cara | Lulus jika |
 |---|---|---|---|
 | 1 | Cold start | Buka PWA dari ikon, catat waktu sampai canvas interaktif | < 5 s pada jaringan 4G |
-| 2 | Frame budget | Main 5 menit, 25+ objek, cuaca hujan/badai | p50 ≥ 30 FPS, p95 ≤ 33 ms Android; desktop p95 ≤ 16,7 ms |
+| 2 | Frame budget | Total 5 menit (2× `qaSeconds=180`), 25+ objek, cuaca hujan/badai | p50 frame time ≤ 33,3 ms / `fps ≥ 30`, p95 ≤ 33 ms Android; desktop p95 ≤ 16,7 ms |
 | 3 | Adaptive quality | Paksa beban berat; amati overlay | Tier turun otomatis, tidak error, game tetap bisa dimainkan |
 | 4 | Pinch zoom | Dua jari pinch in/out di permukaan planet | `camera().distance` berubah; tidak ada rotasi liar |
 | 5 | Drag 360° | Geser satu jari melewati kutub | Kamera tidak terbalik; batas polar bekerja |
 | 6 | Context loss | Background aplikasi 30 s / ganti app / GPU reset | Tidak crash; `webglcontextrestored` terjadi; render lanjut |
-| 7 | PWA offline | Install → airplane mode → buka again | App shell tampil, save terbaca, bisa menanam objek |
+| 7 | PWA offline | Install → airplane mode → buka kembali | App shell tampil, save terbaca, bisa menanam objek |
 | 8 | Update PWA | Deploy build baru, buka app lama | Prompt update muncul; save IndexedDB tetap utuh |
 | 9 | Save/load | Tanam objek, tunggu 1 s, reload | Objek & tick kembali sama |
 | 10 | DNA | Salin DNA, planet baru, muat DNA | Seed & nama kembali sama |
@@ -74,11 +75,11 @@ Adaptive quality otomatis menurunkan tier bila p95 > 34 ms selama 120 frame. Tid
 
 ## Gate beban deterministik
 
-`npm run test:qa-load` membuka `?debug=1&qa=1&qaObjects=94&qaSeconds=12&quality=medium&seed=1`, memajukan 16 tick agar cuaca Hujan aktif, lalu mengunci p95 ≤ 33,40 ms, tier medium tanpa downgrade, 94 objek, dan draw call ≤ 20 pada cuaca berawan/hujan (≤ 18 saat cerah). Angka 20 adalah baseline yang sama sebelum perubahan facet; jangan disamakan dengan 18 pada run cerah.
+`npm run test:qa-load` membuka `?debug=1&qa=1&qaObjects=94&qaSeconds=12&quality=medium&seed=1`, memajukan 16 tick agar cuaca Hujan aktif, lalu mengunci p95 ≤ 33,40 ms, tier medium tanpa downgrade, 94 objek, dan draw call ≤ 20 pada cuaca **Hujan/Badai/Salju** (≤ 18 saat Cerah). Tidak ada weather state “Berawan”. Angka 20 adalah baseline seed 1 pra-facet; jangan disamakan dengan 18 pada run cerah.
 
 ## Catatan headless
 
-`npm run test:device` sudah menguji pinch sintetis, quality override, adaptive downgrade, dan handler context loss/restore di Chromium headless. Namun Chromium headless tidak bisa mengembalikan konteks WebGL sungguhan setelah `WEBGL_lose_context.restoreContext()`, jadi **checklist #6 tetap wajib** dilakukan di perangkat nyata.
+`npm run test:device` sudah menguji pinch sintetis, quality override, adaptive downgrade, dan hook `loseContext()`/`restoreContext()` di Chromium headless. Namun Chromium headless tidak bisa mengembalikan konteks WebGL sungguhan setelah `WEBGL_lose_context.restoreContext()`, jadi **checklist #6 tetap wajib** dilakukan di perangkat nyata.
 
 > Catatan (v0.14.3): verifikasi localhost secure-context sudah lolos untuk manifest installable shape, service worker control, precache shell + chunk, offline reload, dan tanpa page error. Ini **bukan** pengganti verifikasi HTTPS + Android nyata pada baris 7–8 di atas.
 
@@ -101,12 +102,12 @@ Catatan interpretasi:
 - Boot yang dilaporkan QaProbe adalah **0,24–2,03 s** sejak hook mulai, bukan cold-start 4G penuh dari ikon PWA; baris #1 masih memerlukan pengukuran terpisah.
 - Service worker aktif pada semua run. `installPromptSeen` terlihat pada sebagian run; `standalone: false` karena aplikasi dibuka dari browser, bukan dari ikon yang sudah dipasang. Baris #7–#8 (install → airplane mode, update) **masih belum terverifikasi**.
 - Tidak ada context loss pada semua run; ini melengkapi tetapi tidak menggantikan checklist #6 untuk background/GPU reset nyata.
-- Catatan v0.15.6: normalisasi bentuk planet mengubah skala kontak prop. Angka di atas adalah baseline sebelum perbaikan dan perlu diulang setelah build v0.15.6.
+- Catatan v0.15.6–v0.15.9: normalisasi bentuk planet, perubahan cuaca, facet/contact shadow, dan layout landscape mengubah apa yang harus diamati. Angka di atas adalah baseline pra-v0.15.6 dan wajib diulang; lihat `docs/SPRINT.md` SPR-03.
 
 ## Hasil lokal v0.15.9 (2026-11-22)
 
 - `npm test` lokal: 8/8 PASS (termasuk `test:qa-load`).
-- QA deterministik seed 1, 94 objek, medium, Hujan: p50 16,70 ms, p95 16,80 ms, 59,9 FPS, draw call 20, boot 335 ms, tanpa downgrade.
-- Ini hasil Chromium headless; checklist perangkat nyata #1–#8 dan #13 belum dinyatakan lulus hanya dari angka ini.
+- QA deterministik seed 1, 94 objek, medium, Hujan: p50 16,70 ms, p95 16,80 ms, 59,9 FPS, draw call 20, boot **359 ms** pada run lokal terakhir (run lokal sebelumnya 463 ms; remote 345 ms), tanpa downgrade. Angka 335 ms berasal dari laporan `test:device` remote dan bukan hasil `test:qa-load`.
+- Ini hasil Chromium headless; checklist perangkat nyata #1–#15 belum dinyatakan lulus hanya dari angka ini. Sebagian (#9 save/load, #13 responsive) hanya teruji di headless.
 
 Remote produksi v0.15.9 (`https://tinyplanetfactory.netlify.app/`, commit `ea8f9b9`): `npm test` 8/8 PASS; manifest/sw 200, cache `tpf-shell-v0-15-9`, offline reload menampilkan canvas + menu. Ini bukan pengganti install fisik → airplane mode → update pada Android.

@@ -1,5 +1,14 @@
 # Cosmos + Crystal Biome — v0.14.0
 
+## Status saat ini (v0.15.9)
+
+- Spesifikasi v0.14 tetap berlaku untuk pemakaian ulang slot `eco.sky`, kristal, radiasi, gravitasi, dan fase meteor.
+- Siklus aktual Cosmos adalah **110 tick**: 0–29, 30–57, 58–84, 85–109. Angka 360 tick di bawah adalah spec historis dan tidak konsisten dengan tabelnya sendiri.
+- Kesembilan planet aktif; Cosmos bukan data-only.
+- Sejak v0.15.7, pemilih 9 planet tersedia permanen di menu utama. `?planet=` tetap hook QA.
+- Partikel meteor dan shader kristal belum diimplementasikan.
+
+
 Tujuan: menutup Nine Worlds dengan planet kesembilan bertema kristal, nebula, meteor, dan anomali gravitasi tanpa menambah draw call atau object type baru.
 
 ## Status planet
@@ -34,7 +43,7 @@ Untuk menjaga app chunk <100 kB, Cosmos **tidak** menambah substate baru. Cosmos
 
 ## Fase kosmik
 
-Total durasi 360 tick.
+Total durasi 360 tick pada spec v0.14; aktual v0.15.9 adalah 110 tick.
 
 | Fase | Tick | Modifikasi utama | Efek |
 |---|---|---|---|
@@ -82,7 +91,7 @@ voidStressTarget  = max(0, radiation-60)*1.2 + max(0, 50-lattice)*0.8
 ## Gate
 
 - 10 populasi Cosmos; tidak ada kebocoran spesies planet lain.
-- Empat fase deterministik selama 360 tick.
+- Empat fase deterministik selama 110 tick pada v0.15.9 (spec historis: 360 tick).
 - Kisi menguat saat Resonansi Kristal; radiasi dan gravitasi naik saat Pasang Hampa; radiasi puncak saat Hujan Meteor.
 - 10 spesies tetap hidup setelah satu siklus penuh.
 - Guild Cosmos memetakan kelinci bintang, elang astral, dan ngengat komet; predator terhubung ke food web.
@@ -95,4 +104,4 @@ voidStressTarget  = max(0, radiation-60)*1.2 + max(0, 50-lattice)*0.8
 
 - Tidak ada partikel meteor atau shader kristal khusus; `sky` memengaruhi sim/HUD.
 - Slot `eco.sky` dipakai bersama Sakura dan Cosmos; pemisahan substate baru bisa dilakukan jika anggaran chunk naik.
-- Tidak ada UI selector planet permanen; akses lewat query param/debug hook untuk QA.
+- Pemilih 9 planet tersedia permanen di menu utama sejak v0.15.7; `?planet=` tetap hook QA.

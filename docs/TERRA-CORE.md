@@ -1,5 +1,15 @@
 # Terra Core — v0.5
 
+## Status saat ini (v0.15.9)
+
+- Dokumen ini adalah spesifikasi historis v0.5.
+- Engine kini memanggil `stepEcosystem(planet)` → `ecosystemFor(planetId)` untuk **9 manager**, bukan `terraEcosystem.step()`.
+- Mortalitas juga mencakup `cold`, `heat`, `reef`, `network`, `isolation`, dan `frost`; births memakai faktor `(1 + pollinationBoost)`.
+- Kunci RNG populasi adalah `seed:eco:tick`.
+- `ecoScore(id)` memakai config planet aktif dan hanya tersedia di DEV atau `?debug=1`.
+- Config planet berada di chunk `planet-configs`, tetapi tetap diimpor saat boot lewat Hud/migrate; klaim lama “tidak dimuat saat boot” tidak berlaku.
+
+
 Phase ini mengubah `eco` dari container data menjadi simulasi population-level yang hidup untuk 12 spesies kunci Terra.
 
 ## Modul

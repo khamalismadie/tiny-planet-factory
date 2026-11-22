@@ -1,6 +1,6 @@
 # Sprint 09 — Production QA Closure
 
-> **Status:** active plan  \n> **Periode:** 23 Nov – 6 Des 2026 · 10 hari kerja  \n> **Versi awal:** `v0.15.9`  \n> **Target rilis:** `v0.15.10` bila hanya fix/QA; `v0.16.0` bila ada perubahan schema atau kontrak  \n> **Sprint goal:** Menutup blocker QA perangkat nyata dan PWA sebelum fitur baru masuk backlog.  \n> **Referensi:** `docs/PRODUCT-TO-PRODUCTION.md`, `docs/QA-DEVICE.md`, `docs/RELEASE.md`
+> **Status:** active plan  \n> **Periode:** 23 Nov – 4 Des 2026 · 10 hari kerja  \n> **Versi awal:** `v0.15.9`  \n> **Target rilis:** `v0.15.10` bila hanya fix/QA; `v0.16.0` bila ada perubahan schema atau kontrak  \n> **Sprint goal:** Menutup blocker QA perangkat nyata dan PWA sebelum fitur baru masuk backlog.  \n> **Referensi:** `docs/PRODUCT-TO-PRODUCTION.md`, `docs/QA-DEVICE.md`, `docs/RELEASE.md`
 
 Nomor sprint ini adalah sprint pertama yang didokumentasikan formal. Tidak ada sprint sebelumnya dalam repo; penomoran mengikuti phase rilis `v0.15.x`.
 
@@ -30,7 +30,7 @@ Yang **tidak** boleh terjadi:
 | Area | Kondisi awal | Sumber |
 |---|---|---|
 | Versi | `v0.15.9` | `package.json` |
-| Deploy | Netlify produksi aktif, commit `ea8f9b9` | `README.md`, `docs/RELEASE.md` |
+| Deploy | Netlify produksi aktif, commit `ea8f9b9` | `README.md` (deploy), `docs/RELEASE.md` §2z + `docs/QA-DEVICE.md` (commit) |
 | Test lokal | 8/8 PASS | log lokal 2026-11-22 |
 | Test remote | 8/8 PASS | log produksi 2026-11-22 |
 | PWA headless | manifest/sw 200, offline reload PASS | QA remote 2026-11-22 |
@@ -88,8 +88,8 @@ Jika perangkat fisik tidak tersedia, SPR-01, SPR-02, SPR-03, dan SPR-08 berubah 
 
 - [ ] Perangkat: Itel S686LN, Android 15, DPR 3, viewport 360×678, atau Android menengah sekelas.
 - [ ] Build diambil dari produksi, bukan dev server.
-- [ ] Skenario `?qa=1&qaObjects=94&qaSeconds=300&quality=medium&seed=1` berjalan penuh.
-- [ ] p50 ≥30 FPS.
+- [ ] Skenario `?qa=1&qaObjects=94&qaSeconds=180&quality=medium&seed=1` berjalan penuh (`qaSeconds=300` dipotong menjadi 180; untuk target 5 menit lakukan 2 run berturut-turut).
+- [ ] p50 frame time ≤33,3 ms dan `fps ≥30`.
 - [ ] p95 ≤33 ms.
 - [ ] Boot cold-start <5 s dari ikon PWA pada 4G.
 - [ ] Drag 360° dan pinch dengan jari tidak macet.
@@ -159,14 +159,15 @@ Jika perangkat fisik tidak tersedia, SPR-01, SPR-02, SPR-03, dan SPR-08 berubah 
 
 ### SPR-07 — Documentation drift
 
-Doc sumber yang perlu disentuh bila masih tertinggal:
+Sinkronisasi awal sudah dilakukan 2026-11-22. Task tetap terbuka untuk verifikasi berkelanjutan sebelum rilis.
 
-| File | Koreksi |
-|---|---|
-| `docs/ART-DIRECTION.md` | target sentuh 48 dp, orbit awan 1,08, radius 0,045 |
-| `README.md` | app chunk 65,43 kB, 8 gate test, deploy aktif |
-| `docs/RELEASE.md` | status p95 device masih open |
-| `docs/QA-DEVICE.md` | hasil v0.15.9 lokal/remote vs device |
+| File | Koreksi | Status |
+|---|---|---|
+| `docs/ART-DIRECTION.md` | target sentuh 48 dp, orbit awan 1,08, radius 0,045 | done |
+| `README.md` | app chunk 65,43 kB, 8 gate test, deploy aktif | done |
+| `docs/RELEASE.md` | status p95 device masih open + siklus 106–120 tick | done |
+| `docs/QA-DEVICE.md` | hasil v0.15.9 lokal/remote vs device | done |
+| Doc core & biome v0.4–v0.14 | 103 spesies, 9 planet aktif, UI selector, siklus aktual | done via addendum |
 
 **Exit:** tidak ada nilai lama yang bertentangan dengan `docs/PRODUCT-TO-PRODUCTION.md`.
 
@@ -203,7 +204,7 @@ Doc sumber yang perlu disentuh bila masih tertinggal:
 | Kamis 3 Des | SPR-08 release gate | Remote 8/8 + PWA check |
 | Jumat 4 Des | Buffer, retrospektif, sprint review | Sprint report + next sprint |
 
-Hari 7–10 adalah buffer. Jika P0 belum PASS, buffer dipakai untuk iterasi QA, bukan untuk fitur baru.
+Hari 10 (Jumat 4 Des) adalah buffer; hari 7–9 masih berisi gate SPR-05/06/07/08. Buffer dipakai untuk iterasi QA, bukan fitur baru.
 
 ---
 
@@ -246,7 +247,7 @@ Sprint selesai jika:
 | Metrik | Target | Bukti |
 |---|---|---|
 | P0 closure | 5/5 PASS | Checklist SPR-01…SPR-05 |
-| p95 Android | ≤33 ms | QA report 300 s |
+| p95 Android | ≤33 ms | QA report 180 s ×2 (batas aplikasi) atau sesi 5 menit gabungan |
 | Boot cold-start | <5 s | Stopwatch/video 4G |
 | PWA offline | PASS | Screenshot airplane mode |
 | Landscape | PASS | Screenshot 780×360 |

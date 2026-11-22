@@ -1,5 +1,14 @@
 # Food Web + Wildlife AI — v0.6.0
 
+## Status saat ini (v0.15.9)
+
+- Spesifikasi v0.6 tetap berlaku untuk 5 guild visual; tidak ada aset fauna per-biome baru.
+- Format DNA kemudian berubah: byte `planetId` ditambahkan sebelum CRC16.
+- `foodWeb()` memakai `foodWebLinks(planet)` dari **planet aktif**, bukan hardcoded Terra.
+- Panel `?eco=1` mengikuti jumlah spesies planet aktif (10–12).
+- Kesembilan planet aktif; `?planet=` dan `setPlanet()` tetap tersedia untuk QA.
+
+
 Tujuan: menyatukan agen fauna visual dengan populasi ekologis v0.5 tanpa menambah aset baru atau mengubah format DNA.
 
 ## Guild visual

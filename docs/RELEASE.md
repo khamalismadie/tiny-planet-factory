@@ -2,6 +2,8 @@
 
 Gunakan checklist ini sebelum publish build produksi.
 
+> **Status pembacaan v0.15.9:** angka 360 tick pada phase v0.10–v0.14 adalah spesifikasi historis. Sejak v0.15.4, semua siklus musim aktif berada pada **106–120 tick** (divalidasi `test:sim`). Bagian bertanda v0.4–v0.14 adalah catatan rilis, bukan klaim kondisi saat ini; lihat §2u–§2z untuk status terkini.
+
 ## 1. Prasyarat
 
 - [ ] Node 20+ dan dependency terpasang (`npm install`).
@@ -17,11 +19,16 @@ npm run build
 PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 ```
 
-- [ ] `npm run build` tanpa error. Chunk vendor: `pixi-core` + `pixi-3d`, app chunk < 100 kB.
+- [ ] `npm run build` tanpa error. Chunk vendor: `pixi-core` + `pixi-3d`, app chunk < 100 kB (v0.15.9: 65,43 kB / gzip 21,47 kB).
 - [ ] `PASS: sim`
+- [ ] `PASS: art scale`
+- [ ] `PASS: terrain render`
 - [ ] `PASS: vertical slice smoke`
 - [ ] `PASS: device-check`
-- [ ] Tidak ada error konsol aplikasi di smoke/device check.
+- [ ] `PASS: qa load`
+- [ ] `PASS: menu check`
+- [ ] `PASS: layout audit`
+- [ ] Tidak ada error konsol aplikasi di gate browser.
 - [ ] Unit test mencakup DNA v1/v2 round-trip (termasuk fauna), checksum rusak, migrasi save lama, replay event deterministik, kemunculan fauna, determinisme fauna, dan kepunahan.
 - [ ] Smoke test memakai **kode DNA lengkap** (`#dna-full`), bukan hanya kode pendek, saat verifikasi round-trip, termasuk jumlah agen fauna.
 
@@ -50,10 +57,10 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [ ] `schemaVersion` = 3 dengan field `planetId`, `ecosystemVersion`, dan `eco`.
 - [ ] Save lama v1/v2 tetap terbuka dan mendapat `eco` state default tanpa kehilangan objek/event/fauna.
 - [ ] Semua 9 `PlanetConfig` lolos validasi: species unik, referensi flora/fauna/decomposer valid, food web valid, minimal satu season.
-- [ ] `SpeciesRegistry` berisi subset spesies kunci untuk 9 planet dengan id global unik.
+- [ ] `SpeciesRegistry` berisi 103 spesies untuk 9 planet dengan id global unik (angka awal v0.4 adalah subset; saat ini seluruhnya diinisialisasi).
 - [ ] `HabitatManager` menghasilkan skor deterministik untuk input yang sama.
 - [ ] `eco.discovered`, `eco.populations`, dan `eco.eventHistory` bertahan setelah save/load.
-- [ ] DNA format lama masih bisa dibaca; schema v3 baru belum mengubah binary DNA sampai phase evolution.
+- [ ] DNA v1 base64 masih bisa dibaca. Binary saat ini adalah v2 + 1 byte `planetId` sebelum CRC16; DNA v3/evolusi **belum** diimplementasikan.
 
 ## 2e. Terra Core (v0.5)
 
@@ -67,7 +74,7 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 
 ## 2f. Observability & Stress Tests (v0.5.1)
 
-- [ ] Debug hook `eco()` mengembalikan state ekosistem Terra dengan 12 populasi.
+- [ ] Debug hook `eco()` mengembalikan state ekosistem planet aktif; Terra 12 populasi, planet lain 10–12 populasi. Hook hanya tersedia di DEV atau `?debug=1`.
 - [ ] Debug hook `ecoScore(id)` mengembalikan skor dan limiting factor habitat.
 - [ ] Panel `?eco=1` menampilkan populasi, kapasitas, trend, detritus, dan metrik turunan.
 - [ ] Panel eco tersembunyi secara default sehingga HUD normal tidak berubah.
@@ -88,7 +95,7 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 
 ## 2h. Dune + Biome Expansion (v0.7)
 
-- [ ] Hanya Terra dan Dune yang dilaporkan aktif oleh `isSupportedPlanet()`.
+- [x] `isSupportedPlanet()` menerima kesembilan `PLANET_IDS` (semua planet aktif sejak v0.14).
 - [ ] `?planet=dune` dan `setPlanet('dune')` menghasilkan planet dengan 12 populasi Dune.
 - [ ] Suhu/air Dune tetap dalam rentang gurun setelah 200 tick.
 - [ ] Guild Dune memetakan unta, kelinci, gazel, kadal, rubah fennec, ular, nasar, dan kumbang.
@@ -124,7 +131,7 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [ ] `?planet=aquaria` dan `setPlanet('aquaria')` menghasilkan 12 populasi Aquaria.
 - [ ] Empat musim berjalan deterministik dari tick: calm-current → warm-water → plankton-bloom → storm-surge.
 - [ ] Plankton naik saat bloom, pemutihan naik saat air hangat, arus naik saat badai laut.
-- [ ] Air >80, terumbu tetap sehat setelah satu siklus 360 tick, dan 12 spesies tetap hidup.
+- [ ] Air >80, terumbu tetap sehat setelah satu siklus 120 tick (v0.15.9; spec v0.10: 360 tick), dan 12 spesies tetap hidup.
 - [ ] Guild laut memetakan ikan terumbu, kepiting, lumba-lumba, dan bakteri; agen ikan/mikroba muncul.
 - [ ] Save/load mempertahankan `eco.ocean`.
 - [ ] DNA lengkap mempertahankan `planetId` Aquaria.
@@ -136,7 +143,7 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [ ] `?planet=mycelia` dan `setPlanet('mycelia')` menghasilkan 11 populasi Mycelia.
 - [ ] Empat musim berjalan deterministik: spore-spring → glow-summer → damp-autumn → quiet-winter.
 - [ ] Spora naik saat Musim Spora, cahaya naik saat Musim Cahaya, nutrisi naik saat Musim Lembap, stres naik saat Musim Tenang.
-- [ ] Jaringan tetap >0 dan 11 spesies tetap hidup setelah satu siklus 360 tick.
+- [ ] Jaringan tetap >0 dan 11 spesies tetap hidup setelah satu siklus 120 tick (v0.15.9; spec v0.11: 360 tick).
 - [ ] Guild Mycelia memetakan kijang spora, kelelawar, dan ngengat; predator terhubung ke food web.
 - [ ] Save/load mempertahankan `eco.fungal`.
 - [ ] DNA lengkap mempertahankan `planetId` Mycelia.
@@ -148,7 +155,7 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [ ] `?planet=sakura` dan `setPlanet('sakura')` menghasilkan 11 populasi Sakura.
 - [ ] Empat musim berjalan deterministik: blossom-season → petal-fall → sky-winds → quiet-sky.
 - [ ] Mekar turun saat Gugur Kelopak, angin/stres isolasi naik saat Angin Langit, konektivitas pulih saat Langit Tenang.
-- [ ] 11 spesies tetap hidup setelah satu siklus 360 tick.
+- [ ] 11 spesies tetap hidup setelah satu siklus 120 tick pada v0.15.9 (spec historis: 360 tick).
 - [ ] Guild Sakura memetakan kijang bunga, elang, dan kupu-kupu; predator terhubung ke food web.
 - [ ] Save/load mempertahankan `eco.sky`.
 - [ ] DNA lengkap mempertahankan `planetId` Sakura.
@@ -160,7 +167,7 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [ ] `?planet=aurelia` dan `setPlanet('aurelia')` menghasilkan 11 populasi Aurelia.
 - [ ] Empat musim berjalan deterministik: spring → summer → autumn → winter.
 - [ ] Simpanan naik saat Panas/Gugur, serasah naik saat Gugur, hibernasi dan embun naik saat Dingin.
-- [ ] 11 spesies tetap hidup setelah satu siklus 360 tick.
+- [ ] 11 spesies tetap hidup setelah satu siklus 120 tick pada v0.15.9 (spec historis: 360 tick).
 - [ ] Guild Aurelia memetakan kijang, rubah, lynx, dan burung hantu; predator terhubung ke food web.
 - [ ] Save/load mempertahankan `eco.forest`.
 - [ ] DNA lengkap mempertahankan `planetId` Aurelia.
@@ -172,7 +179,7 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [ ] `?planet=cosmos` dan `setPlanet('cosmos')` menghasilkan 10 populasi Cosmos.
 - [ ] Empat fase berjalan deterministik: luminous-phase → crystal-resonance → void-tide → meteor-shower.
 - [ ] Kisi menguat saat Resonansi Kristal; radiasi/gravitasi naik saat Pasang Hampa; radiasi puncak saat Hujan Meteor.
-- [ ] 10 spesies tetap hidup setelah satu siklus 360 tick.
+- [ ] 10 spesies tetap hidup setelah satu siklus 110 tick pada v0.15.9 (spec historis: 360 tick).
 - [ ] Guild Cosmos memetakan kelinci bintang, elang astral, dan ngengat komet; predator terhubung ke food web.
 - [ ] Save/load mempertahankan `eco.sky` dengan mapping kosmik.
 - [ ] DNA lengkap mempertahankan `planetId` Cosmos.
@@ -188,8 +195,8 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [x] Plugin `pwa-precache` menyuntik seluruh chunk hasil build ke `SHELL`.
 - [x] `caches.match(request, { ignoreVary: true })` menangani header `Vary: Origin` dari Vite preview.
 - [x] Verifikasi localhost secure-context: manifest installable shape, SW control, shell + chunk ter-cache, offline reload sukses, tanpa page error.
-- [ ] GitHub Pages ditunda: repo masih private dan akun free tidak mendukung Pages untuk repo privat.
-- [ ] Host HTTPS produksi: verifikasi manifest dan `sw.js` mengembalikan 200.
+- [x] GitHub Pages ditunda (keputusan pipeline); produksi memakai Netlify. Alasan akun/repo bersifat eksternal dan tidak diverifikasi di repo ini.
+- [x] Host HTTPS produksi: manifest dan `sw.js` mengembalikan 200 (verifikasi 2026-11-22, commit `ea8f9b9`; lihat `docs/QA-DEVICE.md`).
 - [ ] Install prompt, offline, dan update di perangkat nyata.
 
 ## 2q. Main Menu & Instrument UI (v0.15)
@@ -199,7 +206,7 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [x] Menu menghentikan simulasi dan mengembalikan status jeda saat ditutup.
 - [x] Tombol `Menu` di topbar, Escape untuk menutup, fokus awal pada aksi utama.
 - [x] Bahasa visual “peta kebun planet”: panel catatan lapangan, aksen hijau hayati/amber, tipografi display + data monospace.
-- [x] Tidak ada pemilih planet permanen di UI; `?planet=` tetap merupakan hook QA/deeplink.
+- [x] Pemilih planet permanen hadir di menu observatorium sejak v0.15.7; `?planet=` tetap ada sebagai hook QA/deeplink.
 - [x] Gate baru `npm run test:menu` untuk desktop + mobile, overflow, fokus, kualitas, pause, dan DNA.
 
 ## 2r. Habitat Proportion Balance (v0.15.1)
@@ -218,7 +225,7 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [x] Install PWA pertama kali tidak memicu reload yang menutup/open ulang menu utama.
 - [x] Gate `test:menu` menghitung navigasi first-load dan menggagalkan reload tak sengaja.
 - [x] Deploy HTTPS produksi aktif di <https://tinyplanetfactory.netlify.app/> via auto-deploy Netlify dari `main`.
-- [x] Deploy produksi diverifikasi melalui smoke, device, menu, dan offline PWA check.
+- [x] Deploy produksi diverifikasi lewat gate headless `test:smoke`, `test:device` (emulasi mobile Chromium), `test:menu`, `test:layout`, dan PWA check offline. QA perangkat nyata tetap OPEN (§3).
 
 ## 2t. Balanced World Scale (v0.15.3)
 
@@ -241,13 +248,13 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [x] Telemetri lokal menambah `session_start`, `session_end`, `objective_shown`, `stage_reached`, `level_reached`, `season_change`, dan `planet_switch`.
 - [x] `test:layout` masuk ke `npm test` sebagai gate 48 dp + objective strip + tanpa horizontal overflow.
 - [x] Gate determinisme 50 seed × 9 planet masuk ke `test:sim`.
-- [x] Semua test lokal lolos: sim, art scale, smoke, device, menu, layout. App chunk 58,77 kB / gzip 19,23 kB.
+- [x] Gate saat itu lolos: sim, art scale, smoke, device, menu, layout. Angka app chunk terbaru ada di §2z (65,43 kB / gzip 21,47 kB).
 
 ## 2v. Device QA Load Harness (v0.15.5)
 
 - [x] Parameter `?qa=1&qaObjects=N` menanam hingga 96 objek sebelum QaProbe mulai mengukur.
 - [x] Objek mengikuti urutan `OBJECT_ORDER` dan sebaran spiral deterministik, tanpa mengubah sim atau gameplay normal.
-- [x] Dipakai untuk mengulang checklist #2 dengan beban 25+ objek di Android nyata (terukur hingga 94 objek).
+- [x] Dipakai pada QA v0.15.5 untuk beban 25+ objek di Android nyata (terukur 94 objek); ini baseline pra-v0.15.6 dan wajib diulang (§2w/§2y/§2z).
 
 ## 2w. Planet Shape Fix (v0.15.6)
 
@@ -290,7 +297,7 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 
 Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:
 
-- [ ] Android menengah: p50 ≥ 30 FPS, p95 ≤ 33 ms selama 5 menit bermain.
+- [ ] Android menengah: p50 frame time ≤ 33,3 ms (≈30 FPS) dan `fps ≥ 30`, p95 ≤ 33 ms selama total 5 menit (2 run `qaSeconds=180`).
 - [ ] Cold start < 5 s pada 4G.
 - [ ] Pinch zoom, drag 360°, dan long-press berfungsi dengan jari.
 - [ ] Context loss/restore: background 30 s → kembali → render lanjut tanpa crash.
@@ -298,9 +305,9 @@ Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:
 - [ ] Update PWA: prompt muncul, save IndexedDB tetap utuh.
 - [ ] Portrait/landscape tidak menutupi planet.
 
-Opsional untuk QA cepat: buka `?qa=1&qaSeconds=45` di perangkat. Panel hasil QA akan muncul dan tombol **Salin hasil QA** menghasilkan JSON berisi p50/p95, boot time, quality tier, device info, status PWA, serta jumlah agen/spesies fauna.
+Untuk QA deterministik: buka `?debug=1&qa=1&qaSeconds=45&seed=1&qaObjects=94&quality=medium` di perangkat. Panel hasil QA akan muncul dan tombol **Salin hasil QA** menghasilkan JSON berisi p50/p95, boot time, quality tier, device info, status PWA, serta jumlah agen/spesies fauna.
 
-Catatan 2026-11-21: lima run QA nyata di **Itel S686LN / Android 15**, termasuk tiga run dengan **94 objek** dan durasi hingga **180 s**, menghasilkan p50 **16,90–33,20 ms**, p95 **33,40 ms**, FPS **30,1–59,2**, draw call **6–18**, boot **0,24–2,03 s**, tier medium tanpa downgrade, service worker aktif, dan tidak ada context loss. p95 masih 0,40 ms di atas ambang 33 ms, sehingga checklist #1–#2 belum dicentang lulus penuh; rincian ada di `docs/QA-DEVICE.md`.
+Catatan 2026-11-21: lima run QA nyata di **Itel S686LN / Android 15**, termasuk tiga run dengan **94 objek** dan durasi hingga **180 s**, menghasilkan p50 **16,90–33,20 ms**, p95 **33,40 ms**, FPS **30,1–59,2**, draw call **6–18**, boot **0,24–2,03 s**, tier medium tanpa downgrade, service worker aktif, dan tidak ada context loss. p95 33,40 ms menggagalkan baris #2 (frame budget); baris #1 (cold start 4G dari ikon) belum pernah diukur. Keduanya tetap OPEN. Rincian ada di `docs/QA-DEVICE.md`.
 
 ## 4. Telemetri
 
@@ -319,14 +326,16 @@ Catatan 2026-11-21: lima run QA nyata di **Itel S686LN / Android 15**, termasuk 
 
 ## 6. Publish
 
-Deploy cepat tanpa akun:
+Produksi saat ini sudah stabil di Netlify (auto-deploy dari `main`, <https://tinyplanetfactory.netlify.app/>). Alur rilis normal ada di `docs/PRODUCT-TO-PRODUCTION.md` §11.
+
+Fallback deploy cepat tanpa akun:
 
 1. Buka `https://app.netlify.com/drop`.
 2. Tarik folder `dist/` (atau ekstrak `tiny-planet-factory-dist.zip`) ke halaman tersebut.
 3. Netlify akan memberi URL HTTPS acak, misalnya `https://random-name.netlify.app`.
-4. Buka URL tersebut di Android dan jalankan `?qa=1&qaSeconds=45`.
+4. Buka URL tersebut di Android dan jalankan `?debug=1&qa=1&qaSeconds=45&seed=1&qaObjects=94&quality=medium`.
 
-Untuk produksi yang stabil, gunakan Cloudflare Pages / Vercel / hosting sendiri dengan HTTPS dan `sw.js` di root.
+Cloudflare Pages / Vercel / hosting sendiri hanya alternatif fallback. Pastikan HTTPS dan `sw.js` berada di scope root.
 
 - [ ] Upload `dist/` ke host HTTPS.
 - [ ] Verifikasi `https://<host>/manifest.webmanifest` dan `https://<host>/sw.js` mengembalikan 200.

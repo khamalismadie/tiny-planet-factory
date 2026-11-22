@@ -1,4 +1,4 @@
-# Tiny Planet Factory — Vertical Slice
+# Tiny Planet Factory — Vertical Slice v0.15.9
 
 Prototipe web 3D tempat pemain membangun planet bulat kecil, mengubah permukaannya, dan menjaga ekosistemnya tetap hidup. Fokus slice ini adalah satu transformasi yang terasa jelas dalam ~3–5 menit: batu tandus → planet berair dan hijau.
 
@@ -9,12 +9,12 @@ npm install
 npm run dev        # http://localhost:5173
 npm run build
 npm run preview    # http://localhost:4173 (mode PWA aktif)
-npm test           # simulasi murni + smoke test browser
+npm test           # 8 gate: sim, scale, terrain, smoke, device, qa-load, menu, layout
 ```
 
 Build memakai `NODE_OPTIONS=--max-old-space-size=4096` karena bundler PixiJS 3D membutuhkan heap lebih besar dari default Node.
 
-Deploy produksi HTTPS aktif di <https://tinyplanetfactory.netlify.app/> melalui auto-deploy Netlify dari `main`. Hook QA (`?debug=1`, `?qa=1&qaSeconds=45`, `?planet=...`) tersedia di URL produksi.
+Rilisan aktif `v0.15.9`. Deploy produksi HTTPS di <https://tinyplanetfactory.netlify.app/> melalui auto-deploy Netlify dari `main`. Hook QA di produksi: `?debug=1`, `?perf=1`, `?quality=low|medium|high`, `?eco=1`, `?menu=0`, `?planet=...`, `?seed=N`, dan `?qa=1&qaSeconds=45&qaObjects=N` (`qaObjects` maks 96, `qaSeconds` maks 180).
 
 ## Kontrol
 
@@ -22,6 +22,7 @@ Deploy produksi HTTPS aktif di <https://tinyplanetfactory.netlify.app/> melalui 
 - Scroll / pinch: zoom.
 - Ketuk permukaan: meletakkan objek yang sedang dipilih.
 - Tahan lama (~0,5 s): melihat ringkasan kondisi di area tersebut.
+- Ketukan sukses memberi scale-pop objek `0,45 → 1,0` dalam 0,32 s dan cincin aksen hijau `#6fd39b` di titik kontak selama 0,65 s; reset/import DNA tidak memicu pop massal.
 - Panel bawah / kiri: memilih 13 objek (rumput, pasir, batu, bukit, gunung, laut, danau, pohon, semak, bunga, kijang, rubah, burung).
 - Tombol **Jeda**: menghentikan simulasi.
 - Tombol **Planet DNA**: kode pendek `TPF-XXXX-XXXX-XXXX` (seed) dan kode lengkap (semua objek + fauna + environment + biome + terrain), dengan impor, pratinjau, duplikat, remix, dan Web Share.
@@ -40,13 +41,13 @@ Deploy produksi HTTPS aktif di <https://tinyplanetfactory.netlify.app/> melalui 
 - Sembilan ekosistem aktif (Nine Worlds lengkap): Terra, Dune, Glaciera, Inferna, Aquaria, Mycelia, Sakura, Aurelia, dan Cosmos. Akses QA lewat `?planet=terra|dune|glaciere|inferna|aquaria|mycelia|sakura|aurelia|cosmos` atau `window.__game.setPlanet(id, seed?)`.
 - `schemaVersion`, `revision`, `terrainConfig`, `biome`, dan `eventLog` di state; migrasi otomatis untuk save lama.
 - Event mutasi deterministik (`planet.created`, `object.placed`, `clock.tick`) yang bisa di-replay.
-- PWA: manifest, ikon 192/512, service worker cache-first/stale-while-revalidate, fallback offline, dan notifikasi pembaruan.
+- PWA v0.15.9: manifest, ikon 192/512, service worker cache-first/stale-while-revalidate dengan cache `tpf-shell-v0-15-9`, precache seluruh chunk, fallback offline, dan notifikasi pembaruan.
 - Responsive portrait/landscape; UI memakai overlay DOM di atas kanvas PixiJS.
 - Quality tier (`low`/`medium`/`high`) + adaptive downgrade otomatis bila p95 frame time > 34 ms.
 - Overlay performa (`?perf=1`), hook QA (`?debug=1`), dan probe `?qa=1&qaSeconds=45` yang menghasilkan laporan p50/p95 + info perangkat siap disalin.
-- Vendor PixiJS dipisah menjadi `pixi-core` + `pixi-3d`; data konten di `planet-configs` ~71.5 kB dan codec DNA di `dna` ~47.2 kB, sehingga app chunk ~56.2 kB (gzip ~18.5 kB).
+- Vendor PixiJS dipisah menjadi `pixi-core` + `pixi-3d`; data konten `planet-configs` dan codec DNA `dna` adalah chunk terpisah. App chunk v0.15.9 adalah 65,43 kB (gzip 21,47 kB).
 - Telemetri opt-in (tersimpan lokal, tanpa server) dengan modal penjelasan, ekspor JSON, dan hapus data.
-- Visual polish berbasis skill `pixi3d-visual-polish`: ground contact prop yang dihitung dari ekstent geometri, rim light, dan topbar mobile tanpa overflow. Standar visual ada di `docs/ART-DIRECTION.md`.
+- Visual polish v0.15.9: satu merged geometry per tipe dengan warna per-facet, AO vertikal + bayangan kontak baked, shade lereng planet, awan 10×6, ground contact dari ekstent geometri, rim light, dan topbar mobile tanpa overflow. Standar visual ada di `docs/ART-DIRECTION.md`.
 
 ## Arsitektur
 
@@ -64,23 +65,29 @@ src/
 
 ## Validasi
 
-`npm test` menjalankan:
+`npm test` menjalankan 8 gate:
 
-1. **Unit simulasi** — penempatan objek, 150 ticks, misi selesai, level minimal, satwa/populasi, 3 event opsional, kemunculan fauna, determinisme fauna, kepunahan, migrasi state lama, DNA v1/v2 round-trip termasuk fauna, checksum rusak, dan replay event deterministik.
-2. **Smoke browser** (Chromium headless) — WebGL2 boot, 13 tombol objek, klik menanam objek, akselerasi 120 ticks, fauna muncul, misi selesai, HUD misi/cuaca/event/ekosistem/fauna berubah, persistensi setelah reload, DNA round-trip fauna lewat UI, service worker terdaftar, dan rendering tetap jalan setelah resize mobile.
-3. **Device check** (emulasi mobile Chromium) — quality override, overlay performa, pinch dua jari lewat CDP, adaptive downgrade, dan handler context loss/restore.
-4. Checklist rilis ada di `docs/RELEASE.md`; definisi KPI dan telemetri ada di `docs/KPI.md`; art direction ada di `docs/ART-DIRECTION.md`.
+1. **Unit simulasi** — penempatan objek, 150 ticks, misi selesai, level minimal, satwa/populasi, 3 event opsional, kemunculan fauna, determinisme fauna, kepunahan, migrasi state lama, DNA v1/v2 round-trip termasuk fauna, checksum rusak, replay event deterministik, 9 planet, dan siklus musim 100–120 tick.
+2. **Art scale** — budget triangle per tipe, metrik facet sudut unik, tekstur nol, hierarki ukuran, dan rasio cuaca.
+3. **Terrain render** — normalisasi idempoten dan radius 0,85–1,15 untuk kesembilan planet.
+4. **Smoke browser** (Chromium headless) — WebGL2 boot, 13 tombol objek, klik menanam objek, feedback placement aktif, akselerasi 120 ticks, fauna muncul, misi selesai, HUD berubah, persistensi setelah reload, DNA round-trip lewat UI, service worker terdaftar, resize mobile, dan boot/simulasi untuk kesembilan planet.
+5. **Device check** (emulasi mobile Chromium) — quality override, overlay performa, pinch dua jari lewat CDP, dan adaptive downgrade. Context loss/restore tetap diverifikasi manual di perangkat nyata (checklist `docs/QA-DEVICE.md` #6).
+6. **QA load** — seed 1, 94 objek, tier medium, 16 tick ke cuaca Hujan, p95 ≤ 33,40 ms, dan draw call ≤18 saat Cerah / ≤20 saat Hujan-Badai-Salju.
+7. **Menu** — 9 planet, switching, guide 4 langkah, dan perilaku pause-safe.
+8. **Layout** — target sentuh ≥48 dp di 360×640, 390×844, dan 844×390 tanpa overflow.
+
+Checklist rilis ada di `docs/RELEASE.md`, alur produk/sprint ada di `docs/PRODUCT-TO-PRODUCTION.md` dan `docs/SPRINT.md`, KPI/telemetri ada di `docs/KPI.md`, dan art direction ada di `docs/ART-DIRECTION.md`.
 
 Audit visual mandiri:
 
 ```bash
 npm run capture:visual -- /tmp/opencode/after.png 1337   # screenshot deterministik seed 1337
-npm run audit:layout                                   # bounding box UI pada 390x844
+npm run audit:layout                                   # bounding box UI pada 360x640, 390x844, dan 844x390
 ```
 
-Angka terakhir pada headless: draw call ~15 dengan 26 objek dan 41 agen fauna, p50 ~16,7 ms. **Ini bukan bukti performa Android.** Perlu pengukuran p50/p95 nyata di perangkat target.
+Angka headless terbaru (v0.15.9, `test:qa-load`, seed 1/medium/94 objek/Hujan): p50 16,70 ms, p95 16,80 ms, 59,9 FPS, draw call 20, boot 335–359 ms tergantung run, tanpa downgrade. Smoke grown scene masih ~15 draw call dengan 26 objek dan 41 agen fauna. **Ini bukan bukti performa Android.**
 
-Catatan: Chromium headless di lingkungan ini melepaskan konteks WebGL (`CONTEXT_LOST_WEBGL`), sehingga muncul 3 error shader saat shader variant baru dikompilasi. Error tersebut difilter dalam smoke test hanya ketika `contextLost === true`; error aplikasi lain tetap menggagalkan tes. Chromium headless juga tidak bisa mengembalikan konteks WebGL sungguhan setelah `restoreContext()`, jadi handler restore hanya diuji dengan event sintetis. Lihat `docs/QA-DEVICE.md` untuk checklist perangkat nyata.
+Catatan: Chromium headless di lingkungan ini dapat melepaskan konteks WebGL (`CONTEXT_LOST_WEBGL`), sehingga muncul error shader saat variant baru dikompilasi. Error tersebut difilter hanya ketika `contextLost === true`; error aplikasi lain tetap menggagalkan tes. Belum ada gate otomatis untuk restore sungguhan; hook `restoreContext()` tersedia untuk QA, tetapi checklist #6 di `docs/QA-DEVICE.md` wajib di perangkat nyata.
 
 ## Asumsi & batas
 
@@ -110,7 +117,7 @@ Program Nine Worlds menggantikan roadmap lama: Terra diselesaikan lebih dulu, la
 | `v0.12` | **Sakura + Floral Biome** — pulau melayang, mekar, angin langit, dan konektivitas vertikal. *(selesai)* |
 | `v0.13` | **Aurelia + Autumn Biome** — serasah, simpanan makanan, hibernasi, dan embun beku. *(selesai)* |
 | `v0.14` | **Cosmos + Crystal Biome** — kristal, radiasi, gravitasi, dan fase meteor; Nine Worlds lengkap. *(selesai)* |
-| `v0.14.1–v0.14.3` | **PWA Portability** — base relatif, manifest/scope relatif, precache seluruh chunk, dan `ignoreVary` untuk offline reload. *(selesai; deploy HTTPS tertunda)* |
+| `v0.14.1–v0.14.3` | **PWA Portability** — base relatif, manifest/scope relatif, precache seluruh chunk, dan `ignoreVary` untuk offline reload. *(selesai; deploy HTTPS aktif — Netlify)* |
 | `v0.15` | **Main Menu & Instrument UI** — menu utama, kontrol kualitas, pause-safe, dan bahasa visual peta kebun planet. *(selesai)* |
 | `v0.15.1` | **Habitat Proportion Balance** — hierarki gunung/pohon, silhouette bunga, dan soft spacing deterministik. *(selesai)* |
 | `v0.15.2` | **First-Visit SW Fix** — tidak ada reload paksa saat install PWA pertama kali. *(selesai)* |
@@ -120,11 +127,11 @@ Program Nine Worlds menggantikan roadmap lama: Terra diselesaikan lebih dulu, la
 | `v0.15.6` | **Planet Shape Fix** — normalisasi terrain di renderer, silhouette semua planet seukuran kamera dan prop. *(selesai)* |
 | `v0.15.7` | **Menu & Tutorial** — menu observatorium, pemilih 9 planet, panduan UI 4 langkah. *(selesai)* |
 | `v0.15.8` | **Weather Scale Fix** — badai proporsional, lebih basah & gelap dari hujan, gate rasio cuaca. *(selesai)* |
-| `v0.15.9` | **Faceted Diorama Polish** — facet lowpoly lebih kaya, AO per-facet, bayangan kontak baked, warna lereng, dan awan lebih berdimensi. |
+| `v0.15.9` | **Faceted Diorama Polish** — facet lowpoly + AO per-facet, kontak baked, warna lereng, awan 10×6; 8 gate test, chunk 65,43 kB, cache `tpf-shell-v0-15-9`, deploy aktif. *(selesai)* |
 
 ## Langkah berikutnya
 
-1. Selesaikan checklist `docs/QA-DEVICE.md` di Android menengah sungguhan: p50/p95, cold start, pinch, context loss/restore, PWA offline/update. Verifikasi localhost sudah lolos, tapi bukan pengganti perangkat nyata.
-2. Buka URL produksi HTTPS dan jalankan `?qa=1&qaSeconds=45` dari perangkat Android menengah.
-3. Fokus ke QA HTTPS/perangkat nyata sebelum menambah biome berikutnya.
-4. Baru setelah Nine Worlds selesai, evaluasi ulang Supabase cloud/gallery/social sebagai fase terpisah.
+1. Yang tersisa adalah QA Android nyata: p50/p95, cold start 4G dari ikon PWA, pinch, context loss/restore, landscape, dan PWA offline/update. Verifikasi localhost **dan** remote HTTPS sudah PASS, tetapi bukan pengganti perangkat nyata.
+2. Ulangi `?debug=1&qa=1&qaSeconds=45&seed=1&qaObjects=94&quality=medium` dari Android menengah; untuk target 5 menit, jalankan dua sesi 180 s karena aplikasi memotong `qaSeconds` ke maks 180.
+3. Ikuti `docs/SPRINT.md` (Sprint 09) dan jangan tambah biome sebelum P0 QA ditutup.
+4. Baru setelah QA ditutup, evaluasi ulang Supabase cloud/gallery/social sebagai fase terpisah.

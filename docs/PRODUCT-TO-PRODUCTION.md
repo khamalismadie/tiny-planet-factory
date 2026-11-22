@@ -5,7 +5,8 @@
 > **Terakhir diverifikasi:** 2026-11-22  
 > **Production:** <https://tinyplanetfactory.netlify.app/>  
 > **Commit aplikasi terakhir:** `ea8f9b9`  
-> **Commit dokumentasi QA terakhir:** `0c6b658`
+> **Commit dokumentasi QA terakhir:** `0c6b658`  
+> **Commit docs pipeline & sprint:** `421c8d6`
 
 Dokumen ini adalah satu jalur resmi dari ide/product backlog sampai rilis produksi. Ia tidak menggantikan doc fitur yang sudah ada, tetapi menyatukan gate, artefak, dan aturan keputusan agar setiap perubahan bisa dilacak dari product requirement ke bukti produksi.
 
@@ -108,8 +109,8 @@ Setiap konflik yang ditemukan harus dicatat di bagian **Known documentation drif
 | P0 | PWA fisik: install → airplane mode → boot/save/place → update | **Open** |
 | P0 | Landscape Android: panel tidak menutup planet | **Open** |
 | P0 | Verifikasi visual real-device untuk shape fix v0.15.6 dan weather v0.15.8 | **Open** |
-| P1 | Tutup gap p95: baseline device `33,40 ms`, target `33 ms` | **Open** |
-| P1 | Konfirmasi screenshot before/after v0.15.9 oleh manusia | **Open** |
+| P0 | Tutup gap p95: baseline device `33,40 ms`, target `33 ms` | **Open** |
+| P0 | Verifikasi visual real-device + konfirmasi screenshot before/after v0.15.9 oleh manusia | **Open** |
 | P2 | Cloud save / gallery / social via Supabase | **Deferred** |
 | P2 | Planet baru | **Ditahan sampai QA ditutup** |
 
@@ -189,7 +190,7 @@ Ini bukan preferensi; ini batas produksi.
 | Bahasa | Semua copy UI/misi Bahasa Indonesia |
 | Aksesibilitas | Target sentuh aktif **48 dp** (menggantikan angka lama 36 px) |
 | Performa | Target Android menengah 30 FPS, desktop 60 FPS, boot < 5 s |
-| Budget | App chunk < 100 kB; draw call ≤18 saat cerah, ≤20 saat cuaca berawan/hujan |
+| Budget | App chunk < 100 kB; draw call ≤18 saat Cerah, ≤20 saat Hujan/Badai/Salju |
 | Offline | PWA installable/offline-capable; klaim hanya setelah verifikasi |
 | Telemetri | Opt-in, local-only, tidak dikirim ke server |
 
@@ -337,7 +338,7 @@ Target gate:
 
 Wajib sebelum status produksi ditutup:
 
-1. Android menengah: p50 ≥30 FPS, p95 ≤33 ms selama 5 menit.
+1. Android menengah: p50 frame time ≤33,3 ms (≈30 FPS), `fps ≥30`, p95 ≤33 ms selama 5 menit (2 run `qaSeconds=180`).
 2. Cold start <5 s dari ikon PWA pada 4G.
 3. Pinch zoom dan drag 360° dengan jari.
 4. Background 30 s → kembali → render lanjut tanpa crash.
@@ -388,7 +389,7 @@ Invalid `?planet=` atau `setPlanet(id)` jatuh ke `terra`.
 | Desktop | 60 FPS | Terpenuhi pada headless |
 | Boot | <5 s | QA boot 0,24–2,03 s device; bukan cold-start 4G penuh |
 | App chunk | <100 kB | 65,43 kB / gzip 21,47 kB |
-| Draw call cerah | ≤18 | 15–19 tergantung state; gate memakai ≤18 steady |
+| Draw call cerah | ≤18 | 15 pada emulasi `test:device`; 19 adalah baseline pra-facet; gate pasca-facet memakai ≤18 |
 | Draw call hujan | ≤20 | 20, sama dengan baseline sebelum facet |
 | Triangle per tipe | Gate `test:scale` | 34–276 triangle tergantung tipe |
 | Adaptif | Turun bila p95 >34 ms / 120 frame | Tidak ada downgrade pada QA seed 1 |
@@ -399,7 +400,7 @@ Catatan: angka headless bukan pengganti angka device nyata.
 
 ## 11. Release procedure
 
-1. Pastikan P0 backlog tidak ada yang menghalangi rilis.
+1. Pastikan status P0 dicatat jujur. P0 OPEN bukan blocker untuk deploy RC, tetapi blocker untuk klaim `production-ready` (§18).
 2. Tentukan versi baru dan samakan seluruh file versi.
 3. Tulis bagian rilis baru di `docs/RELEASE.md`.
 4. Perbarui `README.md` bila perlu:
@@ -487,17 +488,19 @@ Rollback aman karena:
 
 ## 14. Known documentation drift
 
-Doc lama berikut mengandung angka yang sudah tertinggal. Pipeline memakai nilai kanan sampai doc sumber diperbarui.
+Tabel ini adalah **audit trail**. Seluruh nilai lama di bawah sudah disinkronkan ke doc sumber pada commit dokumentasi ini; kolom nilai kanan adalah fakta aktif yang dipakai pipeline.
 
-| Sumber | Nilai lama | Nilai kanan |
+| Sumber | Nilai lama | Nilai kanan (status) |
 |---|---|---|
-| `docs/ART-DIRECTION.md` | target sentuh ≥36 px | **48 dp** sejak v0.15.4 |
-| `docs/ART-DIRECTION.md` | orbit awan ≈1,55 | **orbit 1,08**, radius 0,045 sejak v0.15.8 |
-| `README.md` | app chunk ~56,2 kB | **65,43 kB / gzip 21,47 kB** sejak v0.15.9 |
-| `README.md` | `npm test` 3 grup | **8 gate** sejak v0.15.9 |
-| `README.md` | deploy HTTPS tertunda | **produksi aktif** di Netlify |
-| `docs/RELEASE.md` checklist | p95 ≤33 ms sudah target | baseline device **33,40 ms**, masih open |
-| `docs/QA-DEVICE.md` | hasil device v0.15.5 | v0.15.9 baru hasil headless lokal/remote |
+| `docs/ART-DIRECTION.md` | target sentuh ≥36 px | **48 dp** sejak v0.15.4 — resolved |
+| `docs/ART-DIRECTION.md` | orbit awan ≈1,55 | **orbit 1,08**, radius 0,045 sejak v0.15.8 — resolved |
+| `README.md` | app chunk ~56,2 kB | **65,43 kB / gzip 21,47 kB** sejak v0.15.9 — resolved |
+| `README.md` | `npm test` 3 grup | **8 gate** sejak v0.15.9 — resolved |
+| `README.md` | deploy HTTPS tertunda | **produksi aktif** di Netlify — resolved |
+| `docs/RELEASE.md` checklist | target p95 ≤33 ms tanpa penjelasan | baseline 33,40 ms + alasan baris #1/#2 — resolved |
+| `docs/QA-DEVICE.md` | hasil device v0.15.5 | ditandai baseline pra-v0.15.6; v0.15.9 headless lokal/remote dicatat terpisah — resolved |
+| Doc biome v0.8–v0.14 | siklus 360 tick, planet data-only, tanpa UI selector | siklus aktual 106–120 tick, 9 planet aktif, selector di menu sejak v0.15.7 — resolved via addendum |
+| Doc core v0.4–v0.6 | subset spesies, hook Terra-centric, `FoodWebManager`/`PopulationManager` | 103 spesies, hook planet aktif, `EcosystemManager` + `guilds.ts` — resolved via addendum |
 
 ---
 

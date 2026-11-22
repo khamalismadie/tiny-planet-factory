@@ -1,5 +1,15 @@
 # Ecosystem Data Foundation — v0.4
 
+## Status saat ini (v0.15.9)
+
+- Fondasi v0.4 sudah dipakai oleh simulasi penuh 9 planet (v0.5–v0.14).
+- Nama `FoodWebManager` / `PopulationManager` bersifat aspiratif; implementasinya ada di `EcosystemManager` + `src/sim/eco/guilds.ts`.
+- `EcoStateV3` kini juga punya `detritus`, `cryo`, `volcano`, `ocean`, `fungal`, `sky`, dan `forest`.
+- Migrasi mempertahankan `planetId` valid; `'terra'` hanya fallback. Seluruh 103 spesies diinisialisasi, bukan subset.
+- Config planet berada di chunk terpisah, tetapi tetap diimpor saat boot lewat Hud/migrate.
+- DNA saat ini adalah v2 + byte `planetId` sebelum CRC16; DNA v3/evolusi **belum** ada.
+
+
 Dokumen ini mencatat fondasi data untuk program **Nine Worlds** sebelum simulasi ekosistem penuh diimplementasikan.
 
 ## Tujuan

@@ -1,5 +1,14 @@
 # Glaciera + Cold Biome — v0.8.0
 
+## Status saat ini (v0.15.9)
+
+- Spesifikasi v0.8 tetap berlaku untuk cryosphere, hazard `pencairan-glasial`, guild es, dan DNA sadar planet.
+- Siklus aktual Glaciera adalah **120 tick**: 0–36, 37–63, 64–86, 87–119 (tabel 360 tick di bawah adalah spec historis).
+- Kesembilan planet aktif; tidak ada lagi planet “data-only”.
+- Sejak v0.15.7, pemilih 9 planet tersedia permanen di menu utama. `?planet=` tetap hook QA.
+- Badai salju khusus dan palette renderer Glaciera belum diimplementasikan.
+
+
 Tujuan: menambahkan planet ketiga dengan musim, pembekuan, dan food web sendiri tanpa mengubah format DB/SDK yang sudah dipakai pemain.
 
 ## Status planet
@@ -101,5 +110,5 @@ TPF-... | payload v2 | [planetId] | CRC16
 
 - Belum ada cuaca khusus `badai-salju`; cuaca global tetap empat tipe.
 - Palette Glaciera belum dipakai renderer.
-- Enam planet lain masih data-only.
-- Tidak ada UI selector planet permanen; akses lewat query param/debug hook untuk QA.
+- Enam planet lain kini aktif (status historis: data-only).
+- Pemilih 9 planet tersedia permanen di menu utama sejak v0.15.7; `?planet=` tetap hook QA.

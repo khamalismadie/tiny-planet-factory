@@ -1,5 +1,14 @@
 # Sakura + Floral Biome — v0.12.0
 
+## Status saat ini (v0.15.9)
+
+- Spesifikasi v0.12 tetap berlaku untuk sky, mekar, angin, dan konektivitas vertikal.
+- Siklus aktual Sakura adalah **120 tick**: 0–26, 27–51, 52–84, 85–119 (360 tick di bawah adalah spec historis).
+- Faktor mortalitas sky-adapted aktual `0,004` vs `0,014` ≈ **0,29**, bukan tepat sepertiga.
+- Sejak v0.15.7, pemilih 9 planet tersedia permanen di menu utama. `?planet=` tetap hook QA.
+- Partikel kelopak dan shader mekar belum diimplementasikan.
+
+
 Tujuan: menambahkan planet ketujuh dengan pulau melayang, siklus mekar, angin langit, dan konektivitas vertikal tanpa menambah draw call atau object type baru.
 
 ## Status planet
@@ -20,7 +29,7 @@ Tujuan: menambahkan planet ketujuh dengan pulau melayang, siklus mekar, angin la
 
 ## Musim dan pulau melayang
 
-Total durasi Sakura 360 tick. `eco.sky` adalah ringkasan turunan dari `planet.tick`, cuaca, dan populasi.
+Total durasi Sakura 360 tick pada spec v0.12; aktual v0.15.9 adalah 120 tick. `eco.sky` adalah ringkasan turunan dari `planet.tick`, cuaca, dan populasi.
 
 | Musim | Tick | Modifikasi utama | Efek |
 |---|---|---|---|
@@ -52,7 +61,7 @@ isolationStressTarget = max(0, wind-65)*1.8 + max(0, 55-connectivity)
 
 - Faktor vegetasi Sakura: `1 + (connectivity-50)*0.003 - wind*0.0015`, dikalikan modifier musim.
 - Mekar menambah `blossom*0.01` pada fertilitas dan oksigen setelah target dasar.
-- `isolationStress` menambah mortalitas; trait `wind-dispersal`, `blossom-season`, `vertical-growth`, dan `seed-dispersal` menurunkan faktor menjadi sekitar sepertiga.
+- `isolationStress` menambah mortalitas; trait `wind-dispersal`, `blossom-season`, `vertical-growth`, dan `seed-dispersal` menurunkan faktor menjadi `0,004` vs `0,014` (≈0,29, bukan tepat sepertiga).
 - Hazard prioritas: badai hujan → dingin → kriogenik → vulkanik → laut → fungal → **putusnya pulau melayang → angin kencang → kekeringan awan** → kekeringan musiman.
 - Tidak ada object type baru; pohon sakura, rumput awan, dan anggrek langit memakai `tree`/`grass`/`flower`.
 
@@ -78,7 +87,7 @@ Elang langit dan kolibri memakai proksi guild burung. `sakura_sky_mushroom` teta
 ## Gate
 
 - 11 populasi Sakura; tidak ada kebocoran spesies planet lain.
-- Empat musim deterministik selama 360 tick.
+- Empat musim deterministik selama 120 tick pada v0.15.9 (spec historis: 360 tick).
 - Mekar turun saat Gugur Kelopak; angin dan stres isolasi naik saat Angin Langit; konektivitas pulih saat Langit Tenang.
 - 11 spesies tetap hidup setelah satu siklus penuh.
 - Guild Sakura memetakan kijang bunga, elang, dan kupu-kupu; predator terhubung ke food web.
@@ -91,5 +100,5 @@ Elang langit dan kolibri memakai proksi guild burung. `sakura_sky_mushroom` teta
 
 - Belum ada partikel kelopak atau jembatan visual antar-pulau.
 - Tidak ada shader warna dinamis untuk mekar; `sky` saat ini memengaruhi sim/HUD.
-- Tidak ada UI selector planet permanen; akses lewat query param/debug hook untuk QA.
+- Pemilih 9 planet tersedia permanen di menu utama sejak v0.15.7; `?planet=` tetap hook QA.
 - Nine Worlds lengkap; lihat dokumen Cosmos.

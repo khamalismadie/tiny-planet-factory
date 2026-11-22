@@ -1,5 +1,14 @@
 # Dune + Biome Expansion — v0.7.0
 
+## Status saat ini (v0.15.9)
+
+- Spesifikasi v0.7 tetap berlaku untuk iklim, guild, dan gate Dune.
+- `ecosystemFor(planetId)` kini memilih salah satu dari **9 manager**, bukan hanya Terra/Dune.
+- Kesembilan planet aktif; tidak ada lagi planet “data-only”.
+- Sejak v0.15.7, pemilih 9 planet tersedia permanen di menu utama. `?planet=` tetap hook QA.
+- Cuaca tetap 4 tipe global; `badai-pasir` belum diimplementasikan.
+
+
 Tujuan: mengaktifkan planet kedua dengan ekosistemnya sendiri tanpa mengubah format DNA, renderer fauna, atau ritual build.
 
 ## Planet aktif
@@ -16,11 +25,11 @@ Tujuan: mengaktifkan planet kedua dengan ekosistemnya sendiri tanpa mengubah for
 | Aurelia | aktif di v0.13 | 11 (lihat dokumen sendiri) |
 | Cosmos | aktif di v0.14 | 10 (lihat dokumen sendiri) |
 
-Daftar aktif berada di `GUILD_PROFILES`. `isSupportedPlanet()` dipakai oleh `createPlanet()` dan QA hook supaya planet yang belum aktif tidak menghasilkan state ekologis palsu.
+Daftar aktif berada di `GUILD_PROFILES`. `isSupportedPlanet()` dipakai oleh `createPlanet()` dan QA hook supaya ID planet tidak dikenal tidak menghasilkan state ekologis palsu.
 
 ## Generalisasi yang dilakukan
 
-- `EcosystemManager` tidak lagi singleton Terra. `ecosystemFor(planetId)` memilih manager Terra atau Dune.
+- `EcosystemManager` tidak lagi singleton Terra. `ecosystemFor(planetId)` memilih salah satu dari 9 manager.
 - `initializeEcosystem()` dan `stepEcosystem()` dipanggil oleh engine/migrasi tanpa peduli planet.
 - `guilds.ts` memetakan guild visual per planet, termasuk food source dan objek target.
 - `Hud` dan `ecoScore()` mengambil config dari planet saat ini, bukan `terraConfig` tetap.
@@ -67,7 +76,7 @@ Rubah visual mengejar `deer`/`insect`; nasar mengejar `deer`. Kadal dan kumbang 
 
 ## Batas
 
-- Ini bukan editor biome penuh; tujuh planet lain masih data-only.
-- Tidak ada pilihan planet di UI utama saat ini; akses lewat query param/debug hook untuk QA.
+- Ini bukan editor biome penuh; ketujuh planet lain kini aktif (status historis: data-only).
+- Pemilih 9 planet tersedia permanen di menu utama sejak v0.15.7; `?planet=` tetap hook QA.
 - CUACA Dune masih memakai empat tipe cuaca global, belum `badai-pasir` khusus.
 - Palette warna Dune belum dipakai renderer; terrain tetap memakai bentuk generik dengan `terrainConfig` Dune.

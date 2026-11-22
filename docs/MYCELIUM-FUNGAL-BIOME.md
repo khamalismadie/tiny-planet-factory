@@ -1,5 +1,14 @@
 # Mycelia + Fungal Biome — v0.11.0
 
+## Status saat ini (v0.15.9)
+
+- Spesifikasi v0.11 tetap berlaku untuk jaringan, spora, bioluminesensi, dan hazard fungal.
+- Siklus aktual Mycelia adalah **120 tick**: 0–27, 28–59, 60–89, 90–119 (360 tick di bawah adalah spec historis).
+- Faktor mortalitas fungal-adapted aktual `0,004` vs `0,014` ≈ **0,29**, bukan tepat sepertiga.
+- Sejak v0.15.7, pemilih 9 planet tersedia permanen di menu utama. `?planet=` tetap hook QA.
+- Warna bercahaya dan partikel spora khusus belum diimplementasikan.
+
+
 Tujuan: menambahkan planet keenam dengan jaringan miselium, spora, bioluminesensi, dan pertukaran nutrisi tanpa menambah draw call atau objek baru.
 
 ## Status planet
@@ -20,7 +29,7 @@ Tujuan: menambahkan planet keenam dengan jaringan miselium, spora, bioluminesens
 
 ## Musim dan jaringan
 
-Total durasi Mycelia 360 tick. `eco.fungal` adalah ringkasan turunan dari `planet.tick`, cuaca, dan populasi, bukan state musim tersimpan.
+Total durasi Mycelia 360 tick pada spec v0.11; aktual v0.15.9 adalah 120 tick. `eco.fungal` adalah ringkasan turunan dari `planet.tick`, cuaca, dan populasi, bukan state musim tersimpan.
 
 | Musim | Tick | Modifikasi utama | Efek |
 |---|---|---|---|
@@ -54,7 +63,7 @@ Bonus musim: nutrisi +14 saat Musim Lembap, −4 saat Musim Tenang; stres +12 sa
 
 - Faktor vegetasi Mycelia: `1 + (network-50)*0.003 - networkStress*0.002`, dikalikan modifier musim.
 - Fertilitas Mycelia mendapat tambahan `nutrients*0.02 + (network-50)*0.01` setelah target dasar.
-- `networkStress` menambah mortalitas; trait `nutrient-exchange`, `fungal-network`, `spore-dispersal`, `bioluminescence`, dan `day-night-glow` menurunkan faktor menjadi sekitar sepertiga.
+- `networkStress` menambah mortalitas; trait `nutrient-exchange`, `fungal-network`, `spore-dispersal`, `bioluminescence`, dan `day-night-glow` menurunkan faktor menjadi `0,004` vs `0,014` (≈0,29, bukan tepat sepertiga).
 - Habitat kelembapan config Mycelia dilebarkan sampai ~100% karena iklim dasar 86% plus modifier musim.
 - Hazard prioritas: badai hujan → dingin → kriogenik → vulkanik → laut → **gangguan jaringan → spora beracun → kelembapan ekstrem** → kekeringan.
 - Tidak ada object type baru; jamur, pakuis, dan pohon spora tetap memakai `tree`/`bush`/`grass`.
@@ -81,7 +90,7 @@ Kelelawar spora memakai proksi guild burung; ngengat spora memakai proksi serang
 ## Gate
 
 - 11 populasi Mycelia; tidak ada kebocoran spesies planet lain.
-- Empat musim deterministik selama 360 tick.
+- Empat musim deterministik selama 120 tick pada v0.15.9 (spec historis: 360 tick).
 - Spora naik saat Musim Spora, cahaya naik saat Musim Cahaya, nutrisi naik saat Musim Lembap, stres naik saat Musim Tenang.
 - Jaringan tetap >0 dan 11 spesies tetap hidup setelah satu siklus penuh.
 - Agen deer/fox/bird/inset muncul; predator terhubung ke kijang spora melalui food web.
@@ -95,5 +104,5 @@ Kelelawar spora memakai proksi guild burung; ngengat spora memakai proksi serang
 
 - Belum ada warna bercahaya khusus di renderer; `fungal` saat ini memengaruhi sim/HUD.
 - Tidak ada partikel spora atau jaringan visual antar-prop.
-- Tidak ada UI selector planet permanen; akses lewat query param/debug hook untuk QA.
+- Pemilih 9 planet tersedia permanen di menu utama sejak v0.15.7; `?planet=` tetap hook QA.
 - Nine Worlds lengkap; lihat dokumen Cosmos.
