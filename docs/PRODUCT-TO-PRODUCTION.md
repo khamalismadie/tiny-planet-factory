@@ -442,6 +442,38 @@ Catatan: angka headless bukan pengganti angka device nyata.
 
 16. Tulis status akhir: lulus / gagal / belum diverifikasi device.
 
+### 11a. Gate khusus v0.21.0
+
+Rilis v0.21.0 **tidak boleh di-deploy ke produksi** sebelum issue #5–#8 benar-benar closed dengan laporan QA fisik dan screenshot/video asli. Ini mengikat lebih ketat daripada catatan umum di §11 bahwa P0 OPEN masih memperbolehkan RC: untuk v0.21.0, P0 OPEN adalah blocker deploy produksi.
+
+Sebelum trigger Netlify produksi:
+
+- [ ] #7 closed: minimal 3 run p95 v0.21.0 ≤ 33 ms dari `docs/QA-P95-REMEASURE.md`.
+- [ ] #6 closed: install → airplane mode → save terbaca → place → update dengan save utuh.
+- [ ] #8 closed: landscape `844×390` dan `layout.planetCenterVisible === true` tanpa overlap.
+- [ ] #5 closed: cold start 4G, pinch/drag, context loss/restore nyata, dan konsol bersih.
+- [ ] `package.json` = `0.21.0`; `public/sw.js` = `tpf-shell-v0-21-0`.
+- [ ] Build lokal sesuai: app chunk `index-BiS1XGVG.js`, 80,49 kB / gzip 26,42 kB.
+
+Sesaat setelah produksi berpindah:
+
+- [ ] `curl -s https://tinyplanetfactory.netlify.app/ | grep -oE 'index-[A-Za-z0-9_-]+\.js'` → `index-BiS1XGVG.js`.
+- [ ] `curl -s https://tinyplanetfactory.netlify.app/sw.js | grep -oE 'tpf-shell-v[0-9-]+'` → `tpf-shell-v0-21-0`.
+- [ ] `URL=https://tinyplanetfactory.netlify.app/ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test` → 8/8 PASS.
+- [ ] Manifest, `sw.js`, dan offline reload terverifikasi di produksi.
+- [ ] `docs/RELEASE.md` dan `docs/SPRINT.md` diperbarui dari “unreleased” menjadi status deploy aktif beserta commit produksi.
+
+Rollback v0.21.0 harus kembali ke artefak produksi v0.16.0:
+
+| Item | v0.21.0 | Rollback |
+|---|---|---|
+| Commit | `ec8f251` atau commit produksi yang dipilih | `e71e6c1` |
+| Bundle | `index-BiS1XGVG.js` | `index-Cl2SK4zO.js` |
+| SW cache | `tpf-shell-v0-21-0` | `tpf-shell-v0-16-0` |
+| Save/IndexedDB | kompatibel via migrasi `schemaVersion: 3` | tetap kompatibel |
+
+Jangan menggunakan preview #41 sebagai rollback; rollback harus ke build produksi v0.16.0 yang sebelumnya terverifikasi.
+
 ---
 
 ## 12. KPI & feedback loop
