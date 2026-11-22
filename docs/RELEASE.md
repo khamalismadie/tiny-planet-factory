@@ -402,6 +402,7 @@ Status jujur: instrumentasi dan runbook sudah siap, tetapi tidak ada klaim QA fi
 - [x] `test:sim` membuktikan setiap hazard yang benar-benar dipakai `habitatContextFor()` masih terdaftar di `climate.hazards` planet bersangkutan.
 - [x] 100 copy misi kini menyebut angka dan kata kunci yang sama dengan `MissionCheck`; klaim “spesies jamur/reptil” ditandai sebagai proxy, bukan mechanic baru.
 - [x] `test:sim` menolak copy yang angkanya tidak cocok atau kata kunci mechanic-nya meleset; gate tetap 8 buah.
+- [x] Perilaku reward saat XP pasif melompat level didokumentasikan di `docs/CAMPAIGN.md` dan diverifikasi `test:sim`: misi yang terlewat tidak dibayar mundur, misi aktif di level tujuan tetap memberi reward.
 - [x] Tidak ada planet, biome, objek, unlock, field DNA, atau `schemaVersion` baru.
 - [x] Build lokal app chunk 80,49 kB (gzip 26,42 kB); cache SW `tpf-shell-v0-21-0`.
 - [ ] **Belum di-deploy.** Produksi tetap bundle v0.16.0 `index-Cl2SK4zO.js` / cache `tpf-shell-v0-16-0`.

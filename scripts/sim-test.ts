@@ -1163,6 +1163,34 @@ nextMissionPlanet.progression.level = 2;
 syncCampaignMission(nextMissionPlanet);
 assert(nextMissionPlanet.mission.id === 'era1-02', 'level 2 harus mengaktifkan misi era1-02');
 
+// v0.21.0: XP pasif bisa menaikkan beberapa level dalam satu tick. Misi yang
+// terlewat tidak dibayar mundur; hanya misi aktif di level terbaru yang dapat reward.
+const skippedLevels = createPlanet(5153, 'XP Pasif Melompat');
+skippedLevels.progression.level = 2;
+syncCampaignMission(skippedLevels);
+skippedLevels.progression.xp = cumulativeXp(5);
+simulateTick(skippedLevels, false);
+assert(skippedLevels.progression.level === 5, `XP pasif harus melompat ke level 5: ${skippedLevels.progression.level}`);
+assert(skippedLevels.mission.id === 'era1-05', `misi harus tersinkron ke level 5: ${skippedLevels.mission.id}`);
+assert(
+  skippedLevels.progression.xp < cumulativeXp(5) + 100,
+  'level yang terlewat tidak boleh memberi reward misi secara mundur',
+);
+
+const skippedActive = createPlanet(5154, 'Misi Level Tujuan');
+skippedActive.progression.level = 2;
+syncCampaignMission(skippedActive);
+skippedActive.progression.xp = cumulativeXp(5);
+assert(placeObject(skippedActive, 'lake', [0, 1, 0]), 'misi lompat: danau pertama');
+assert(placeObject(skippedActive, 'lake', [0.3, 1, 0.2]), 'misi lompat: danau kedua');
+tickN(skippedActive, 3);
+assert(skippedActive.mission.id === 'era1-05', 'misi level tujuan tetap era1-05');
+assert(skippedActive.mission.status === 'complete', 'misi aktif di level tujuan harus tetap selesai');
+assert(
+  skippedActive.progression.xp >= cumulativeXp(5) + CAMPAIGN_BY_LEVEL[4].rewardXp,
+  'misi aktif di level tujuan tetap memberi reward',
+);
+
 const oceanProgressPlanet = createPlanet(5152, 'Progres Laut');
 assert(placeObject(oceanProgressPlanet, 'ocean', [0, 1, 0]), 'misi laut: ocean harus terpasang');
 assert(

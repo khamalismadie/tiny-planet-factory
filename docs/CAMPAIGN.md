@@ -54,6 +54,21 @@ DNA Points dan Bio Energy sengaja belum menjadi field DNA baru sampai P0 QA pera
 | Membuat ekosistem mandiri | 1.000 |
 | Menyelesaikan milestone planet | 2.000 |
 
+### Reward saat XP pasif melompat level
+
+XP pasif ditambahkan setiap tick dari kondisi lingkungan aktual:
+`jumlah metrik ideal × 0,12 + 0,08` jika vegetasi di atas 20. Level dihitung ulang dari total XP memakai `levelForXp()`, sehingga satu tick dapat menaikkan beberapa level sekaligus.
+
+Perilaku resminya:
+
+- `syncCampaignMission()` langsung memindahkan misi aktif ke misi level terbaru.
+- Reward misi yang terlewat **tidak dibayar mundur** dan tidak dibackfill.
+- Hanya misi aktif di level terbaru yang memberi reward, setelah progres penuh bertahan 3 tick.
+- XP event dan reward misi masuk ke pool XP yang sama, lalu level dihitung ulang lagi di akhir tick.
+- Tidak ada unlock objek yang terlewat: semua 12 tipe objek sudah tersedia sejak level 1.
+
+`test:sim` memverifikasi dua kondisi: lompat level lewat XP pasif tidak menambah reward misi yang dilewati, dan misi aktif di level tujuan tetap memberi reward seperti biasa.
+
 ## Jenis quest
 
 - **Penemuan** (`discovery`)
