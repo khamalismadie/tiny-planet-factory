@@ -19,6 +19,10 @@ export type MissionCheck =
   | { kind: 'weather'; type: WeatherType }
   | { kind: 'web'; target: number }
   | { kind: 'stage'; target: number }
+  | { kind: 'civilization'; target: number }
+  | { kind: 'industry'; target: number }
+  | { kind: 'ai'; target: number }
+  | { kind: 'cosmic'; target: number }
   | { kind: 'always' };
 
 export interface CampaignMission {
@@ -47,10 +51,15 @@ const fishAgents = (target: number): MissionCheck => ({ kind: 'fishAgents', targ
 const weather = (type: WeatherType): MissionCheck => ({ kind: 'weather', type });
 const web = (target: number): MissionCheck => ({ kind: 'web', target });
 const stage = (target: number): MissionCheck => ({ kind: 'stage', target });
+const civilization = (target: number): MissionCheck => ({ kind: 'civilization', target });
+const industry = (target: number): MissionCheck => ({ kind: 'industry', target });
+const ai = (target: number): MissionCheck => ({ kind: 'ai', target });
+const cosmic = (target: number): MissionCheck => ({ kind: 'cosmic', target });
 const always: MissionCheck = { kind: 'always' };
 
-// Misi 61-100 tetap dikatalogkan, tetapi terkunci sampai mekanik manusia,
-// industri, AI, dan kosmik tersedia. Tidak ada klaim fitur palsu.
+// Era 7-10 memakai skor sistem lanjutan yang diturunkan dari state sim nyata.
+// Tidak ada entitas manusia/industri/AI/alien baru; targetnya adalah proxy
+// yang jujur dari populasi, energi, biodiversitas, dan tahap planet.
 const ERA_SEEDS: MissionSeed[][] = [
   [
     { title: 'Dunia Baru', type: 'ecosystem', check: always, xp: 100 },
@@ -125,52 +134,52 @@ const ERA_SEEDS: MissionSeed[][] = [
     { title: 'Alam Sempurna', type: 'legendary', check: stage(6), xp: 500 },
   ],
   [
-    { title: 'Manusia Pertama', type: 'civilization', check: always, xp: 500 },
-    { title: 'Desa Kecil', type: 'civilization', check: always, xp: 500 },
-    { title: 'Ladang Pertama', type: 'production', check: always, xp: 500 },
-    { title: 'Pasokan Makanan', type: 'production', check: always, xp: 500 },
-    { title: 'Peternakan', type: 'civilization', check: always, xp: 500 },
-    { title: 'Pertumbuhan Komunitas', type: 'civilization', check: always, xp: 500 },
-    { title: 'Pengelolaan Air', type: 'production', check: always, xp: 500 },
-    { title: 'Ekonomi Desa', type: 'civilization', check: always, xp: 500 },
-    { title: 'Masyarakat Berkembang', type: 'civilization', check: always, xp: 500 },
-    { title: 'Peradaban Dimulai', type: 'legendary', check: always, xp: 500 },
+    { title: 'Manusia Pertama', type: 'civilization', check: civilization(30), xp: 500 },
+    { title: 'Desa Kecil', type: 'civilization', check: civilization(35), xp: 500 },
+    { title: 'Ladang Pertama', type: 'production', check: civilization(40), xp: 500 },
+    { title: 'Pasokan Makanan', type: 'production', check: civilization(45), xp: 500 },
+    { title: 'Peternakan', type: 'civilization', check: civilization(50), xp: 500 },
+    { title: 'Pertumbuhan Komunitas', type: 'civilization', check: civilization(55), xp: 500 },
+    { title: 'Pengelolaan Air', type: 'production', check: civilization(60), xp: 500 },
+    { title: 'Ekonomi Desa', type: 'civilization', check: civilization(65), xp: 500 },
+    { title: 'Masyarakat Berkembang', type: 'civilization', check: civilization(68), xp: 500 },
+    { title: 'Peradaban Dimulai', type: 'legendary', check: civilization(70), xp: 500 },
   ],
   [
-    { title: 'Workshop Pertama', type: 'civilization', check: always, xp: 500 },
-    { title: 'Operasi Pertambangan', type: 'production', check: always, xp: 500 },
-    { title: 'Penemuan Energi', type: 'production', check: always, xp: 500 },
-    { title: 'Tenaga Angin', type: 'production', check: always, xp: 500 },
-    { title: 'Revolusi Surya', type: 'production', check: always, xp: 500 },
-    { title: 'Pertumbuhan Industri', type: 'civilization', check: always, xp: 500 },
-    { title: 'Sistem Transportasi', type: 'civilization', check: always, xp: 500 },
-    { title: 'Dampak Lingkungan', type: 'ecosystem', check: always, xp: 500 },
-    { title: 'Teknologi Hijau', type: 'production', check: always, xp: 500 },
-    { title: 'Peradaban Berkelanjutan', type: 'legendary', check: always, xp: 500 },
+    { title: 'Workshop Pertama', type: 'civilization', check: industry(50), xp: 500 },
+    { title: 'Operasi Pertambangan', type: 'production', check: industry(52), xp: 500 },
+    { title: 'Penemuan Energi', type: 'production', check: industry(54), xp: 500 },
+    { title: 'Tenaga Angin', type: 'production', check: industry(56), xp: 500 },
+    { title: 'Revolusi Surya', type: 'production', check: industry(58), xp: 500 },
+    { title: 'Pertumbuhan Industri', type: 'civilization', check: industry(60), xp: 500 },
+    { title: 'Sistem Transportasi', type: 'civilization', check: industry(62), xp: 500 },
+    { title: 'Dampak Lingkungan', type: 'ecosystem', check: industry(64), xp: 500 },
+    { title: 'Teknologi Hijau', type: 'production', check: industry(66), xp: 500 },
+    { title: 'Peradaban Berkelanjutan', type: 'legendary', check: industry(68), xp: 500 },
   ],
   [
-    { title: 'Riset Lanjutan', type: 'civilization', check: always, xp: 500 },
-    { title: 'Penemuan Genetik', type: 'discovery', check: always, xp: 500 },
-    { title: 'Pertanian Cerdas', type: 'production', check: always, xp: 500 },
-    { title: 'Perlindungan Satwa', type: 'ecosystem', check: always, xp: 500 },
-    { title: 'Kendali Iklim', type: 'ecosystem', check: always, xp: 500 },
-    { title: 'Ekosistem Otomatis', type: 'ecosystem', check: always, xp: 500 },
-    { title: 'Kecerdasan Buatan', type: 'civilization', check: always, xp: 500 },
-    { title: 'Evolusi Genetik', type: 'discovery', check: always, xp: 500 },
-    { title: 'Optimasi Planet', type: 'ecosystem', check: always, xp: 500 },
-    { title: 'Peradaban Sempurna', type: 'legendary', check: always, xp: 500 },
+    { title: 'Riset Lanjutan', type: 'civilization', check: ai(65), xp: 500 },
+    { title: 'Penemuan Genetik', type: 'discovery', check: ai(67), xp: 500 },
+    { title: 'Pertanian Cerdas', type: 'production', check: ai(69), xp: 500 },
+    { title: 'Perlindungan Satwa', type: 'ecosystem', check: ai(71), xp: 500 },
+    { title: 'Kendali Iklim', type: 'ecosystem', check: ai(73), xp: 500 },
+    { title: 'Ekosistem Otomatis', type: 'ecosystem', check: ai(75), xp: 500 },
+    { title: 'Kecerdasan Buatan', type: 'civilization', check: ai(77), xp: 500 },
+    { title: 'Evolusi Genetik', type: 'discovery', check: ai(79), xp: 500 },
+    { title: 'Optimasi Planet', type: 'ecosystem', check: ai(81), xp: 500 },
+    { title: 'Peradaban Sempurna', type: 'legendary', check: ai(83), xp: 500 },
   ],
   [
-    { title: 'Penemuan Kosmik', type: 'exploration', check: always, xp: 500 },
-    { title: 'Kehidupan Alien', type: 'discovery', check: always, xp: 500 },
-    { title: 'Dunia Kristal', type: 'exploration', check: always, xp: 500 },
-    { title: 'Pulau Melayang', type: 'exploration', check: always, xp: 500 },
-    { title: 'Makhluk Purba', type: 'discovery', check: always, xp: 500 },
-    { title: 'Jaringan Planet', type: 'civilization', check: always, xp: 500 },
-    { title: 'Evolusi Kosmik', type: 'discovery', check: always, xp: 500 },
-    { title: 'Planet Hidup', type: 'legendary', check: always, xp: 1000 },
-    { title: 'Penjaga Semesta', type: 'legendary', check: always, xp: 2000 },
-    { title: 'Dewa Pencipta', type: 'legendary', check: always, xp: 2000 },
+    { title: 'Penemuan Kosmik', type: 'exploration', check: cosmic(55), xp: 500 },
+    { title: 'Kehidupan Alien', type: 'discovery', check: cosmic(57), xp: 500 },
+    { title: 'Dunia Kristal', type: 'exploration', check: cosmic(59), xp: 500 },
+    { title: 'Pulau Melayang', type: 'exploration', check: cosmic(61), xp: 500 },
+    { title: 'Makhluk Purba', type: 'discovery', check: cosmic(63), xp: 500 },
+    { title: 'Jaringan Planet', type: 'civilization', check: cosmic(65), xp: 500 },
+    { title: 'Evolusi Kosmik', type: 'discovery', check: cosmic(67), xp: 500 },
+    { title: 'Planet Hidup', type: 'legendary', check: cosmic(69), xp: 1000 },
+    { title: 'Penjaga Semesta', type: 'legendary', check: cosmic(71), xp: 2000 },
+    { title: 'Dewa Pencipta', type: 'legendary', check: cosmic(73), xp: 2000 },
   ],
 ];
 
@@ -182,7 +191,7 @@ export const CAMPAIGN: CampaignMission[] = ERA_SEEDS.flatMap((missions, eraIndex
     type: mission.type,
     check: mission.check,
     rewardXp: mission.xp,
-    locked: eraIndex >= 6,
+    locked: false,
   })),
 );
 

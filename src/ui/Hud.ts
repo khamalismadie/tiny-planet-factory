@@ -264,11 +264,12 @@ export class Hud {
     const era = eraForLevel(level);
     const percent = Math.round(view.progress * 100);
     const missionDone = view.status === 'complete';
+    const systemLine = view.system ? `<br>Sistem ${view.system}: ${view.systemScore}/100` : '';
     this.mission.innerHTML = missionDone
       ? `<strong>Misi selesai</strong><br>${view.title} ✓<br>${MISSION_TYPE_LABELS[view.type]} · +${view.rewardXp} XP`
       : view.locked
         ? `<strong>Misi: ${view.title}</strong><br>Terkunci — mekanik era ini belum tersedia.`
-        : `<strong>Misi: ${view.title}</strong><br>${MISSION_TYPE_LABELS[view.type]} · progres ${percent}%<br>Tahan ${view.holdTicks}/3 tick · +${view.rewardXp} XP`;
+        : `<strong>Misi: ${view.title}</strong><br>${MISSION_TYPE_LABELS[view.type]} · progres ${percent}%${systemLine}<br>Tahan ${view.holdTicks}/3 tick · +${view.rewardXp} XP`;
 
     const stage = Math.max(1, Math.min(6, planet.stage));
     const missionLine = missionDone

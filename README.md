@@ -14,7 +14,7 @@ npm test           # 8 gate: sim, scale, terrain, smoke, device, qa-load, menu, 
 
 Build memakai `NODE_OPTIONS=--max-old-space-size=4096` karena bundler PixiJS 3D membutuhkan heap lebih besar dari default Node.
 
-Kode `main` adalah `v0.17.0` (**belum di-deploy**). Rilisan produksi aktif tetap `v0.16.0` di <https://tinyplanetfactory.netlify.app/>. Hook QA: `?debug=1`, `?perf=1`, `?quality=low|medium|high`, `?eco=1`, `?menu=0`, `?campaign=1`, `?planet=...`, `?seed=N`, dan `?qa=1&qaSeconds=45&qaObjects=N` (`qaObjects` maks 96, `qaSeconds` maks 180). Saat `?debug=1`, varian dibaca lewat `window.__game.variants()` dan progresi lewat `window.__game.campaign()`.
+Kode `main` adalah `v0.18.0` (**belum di-deploy**). Rilisan produksi aktif tetap `v0.16.0` di <https://tinyplanetfactory.netlify.app/>. Hook QA: `?debug=1`, `?perf=1`, `?quality=low|medium|high`, `?eco=1`, `?menu=0`, `?campaign=1`, `?planet=...`, `?seed=N`, dan `?qa=1&qaSeconds=45&qaObjects=N` (`qaObjects` maks 96, `qaSeconds` maks 180). Saat `?debug=1`, varian dibaca lewat `window.__game.variants()` dan progresi lewat `window.__game.campaign()`.
 
 ### Cek cepat varian
 
@@ -73,7 +73,7 @@ Dengan seed `1`, Dune memakai `sand: Dune`, `rock: Sandstone`, `tree: Oak`, dan 
 - Responsive portrait/landscape; UI memakai overlay DOM di atas kanvas PixiJS.
 - Quality tier (`low`/`medium`/`high`) + adaptive downgrade otomatis bila p95 frame time > 34 ms.
 - Overlay performa (`?perf=1`), hook QA (`?debug=1`), dan probe `?qa=1&qaSeconds=45` yang menghasilkan laporan p50/p95 + info perangkat siap disalin.
-- Vendor PixiJS dipisah menjadi `pixi-core` + `pixi-3d`; data konten dan codec DNA berbagi chunk `planet-configs` untuk menghindari inisialisasi circular. App chunk v0.17.0 adalah 75,00 kB (gzip 24,55 kB).
+- Vendor PixiJS dipisah menjadi `pixi-core` + `pixi-3d`; data konten dan codec DNA berbagi chunk `planet-configs` untuk menghindari inisialisasi circular. App chunk v0.18.0 adalah 75,00 kB (gzip 24,55 kB).
 - Telemetri opt-in (tersimpan lokal, tanpa server) dengan modal penjelasan, ekspor JSON, dan hapus data.
 - Visual polish v0.15.9: satu merged geometry per tipe dengan warna per-facet, AO vertikal + bayangan kontak baked, shade lereng planet, awan 10×6, ground contact dari ekstent geometri, rim light, dan topbar mobile tanpa overflow. Standar visual ada di `docs/ART-DIRECTION.md`.
 - Asset varian v0.16.0: 49 pilihan (39 prop + 10 fauna) dari 43 builder unik, dipilih deterministik dari `seed + planetId`, satu geometri aktif per tipe, bias visual 9 planet, tanpa tekstur/DNA/draw call baru. Katalog ada di `docs/ASSET-CATALOG.md`.

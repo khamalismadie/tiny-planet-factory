@@ -273,6 +273,9 @@ const checks = {
   simulationAdvanced: grown.tick >= 120,
   levelUnlocked: grown.progression.level >= 2,
   campaignHookReady: grownDom.campaign?.maxLevel === 100 && grownDom.campaign?.total === 100,
+  advancedSystemsHook: grownDom.campaign?.lockedFrom === null
+    && Object.values(grownDom.campaign?.systems?.scores ?? {}).every((score) => score >= 0 && score <= 100)
+    && Object.values(grownDom.campaign?.systems?.tiers ?? {}).every((tier) => tier >= 1 && tier <= 5),
   ecosystemGrew: grown.environment.oxygen > initialState.environment.oxygen && grown.ecosystem.vegetation > initialState.ecosystem.vegetation,
   campaignMissionTracked: grown.mission.status === 'complete' || (grownDom.campaign?.mission.progress ?? 0) > 0,
   missionUiUpdated: /Misi/.test(grownDom.mission) && !/terkunci/.test(grownDom.mission),
