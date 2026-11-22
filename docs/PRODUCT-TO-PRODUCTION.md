@@ -259,6 +259,7 @@ v0.17.0: campaign 100 level / 10 era (unreleased on main)
 v0.18.0: misi 61-100 aktif lewat skor sistem lanjutan (unreleased on main)
 v0.19.0: FTUE hybrid + tips in-game (unreleased on main)
 v0.20.0: QA device evidence pack (unreleased on main)
+v0.21.0: planet mechanic/copy sync audit (unreleased on main)
 ```
 
 ### Versioning

@@ -1,6 +1,6 @@
 # Tiny Planet Factory — Campaign & Leveling
 
-> **Versi:** v0.20.0 (unreleased di `main`; produksi masih v0.16.0)  
+> **Versi:** v0.21.0 (unreleased di `main`; produksi masih v0.16.0)  
 > **Source of truth:** `src/sim/progression.ts`, `src/sim/campaignRules.ts`, `src/content/campaignCopy.ts`
 
 ## Core loop
@@ -31,7 +31,7 @@ Total XP untuk mencapai level 100: **1.723.920** — masih muat di field DNA `u3
 
 ## Tiga jalur progresi
 
-| Mata uang | Status v0.20.0 | Sumber |
+| Mata uang | Status v0.21.0 | Sumber |
 |---|---|---|
 | Planet XP | Tersimpan di state/DNA | Aksi simulasi + reward misi |
 | DNA Points | **Derived, belum disimpan** | Jumlah spesies ditemukan |
@@ -54,6 +54,21 @@ DNA Points dan Bio Energy sengaja belum menjadi field DNA baru sampai P0 QA pera
 | Membuat ekosistem mandiri | 1.000 |
 | Menyelesaikan milestone planet | 2.000 |
 
+### Reward saat XP pasif melompat level
+
+XP pasif ditambahkan setiap tick dari kondisi lingkungan aktual:
+`jumlah metrik ideal × 0,12 + 0,08` jika vegetasi di atas 20. Level dihitung ulang dari total XP memakai `levelForXp()`, sehingga satu tick dapat menaikkan beberapa level sekaligus.
+
+Perilaku resminya:
+
+- `syncCampaignMission()` langsung memindahkan misi aktif ke misi level terbaru.
+- Reward misi yang terlewat **tidak dibayar mundur** dan tidak dibackfill.
+- Hanya misi aktif di level terbaru yang memberi reward, setelah progres penuh bertahan 3 tick.
+- XP event dan reward misi masuk ke pool XP yang sama, lalu level dihitung ulang lagi di akhir tick.
+- Tidak ada unlock objek yang terlewat: semua 12 tipe objek sudah tersedia sejak level 1.
+
+`test:sim` memverifikasi dua kondisi: lompat level lewat XP pasif tidak menambah reward misi yang dilewati, dan misi aktif di level tujuan tetap memberi reward seperti biasa.
+
 ## Jenis quest
 
 - **Penemuan** (`discovery`)
@@ -63,13 +78,13 @@ DNA Points dan Bio Energy sengaja belum menjadi field DNA baru sampai P0 QA pera
 - **Peradaban** (`civilization`)
 - **Legendaris** (`legendary`)
 
-Daily, weekly, monthly, seasonal, hidden, dan achievement collection **belum diimplementasikan**; ini bukan fitur rilis v0.20.0.
+Daily, weekly, monthly, seasonal, hidden, dan achievement collection **belum diimplementasikan**; ini bukan fitur rilis v0.21.0.
 
 ## 10 era · 100 main mission
 
 Misi 1–60 dievaluasi dari state simulator yang sudah ada. Misi 61–100 juga **aktif** sejak v0.18.0, tetapi memakai skor sistem lanjutan yang diturunkan dari sim yang sama. Tidak ada entitas manusia, pabrik, AI, atau alien literal yang ditambahkan; target era 7–10 adalah proxy yang jujur dari populasi, energi, biodiversitas, dan tahap planet.
 
-> **Kalibrasi reachability:** `test:sim` membangun state nyata lewat `createPlanet`, `placeObject`, dan `simulateTick` untuk membuktikan semua 100 misi bisa mencapai progres 1. Target fauna disesuaikan dengan kapasitas aktual simulator (state teruji mencapai 21 agen dan 9 ikan), sehingga label “spesies” tetap dibaca sebagai proxy jumlah agen.
+> **Kalibrasi reachability:** `test:sim` membangun state nyata lewat `createPlanet`, `placeObject`, dan `simulateTick` untuk membuktikan semua 100 misi bisa mencapai progres 1. Target fauna disesuaikan dengan kapasitas aktual simulator (state teruji mencapai 21 agen dan 9 ikan). Sejak v0.21.0, copy target wajib menyebut angka dan kata kunci check yang sama: `species` = jumlah spesies ditemukan, `agents`/`fishAgents` = jumlah agen, `web` = jumlah jaring, `stage` = tahap. Label tematik seperti “jamur” atau “reptil” ditulis sebagai proxy, bukan klaim mechanic baru.
 
 ### Sistem lanjutan (era 7–10)
 
@@ -95,10 +110,10 @@ Tema: Planet baru terbentuk.
 | 3 | era1-03 | Planet Biru | Isi 30% planet dengan air. | Ekosistem | 120 | aktif |
 | 4 | era1-04 | Pembentuk Gunung | Bangun 3 gunung. | Produksi | 120 | aktif |
 | 5 | era1-05 | Sungai Pertama | Buat 2 aliran sungai/danau. | Ekosistem | 140 | aktif |
-| 6 | era1-06 | Tanah Subur | Ciptakan 5 area tanah subur. | Produksi | 140 | aktif |
-| 7 | era1-07 | Sinar Matahari | Aktifkan siklus siang dan malam lewat energi. | Ekosistem | 160 | aktif |
+| 6 | era1-06 | Tanah Subur | Ciptakan 5 area rumput subur. | Produksi | 140 | aktif |
+| 7 | era1-07 | Sinar Matahari | Capai energi 45. | Ekosistem | 160 | aktif |
 | 8 | era1-08 | Atmosfer Pertama | Capai kondisi atmosfer stabil (oksigen ≥ 45). | Ekosistem | 180 | aktif |
-| 9 | era1-09 | Siklus Air | Aktifkan hujan dan penguapan. | Penemuan | 200 | aktif |
+| 9 | era1-09 | Siklus Air | Aktifkan hujan. | Penemuan | 200 | aktif |
 | 10 | era1-10 | Planet Selesai | Capai planet layak huni (tahap 5). | Legendaris | 500 | aktif |
 
 ### Era 2 — Primordial (Level 11–20)
@@ -107,16 +122,16 @@ Tema: Mikroorganisme pertama.
 
 | Level | ID | Misi | Target | Tipe | Reward XP | Status |
 |---:|---|---|---|---|---:|---|
-| 11 | era2-01 | Awal Kecil | Introduksi 3 makhluk pertama. | Penemuan | 200 | aktif |
+| 11 | era2-01 | Awal Kecil | Temukan 3 spesies pertama. | Penemuan | 200 | aktif |
 | 12 | era2-02 | Ledakan Mikroba | Miliki populasi 100. | Ekosistem | 180 | aktif |
-| 13 | era2-03 | Sel Hijau | Temukan 4 spesies sebagai proxy alga. | Penemuan | 200 | aktif |
+| 13 | era2-03 | Sel Hijau | Temukan 4 spesies (proxy alga). | Penemuan | 200 | aktif |
 | 14 | era2-04 | Produsen Oksigen | Bangun populasi fotosintetik (oksigen ≥ 55). | Ekosistem | 220 | aktif |
-| 15 | era2-05 | Dunia Mikroba | Miliki 5 spesies mikroorganisme. | Penemuan | 240 | aktif |
-| 16 | era2-06 | Rantai Makanan Pertama | Buat rantai makanan 2 tingkat. | Ekosistem | 260 | aktif |
-| 17 | era2-07 | Penguraian | Aktifkan sistem penguraian (kesehatan ≥ 55). | Ekosistem | 240 | aktif |
+| 15 | era2-05 | Dunia Mikroba | Temukan 5 spesies (proxy mikroba). | Penemuan | 240 | aktif |
+| 16 | era2-06 | Rantai Makanan Pertama | Buat 1 jaring makanan. | Ekosistem | 260 | aktif |
+| 17 | era2-07 | Penguraian | Capai kesehatan ekosistem 55. | Ekosistem | 240 | aktif |
 | 18 | era2-08 | Siklus Nutrisi | Seimbangkan nutrisi tanah (kesuburan ≥ 60). | Ekosistem | 260 | aktif |
-| 19 | era2-09 | Keanekaragaman Mikroba | Miliki 12 agen mikroba. | Penemuan | 280 | aktif |
-| 20 | era2-10 | Asal Usul Kehidupan | Capai ekosistem mikroba stabil (tahap 5). | Legendaris | 500 | aktif |
+| 19 | era2-09 | Keanekaragaman Mikroba | Miliki 12 agen fauna. | Penemuan | 280 | aktif |
+| 20 | era2-10 | Asal Usul Kehidupan | Capai tahap 5. | Legendaris | 500 | aktif |
 
 ### Era 3 — Green Age (Level 21–30)
 
@@ -124,16 +139,16 @@ Tema: Tumbuhan dan hutan.
 
 | Level | ID | Misi | Target | Tipe | Reward XP | Status |
 |---:|---|---|---|---|---:|---|
-| 21 | era3-01 | Benih Pertama | Tanam 10 tanaman/pohon. | Produksi | 240 | aktif |
-| 22 | era3-02 | Rumput Hijau | Tutupi daratan dengan 20 rumput. | Produksi | 260 | aktif |
-| 23 | era3-03 | Kekuatan Bunga | Tanam 5 jenis bunga. | Penemuan | 280 | aktif |
+| 21 | era3-01 | Benih Pertama | Tanam 10 pohon. | Produksi | 240 | aktif |
+| 22 | era3-02 | Rumput Hijau | Tanam 20 rumput. | Produksi | 260 | aktif |
+| 23 | era3-03 | Kekuatan Bunga | Tanam 5 bunga. | Penemuan | 280 | aktif |
 | 24 | era3-04 | Arsitek Hutan | Tumbuhkan 15 pohon. | Produksi | 300 | aktif |
 | 25 | era3-05 | Perluasan Hutan | Ciptakan hutan dengan 25 pohon. | Produksi | 320 | aktif |
 | 26 | era3-06 | Surga Buah | Tanam 8 pohon berbunga/berbuah. | Produksi | 300 | aktif |
-| 27 | era3-07 | Taman Lahan Basah | Ciptakan lahan basah (4 danau). | Ekosistem | 320 | aktif |
-| 28 | era3-08 | Penemuan Botani | Temukan 5 spesies tanaman. | Penemuan | 340 | aktif |
+| 27 | era3-07 | Taman Lahan Basah | Buat 4 danau. | Ekosistem | 320 | aktif |
+| 28 | era3-08 | Penemuan Botani | Temukan 5 spesies (proxy botani). | Penemuan | 340 | aktif |
 | 29 | era3-09 | Biodiversitas Hutan | Capai vegetasi 70. | Ekosistem | 360 | aktif |
-| 30 | era3-10 | Hutan Agung | Ciptakan hutan 3 lapisan (tahap 6). | Legendaris | 500 | aktif |
+| 30 | era3-10 | Hutan Agung | Capai tahap 6. | Legendaris | 500 | aktif |
 
 ### Era 4 — Wildlife Age (Level 31–40)
 
@@ -141,16 +156,16 @@ Tema: Hewan dan rantai makanan.
 
 | Level | ID | Misi | Target | Tipe | Reward XP | Status |
 |---:|---|---|---|---|---:|---|
-| 31 | era4-01 | Makhluk Pertama | Introduksi 3 spesies hewan. | Penemuan | 320 | aktif |
-| 32 | era4-02 | Surga Herbivora | Miliki 12 agen herbivora. | Penemuan | 340 | aktif |
+| 31 | era4-01 | Makhluk Pertama | Temukan 3 spesies (proxy fauna). | Penemuan | 320 | aktif |
+| 32 | era4-02 | Surga Herbivora | Miliki 12 agen fauna. | Penemuan | 340 | aktif |
 | 33 | era4-03 | Kedatangan Predator | Introduksi predator pertama (1 jaring makanan). | Ekosistem | 360 | aktif |
-| 34 | era4-04 | Keluarga Hewan | Miliki 18 agen mamalia. | Penemuan | 380 | aktif |
+| 34 | era4-04 | Keluarga Hewan | Miliki 18 agen fauna. | Penemuan | 380 | aktif |
 | 35 | era4-05 | Penghuni Langit | Miliki 20 agen hewan. | Penemuan | 400 | aktif |
 | 36 | era4-06 | Perayap Kecil | Miliki 20 agen hewan aktif. | Penemuan | 380 | aktif |
-| 37 | era4-07 | Kerajaan Reptil | Miliki 5 spesies reptil. | Penemuan | 400 | aktif |
-| 38 | era4-08 | Keseimbangan Alam | Bentuk 3 hubungan predator-mangsa. | Ekosistem | 420 | aktif |
+| 37 | era4-07 | Kerajaan Reptil | Temukan 5 spesies (proxy reptil). | Penemuan | 400 | aktif |
+| 38 | era4-08 | Keseimbangan Alam | Bentuk 2 jaring predator-mangsa. | Ekosistem | 420 | aktif |
 | 39 | era4-09 | Suaka Satwa | Capai 20 agen satwa stabil. | Ekosistem | 440 | aktif |
-| 40 | era4-10 | Kerajaan Hewan | Capai 25 spesies hewan (tahap 6). | Legendaris | 500 | aktif |
+| 40 | era4-10 | Kerajaan Hewan | Capai tahap 6. | Legendaris | 500 | aktif |
 
 ### Era 5 — Aquatic Age (Level 41–50)
 
@@ -158,16 +173,16 @@ Tema: Kehidupan air.
 
 | Level | ID | Misi | Target | Tipe | Reward XP | Status |
 |---:|---|---|---|---|---:|---|
-| 41 | era5-01 | Masuk Laut | Buka biome laut (1 samudra). | Penemuan | 400 | aktif |
+| 41 | era5-01 | Masuk Laut | Bangun 1 samudra. | Penemuan | 400 | aktif |
 | 42 | era5-02 | Ikan Pertama | Introduksi 5 ikan. | Penemuan | 420 | aktif |
-| 43 | era5-03 | Taman Karang | Tanam 5 jenis koral (proxy samudra). | Produksi | 440 | aktif |
-| 44 | era5-04 | Pembangun Terumbu | Bangun 1 ekosistem terumbu karang. | Ekosistem | 460 | aktif |
-| 45 | era5-05 | Laut Dalam | Buka laut dalam (12 samudra). | Eksplorasi | 480 | aktif |
-| 46 | era5-06 | Raksasa Laut | Introduksi hewan laut besar (8 ikan). | Penemuan | 500 | aktif |
+| 43 | era5-03 | Taman Karang | Bangun 5 samudra. | Produksi | 440 | aktif |
+| 44 | era5-04 | Pembangun Terumbu | Bangun 8 samudra. | Ekosistem | 460 | aktif |
+| 45 | era5-05 | Laut Dalam | Bangun 12 samudra. | Eksplorasi | 480 | aktif |
+| 46 | era5-06 | Raksasa Laut | Miliki 8 ikan. | Penemuan | 500 | aktif |
 | 47 | era5-07 | Rantai Makanan Laut | Buat rantai makanan laut (2 jaring). | Ekosistem | 480 | aktif |
-| 48 | era5-08 | Kehidupan Pesisir | Bangun mangrove dan pesisir (6 danau). | Ekosistem | 460 | aktif |
+| 48 | era5-08 | Kehidupan Pesisir | Bangun 6 danau. | Ekosistem | 460 | aktif |
 | 49 | era5-09 | Keanekaragaman Laut | Miliki 9 ikan di ekosistem laut. | Penemuan | 500 | aktif |
-| 50 | era5-10 | Penguasa Samudra | Stabilkan 3 habitat perairan (15 samudra). | Legendaris | 500 | aktif |
+| 50 | era5-10 | Penguasa Samudra | Bangun 15 samudra. | Legendaris | 500 | aktif |
 
 ### Era 6 — Biodiversity Age (Level 51–60)
 
@@ -175,16 +190,16 @@ Tema: Ekosistem kompleks.
 
 | Level | ID | Misi | Target | Tipe | Reward XP | Status |
 |---:|---|---|---|---|---:|---|
-| 51 | era6-01 | Kerajaan Jamur | Temukan 5 spesies jamur. | Penemuan | 500 | aktif |
-| 52 | era6-02 | Jaringan Pengurai | Aktifkan penguraian organik (kesehatan 70). | Ekosistem | 500 | aktif |
-| 53 | era6-03 | Surga Penyerbuk | Dukung 20 agen penyerbuk dan fauna terkait. | Ekosistem | 500 | aktif |
-| 54 | era6-04 | Kehidupan Gurun | Bangun biome gurun (20 pasir). | Eksplorasi | 500 | aktif |
-| 55 | era6-05 | Dunia Beku | Bangun biome tundra (salju). | Eksplorasi | 500 | aktif |
-| 56 | era6-06 | Surga Tropis | Bangun biome tropis (40 pohon). | Ekosistem | 500 | aktif |
-| 57 | era6-07 | Hubungan Bioma | Hubungkan 3 biome (tahap 6). | Ekosistem | 500 | aktif |
-| 58 | era6-08 | Spesies Langka | Temukan 3 spesies langka. | Eksplorasi | 500 | aktif |
+| 51 | era6-01 | Kerajaan Jamur | Temukan 5 spesies (proxy jamur). | Penemuan | 500 | aktif |
+| 52 | era6-02 | Jaringan Pengurai | Capai kesehatan ekosistem 70. | Ekosistem | 500 | aktif |
+| 53 | era6-03 | Surga Penyerbuk | Miliki 20 agen fauna. | Ekosistem | 500 | aktif |
+| 54 | era6-04 | Kehidupan Gurun | Bangun 20 area pasir. | Eksplorasi | 500 | aktif |
+| 55 | era6-05 | Dunia Beku | Aktifkan salju. | Eksplorasi | 500 | aktif |
+| 56 | era6-06 | Surga Tropis | Tanam 40 pohon. | Ekosistem | 500 | aktif |
+| 57 | era6-07 | Hubungan Bioma | Capai tahap 6. | Ekosistem | 500 | aktif |
+| 58 | era6-08 | Spesies Langka | Temukan 5 spesies. | Eksplorasi | 500 | aktif |
 | 59 | era6-09 | Ledakan Biodiversitas | Capai 20 agen fauna aktif. | Ekosistem | 500 | aktif |
-| 60 | era6-10 | Alam Sempurna | Miliki 5 biome stabil (tahap 6). | Legendaris | 500 | aktif |
+| 60 | era6-10 | Alam Sempurna | Capai tahap 6. | Legendaris | 500 | aktif |
 
 ### Era 7 — Civilization Age (Level 61–70)
 

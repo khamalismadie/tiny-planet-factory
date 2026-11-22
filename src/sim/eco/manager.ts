@@ -23,6 +23,38 @@ function clamp(value: number, min = 0, max = 100): number {
   return Math.max(min, Math.min(max, value));
 }
 
+/**
+ * Resolver cuaca memakai label generik yang sama untuk beberapa planet.
+ * Alias ini memetakannya ke label yang dideklarasikan tiap PlanetConfig,
+ * sehingga `climate.hazards` bukan metadata mati. Perilaku habitat tetap
+ * hanya melihat ada/tidaknya hazard, bukan string-nya.
+ */
+const HAZARD_ALIASES: Record<string, string[]> = {
+  'badai-hujan': [
+    'badai-pasir', 'badai-salju', 'badai-laut', 'erupsi-gunung-berapi',
+    'spora-beracun', 'badai-radiasi', 'badai-daun', 'angin-kencang',
+  ],
+  'gelombang-dingin': [
+    'gelombang-dingin-ekstrem', 'badai-salju', 'badai-pasir', 'hujan-abu',
+    'embun-beku', 'kelembapan-ekstrem', 'gelombang-panas-laut', 'badai-radiasi',
+    'angin-kencang', 'spora-beracun', 'badai-daun', 'erupsi-gunung-berapi',
+  ],
+  'kekeringan-musiman': [
+    'kekeringan-ekstrem', 'kekeringan-awan', 'kekeringan-musim-panas',
+    'pencairan-glasial', 'gelombang-panas-laut', 'gelombang-panas',
+    'kelembapan-ekstrem', 'badai-radiasi',
+  ],
+  'gangguan-jaringan': ['gangguan-jaringan-miselium'],
+  'putusnya-pulau-melayang': ['badai-radiasi', 'hujan-meteor', 'anomali-gravitasi'],
+};
+
+export function canonicalHazard(config: PlanetConfig, hazard: string | null): string | null {
+  if (!hazard) return null;
+  if (config.climate.hazards.includes(hazard)) return hazard;
+  const preferred = HAZARD_ALIASES[hazard]?.find((label) => config.climate.hazards.includes(label));
+  return preferred ?? hazard;
+}
+
 function initialFraction(definition: SpeciesDefinition): number {
   switch (definition.trophicLevel) {
     case 'producer': return 0.36;
@@ -257,7 +289,7 @@ export function habitatContextFor(planet: PlanetState, config: PlanetConfig): Ha
           reefCoverage: planet.eco.ocean.reefHealth,
         }
       : config.aquatic,
-    hazard,
+    hazard: canonicalHazard(config, hazard),
   };
 }
 
