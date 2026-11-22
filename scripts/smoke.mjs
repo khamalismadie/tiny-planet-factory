@@ -1,7 +1,7 @@
 import { chromium } from 'playwright';
 
 const base = process.env.URL ?? 'http://127.0.0.1:4173/';
-const url = `${base}${base.includes('?') ? '&' : '?'}debug=1`;
+const url = `${base}${base.includes('?') ? '&' : '?'}debug=1&tutorial=1`;
 const browser = await chromium.launch({ headless: true, args: [] });
 const page = await browser.newPage({ viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1 });
 let phase = 'boot';
@@ -33,6 +33,8 @@ const dom = await page.evaluate(() => ({
   ecoPanelHiddenByDefault: getComputedStyle(document.getElementById('eco-detail')).display === 'none',
   centerElement: document.elementFromPoint(640, 400)?.tagName,
   manifest: !!document.querySelector('link[rel="manifest"]'),
+  tutorial: window.__game.tutorial?.() ?? null,
+  objective: document.getElementById('objective-strip')?.textContent ?? '',
 }));
 
 // Real pointer placement: default tool is grass.
@@ -40,6 +42,7 @@ phase = 'tap';
 await page.mouse.click(640, 400);
 await page.waitForTimeout(250);
 const afterClick = await state();
+const tutorialAfterTap = await page.evaluate(() => window.__game.tutorial?.() ?? null);
 
 // Accelerate the simulation and place a balanced ecosystem through the debug hook.
 const dirs = [
@@ -75,6 +78,8 @@ const grownDom = await page.evaluate(() => ({
   events: document.getElementById('events')?.textContent ?? '',
   ecosystem: document.getElementById('ecosystem')?.textContent ?? '',
   campaign: window.__game.campaign?.() ?? null,
+  tutorial: window.__game.tutorial?.() ?? null,
+  objective: document.getElementById('objective-strip')?.textContent ?? '',
 }));
 const grownMetrics = await snapshot();
 
@@ -276,6 +281,10 @@ const checks = {
   advancedSystemsHook: grownDom.campaign?.lockedFrom === null
     && Object.values(grownDom.campaign?.systems?.scores ?? {}).every((score) => score >= 0 && score <= 100)
     && Object.values(grownDom.campaign?.systems?.tiers ?? {}).every((tier) => tier >= 1 && tier <= 5),
+  ftueStarts: dom.tutorial?.active === true && dom.tutorial?.step === 1 && dom.objective.includes('Panduan 1/3'),
+  ftueAdvancesOnPlacement: tutorialAfterTap?.active === true && tutorialAfterTap?.step === 2,
+  ftueCompletes: grownDom.tutorial?.completed === true && grownDom.tutorial?.active === false,
+  ftueRestoresObjective: !grownDom.objective.includes('Panduan'),
   ecosystemGrew: grown.environment.oxygen > initialState.environment.oxygen && grown.ecosystem.vegetation > initialState.ecosystem.vegetation,
   campaignMissionTracked: grown.mission.status === 'complete' || (grownDom.campaign?.mission.progress ?? 0) > 0,
   missionUiUpdated: /Misi/.test(grownDom.mission) && !/terkunci/.test(grownDom.mission),

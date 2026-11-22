@@ -2,7 +2,7 @@
 
 Gunakan checklist ini sebelum publish build produksi.
 
-> **Status pembacaan v0.15.9:** angka 360 tick pada phase v0.10–v0.14 adalah spesifikasi historis. Sejak v0.15.4, semua siklus musim aktif berada pada **106–120 tick** (divalidasi `test:sim`). Bagian bertanda v0.4–v0.14 adalah catatan rilis, bukan klaim kondisi saat ini; lihat §2u–§2ab untuk status terkini. `main` adalah v0.18.0 (unreleased); produksi masih v0.16.0.
+> **Status pembacaan v0.15.9:** angka 360 tick pada phase v0.10–v0.14 adalah spesifikasi historis. Sejak v0.15.4, semua siklus musim aktif berada pada **106–120 tick** (divalidasi `test:sim`). Bagian bertanda v0.4–v0.14 adalah catatan rilis, bukan klaim kondisi saat ini; lihat §2u–§2ab untuk status terkini. `main` adalah v0.19.0 (unreleased); produksi masih v0.16.0.
 
 ## 1. Prasyarat
 
@@ -19,7 +19,7 @@ npm run build
 PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 ```
 
-- [ ] `npm run build` tanpa error. Chunk vendor: `pixi-core` + `pixi-3d`, app chunk < 100 kB (v0.18.0: 75,09 kB / gzip 24,59 kB; produksi v0.16.0: 73,33 kB).
+- [ ] `npm run build` tanpa error. Chunk vendor: `pixi-core` + `pixi-3d`, app chunk < 100 kB (v0.19.0: 79,07 kB / gzip 25,88 kB; produksi v0.16.0: 73,33 kB).
 - [ ] `PASS: sim`
 - [ ] `PASS: art scale`
 - [ ] `PASS: terrain render`
@@ -349,6 +349,23 @@ Status jujur: fitur campaign sudah ada di `main`, tetapi klaim produksi dan real
 - [ ] QA perangkat nyata v0.18.0 belum dijalankan; P0 Sprint 09 tetap OPEN.
 
 Status jujur: 100 misi sekarang aktif di `main`, tetapi produksi dan real-device masih mengacu ke v0.16.0.
+
+## 2ad. FTUE Hybrid & Tutorial In-Game (v0.19.0 — unreleased di `main`)
+
+- [x] Modal **Cara pakai UI** tetap dipakai sebagai referensi manual, dengan tombol **Ulangi panduan**.
+- [x] FTUE otomatis 3 langkah untuk save baru: tanam objek pertama, putar/zoom sambil menunggu 10 tick, lalu selesaikan misi pertama; progres panduan bisa dilanjutkan setelah reload.
+- [x] Instruksi memakai elemen `#objective-strip` yang sudah ada; tidak menambah panel, modal blocking, atau tinggi strip beyond baseline.
+- [x] Fokus ditandai dengan outline mint; animasi dihentikan bila `prefers-reduced-motion`.
+- [x] Tips one-shot: cuaca pertama, agen pertama, unlock level 2, era lanjutan level 61, dan DNA pertama.
+- [x] Status tutorial di `localStorage['tpf.tutorial.v1']`, terpisah dari DNA; `schemaVersion` tetap 3.
+- [x] Hook QA `?tutorial=0|1` dan `window.__game.tutorial()`; mode `debug`/`qa`/`campaign`/`planet`/`menu=0` tidak menjalankan FTUE kecuali `tutorial=1`.
+- [x] `test:smoke` memverifikasi FTUE mulai, maju saat placement, selesai setelah misi/level, dan objective kembali normal.
+- [x] `test:menu` memverifikasi tombol **Ulangi panduan** dan `test:layout` memverifikasi objective tetap `53/53/48 px` dalam mode tutorial.
+- [x] Build lokal app chunk 79,07 kB (gzip 25,88 kB); cache SW `tpf-shell-v0-19-0`.
+- [ ] **Belum di-deploy.** Produksi tetap bundle v0.16.0 `index-Cl2SK4zO.js` / cache `tpf-shell-v0-16-0`.
+- [ ] QA perangkat nyata v0.19.0 belum dijalankan; P0 Sprint 09 tetap OPEN.
+
+Status jujur: tutorial berjalan di `main`, tetapi produksi dan real-device masih mengacu ke v0.16.0.
 
 ## 3. QA perangkat nyata
 

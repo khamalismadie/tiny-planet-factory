@@ -10,12 +10,14 @@ import { ecosystemConfigOf, guildStatus } from '../sim/eco/guilds';
 import { habitatContextFor } from '../sim/eco/manager';
 import { eraForLevel } from '../sim/progression';
 import type { EnvKey, ObjectType, PlanetState } from '../sim/types';
+import type { TutorialView } from './tutorial';
 
 export interface HudCallbacks {
   onSelect: (type: ObjectType) => void;
   onPause: (paused: boolean) => void;
   onMenu: () => void;
   onCopyDna: () => { short: string; full: string };
+  onDnaOpened: () => void;
   onLoadDna: (code: string) => void;
   onPreviewDna: (code: string) => void;
   onCloseDna: () => void;
@@ -74,6 +76,8 @@ export class Hud {
   private readonly dnaStatus = document.getElementById('dna-status')!;
   private readonly telemetryModal = document.getElementById('telemetry-modal')!;
   private readonly telemetryCheckbox = document.getElementById('telemetry-optin') as HTMLInputElement;
+  private tutorialView: TutorialView | null = null;
+  private tutorialFocus: HTMLElement | null = null;
   private toastTimer = 0;
 
   constructor(callbacks: HudCallbacks) {
@@ -199,6 +203,7 @@ export class Hud {
   }
 
   openDna(): void {
+    this.callbacks.onDnaOpened();
     const codes = this.callbacks.onCopyDna();
     this.dnaInput.value = codes.short;
     this.dnaFull.value = codes.full;
@@ -217,6 +222,10 @@ export class Hud {
       ? 'Pratinjau aktif — planet asli belum berubah. Tutup panel untuk kembali.'
       : '';
     this.dnaStatus.classList.toggle('hidden', !active);
+  }
+
+  setTutorialView(view: TutorialView): void {
+    this.tutorialView = view;
   }
 
   update(planet: PlanetState, selected: ObjectType | null): void {
@@ -295,6 +304,28 @@ export class Hud {
       button.disabled = locked;
       button.title = locked ? `Terbuka di level ${UNLOCK_LEVEL[type]}` : OBJECT_DEFS[type].label;
       button.classList.toggle('active', !locked && selected === type);
+    }
+    this.applyTutorial();
+  }
+
+  private applyTutorial(): void {
+    if (this.tutorialFocus) {
+      this.tutorialFocus.classList.remove('tutorial-focus');
+      this.tutorialFocus = null;
+    }
+    if (!this.tutorialView?.active) return;
+    const stage = this.objectiveStrip.querySelector<HTMLElement>('.objective-stage');
+    const goal = this.objectiveStrip.querySelector<HTMLElement>('.objective-goal');
+    if (stage) stage.textContent = this.tutorialView.label;
+    if (goal) goal.textContent = this.tutorialView.instruction;
+    const target = this.tutorialView.focus === 'tree'
+      ? this.objectList.querySelector<HTMLElement>('[data-object="tree"]')
+      : this.tutorialView.focus === 'objective'
+        ? this.objectiveStrip
+        : null;
+    if (target) {
+      target.classList.add('tutorial-focus');
+      this.tutorialFocus = target;
     }
   }
 

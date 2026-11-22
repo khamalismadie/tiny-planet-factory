@@ -257,6 +257,7 @@ docs: record v0.15.9 remote QA
 v0.16.0: deterministic asset variants (49 pilihan / 43 builder)
 v0.17.0: campaign 100 level / 10 era (unreleased on main)
 v0.18.0: misi 61-100 aktif lewat skor sistem lanjutan (unreleased on main)
+v0.19.0: FTUE hybrid + tips in-game (unreleased on main)
 ```
 
 ### Versioning

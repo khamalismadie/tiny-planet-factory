@@ -25,6 +25,7 @@ export interface MainMenuCallbacks {
   onDna: () => void;
   onPlanet: (planetId: string) => void;
   onQuality: (tier: QualityTier) => void;
+  onReplayTutorial: () => void;
   onClose: () => void;
 }
 
@@ -41,6 +42,7 @@ export class MainMenu {
   private readonly qualityNote = document.getElementById('menu-quality-note')!;
   private readonly guideModal = document.getElementById('guide-modal')!;
   private readonly guideClose = document.getElementById('guide-close') as HTMLButtonElement;
+  private readonly guideReplay = document.getElementById('guide-replay') as HTMLButtonElement;
   private readonly guideButton = document.getElementById('menu-guide') as HTMLButtonElement;
   private readonly qualityButtons = Array.from(
     document.querySelectorAll<HTMLButtonElement>('[data-quality]'),
@@ -53,6 +55,10 @@ export class MainMenu {
     document.getElementById('menu-close')!.addEventListener('click', () => this.callbacks.onClose());
     this.guideButton.addEventListener('click', () => this.openGuide());
     this.guideClose.addEventListener('click', () => this.closeGuide());
+    this.guideReplay.addEventListener('click', () => {
+      this.closeGuide();
+      this.callbacks.onReplayTutorial();
+    });
     this.guideModal.addEventListener('click', (event) => {
       if (event.target === this.guideModal) this.closeGuide();
     });

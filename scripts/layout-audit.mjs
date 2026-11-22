@@ -3,6 +3,7 @@ import { chromium } from 'playwright';
 const base = process.env.URL ?? 'http://127.0.0.1:4173/';
 const url = new URL(base);
 url.searchParams.set('debug', '1');
+url.searchParams.set('tutorial', '1');
 
 const browser = await chromium.launch({ headless: true, args: [] });
 const failures = [];
@@ -40,6 +41,7 @@ for (const vp of viewports) {
       topbar: rect(document.getElementById('topbar')),
       buildPanel: rect(document.getElementById('build-panel')),
       objective: rect(document.getElementById('objective-strip')),
+      objectiveText: document.getElementById('objective-strip')?.textContent ?? '',
       inventory: rect(document.getElementById('inventory')),
       buttons,
       smallButtons: buttons.filter((b) => b.w < 48 || b.h < 48).map((b) => b.text),
@@ -55,6 +57,8 @@ for (const vp of viewports) {
   check('tanpa horizontal overflow', data.scrollW <= data.vw + 1);
   check('semua tombol >= 48dp', data.smallButtons.length === 0);
   check('objective strip terlihat', !!data.objective && data.objective.h >= 48 && data.objective.bottom <= data.vh && data.objective.y >= 0);
+  check('objective tutorial tidak menambah tinggi', !!data.objective && data.objective.h <= (vp.width >= 820 ? 49 : 77));
+  check('objective menampilkan panduan', data.objectiveText.includes('Panduan 1/3'));
   check('objective tidak menimpa inventory', !!data.objective && !!data.inventory && data.objective.bottom <= data.inventory.y + 1);
   check('topbar tidak menimpa panel', !!data.topbar && !!data.buildPanel && data.topbar.bottom <= data.buildPanel.y + 1);
 
@@ -64,6 +68,7 @@ for (const vp of viewports) {
     buttons: data.buttons.length,
     smallButtons: data.smallButtons,
     objective: data.objective,
+    objectiveText: data.objectiveText,
     inventory: data.inventory,
     topbarBottom: data.topbar?.bottom,
     buildTop: data.buildPanel?.y,
