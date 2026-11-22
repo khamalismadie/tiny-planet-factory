@@ -29,16 +29,20 @@ export default defineConfig({
   plugins: [pwaPrecache()],
   build: {
     // PixiJS is intentionally split into two cacheable vendor chunks (~540 kB
-    // each). Content data (planet configs, guild mappings, objects, missions,
-    // species, weather, and the eco factory) is split separately; the DNA codec has its own cacheable chunk.
+    // each). Content data (planet configs, objects, missions, species, weather)
+    // and the DNA codec share one chunk: separating them creates a circular
+    // dna <-> planet-configs chunk that can initialize imports too late.
     chunkSizeWarningLimit: 600,
     rollupOptions: {
       output: {
         manualChunks(id) {
           if (id.includes('node_modules/@pixi/3d')) return 'pixi-3d';
           if (id.includes('node_modules/@pixi') || id.includes('node_modules/pixi.js')) return 'pixi-core';
-          if (id.includes('src/content/') || id.includes('src/sim/eco/factory.ts')) return 'planet-configs';
-          if (id.includes('src/sim/dna.ts')) return 'dna';
+          if (
+            id.includes('src/content/') ||
+            id.includes('src/sim/eco/factory.ts') ||
+            id.includes('src/sim/dna.ts')
+          ) return 'planet-configs';
           return undefined;
         },
       },

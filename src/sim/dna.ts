@@ -3,10 +3,9 @@ import { OBJECT_ORDER } from '../content/objects';
 import { SPECIES_INDEX, SPECIES_ORDER } from '../content/species';
 import { BIOMES } from './biome';
 import { PLANET_IDS } from '../content/planets/ids';
-import { campaignMissionForLevel } from './campaignRules';
 import { createPlanet, decodeDna as decodeLegacyDna, planetNameFromSeed, unlockedForLevel } from './engine';
 import { migratePlanet } from './migrate';
-import { preserveLegacyProgression } from './progression';
+import { missionIdForLevel, preserveLegacyProgression } from './progression';
 import { createFauna } from './wildlife';
 import type {
   Biome,
@@ -387,7 +386,7 @@ function decodeFull(bytes: Uint8Array): PlanetState | null {
       atmosphere,
       weather,
       progression: { level, xp, unlockedObjects: unlockedForLevel(level) },
-      mission: { id: campaignMissionForLevel(level).id, status: missionStatus, holdTicks },
+      mission: { id: missionIdForLevel(level), status: missionStatus, holdTicks },
       events,
       warning,
       stage,

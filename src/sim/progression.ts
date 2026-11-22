@@ -55,6 +55,13 @@ export function eraForLevel(level: number): EraDef {
   return ERAS[Math.min(ERAS.length - 1, Math.floor((safe - 1) / 10))];
 }
 
+export function missionIdForLevel(level: number): string {
+  const safe = sanitizeLevel(level);
+  const era = Math.floor((safe - 1) / 10) + 1;
+  const index = ((safe - 1) % 10) + 1;
+  return `era${era}-${String(index).padStart(2, '0')}`;
+}
+
 /**
  * Save/DNA lama menyimpan level 2..6 dengan XP di bawah tangga baru.
  * Naikkan XP ke ambang level tersebut agar level tidak turun setelah migrasi.

@@ -2,12 +2,11 @@ import { ensureEventState } from '../content/missions';
 import { OBJECT_ORDER } from '../content/objects';
 import { SPECIES_ORDER } from '../content/species';
 import { BIOMES, inferBiome } from './biome';
-import { campaignMissionForLevel } from './campaignRules';
 import { isSupportedPlanet } from './eco/guilds';
 import { initializeEcosystem } from './eco/manager';
 import { CURRENT_ECOSYSTEM_VERSION, normalizeEcoState } from './eco/state';
 import { createPlanet, planetNameFromSeed } from './engine';
-import { preserveLegacyProgression } from './progression';
+import { missionIdForLevel, preserveLegacyProgression } from './progression';
 import type {
   Biome,
   Environment,
@@ -151,8 +150,9 @@ export function migratePlanet(raw: unknown, fallbackPlanetId = 'terra'): PlanetS
     num(rawProgression.xp, base.progression.xp),
   );
   const rawMission = isRecord(raw.mission) ? raw.mission : {};
-  const rawMissionId = str(rawMission.id, campaignMissionForLevel(progression.level).id);
-  const missionId = rawMissionId.startsWith('era') ? rawMissionId : campaignMissionForLevel(progression.level).id;
+  const expectedMissionId = missionIdForLevel(progression.level);
+  const rawMissionId = str(rawMission.id, expectedMissionId);
+  const missionId = rawMissionId.startsWith('era') ? rawMissionId : expectedMissionId;
   const terrainConfig = mergeTerrain(raw.terrainConfig);
   const weatherType = WEATHER_TYPES.includes(rawWeather.type as WeatherType)
     ? (rawWeather.type as WeatherType)

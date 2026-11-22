@@ -1,3 +1,4 @@
+import { missionIdForLevel } from './progression';
 import type { EcoKey, EnvKey, ObjectType, WeatherType } from './types';
 
 export type MissionType =
@@ -176,7 +177,7 @@ const ERA_SEEDS: MissionSeed[][] = [
 export const CAMPAIGN: CampaignMission[] = ERA_SEEDS.flatMap((missions, eraIndex) =>
   missions.map((mission, index) => ({
     level: eraIndex * 10 + index + 1,
-    id: `era${eraIndex + 1}-${String(index + 1).padStart(2, '0')}`,
+    id: missionIdForLevel(eraIndex * 10 + index + 1),
     title: mission.title,
     type: mission.type,
     check: mission.check,
