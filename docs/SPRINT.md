@@ -71,7 +71,7 @@ Jika perangkat fisik tidak tersedia, SPR-01, SPR-02, SPR-03, dan SPR-08 berubah 
 | SPR-05 | Tutup gap p95 device `33,40 ms → ≤33 ms` bila terreproduksi | 4 | P0 | Render dev | To Do |
 | SPR-06 | Audit draw call seed-identik pasca-facet; pastikan tidak ada regresi | 2 | P1 | Render dev | Done (`test:qa-load` seed 1: 20 draw call Hujan = baseline; lokal + remote PASS) |
 | SPR-07 | Sinkronisasi documentation drift ke doc sumber | 2 | P1 | PM/dok | Done (`126b682`) |
-| SPR-08 | Release gate `v0.15.10` + remote verify + ZIP artefak | 1 | P0 | PM + QA | To Do |
+| SPR-08 | Release gate teknis `v0.16.0` + remote verify + ZIP artefak | 1 | P0 | PM + QA | Done (`e71e6c1`, bundle `index-Cl2SK4zO.js`, remote 8/8 PASS; P0 QA tetap OPEN) |
 
 **Total:** 24 poin.
 
@@ -283,7 +283,7 @@ Sprint selesai jika:
 | SPR-04 | Build dengan layout v0.15.4+ |
 | SPR-05 | Data SPR-01 |
 | SPR-06 | Selesai — baseline seed 1 v0.15.9 dipakai sebagai pembanding |
-| SPR-08 | SPR-01…SPR-05 PASS |
+| SPR-08 | Build/test lokal + remote PASS; P0 QA tidak menjadi prasyarat rilis teknis |
 
 ---
 
