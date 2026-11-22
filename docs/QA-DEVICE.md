@@ -117,6 +117,13 @@ Remote produksi v0.15.9 (`https://tinyplanetfactory.netlify.app/`, commit `ea8f9
 - `npm test` lokal: 8/8 PASS; `test:scale` mengaudit 39 varian prop + 10 varian fauna (43 builder unik), tinggi ±5%, triangle/facet, tekstur 0, spacing, dan determinisme resolver untuk seed 1/1337 di 9 planet.
 - `test:qa-load` seed 1, 94 objek, medium, Hujan: p50 16,70 ms, p95 16,80 ms, 59,9 FPS, draw call 20, boot 386–561 ms bergantung run, tanpa downgrade. Tidak ada perubahan draw call dibanding baseline v0.15.9.
 - Varian aktif seed 1: Terra = Oak/Granite/Tropical/Clear, Dune = Dune/Sandstone/Oak/Cactus, Aquaria = Coastal/Oak/Reef/Lotus. Bisa diverifikasi dengan `?debug=1` → `window.__game.variants()` (indices + labels).
+
+### Verifikasi cepat varian
+
+1. Buka `?debug=1&seed=1&planet=dune&menu=0&quality=medium`.
+2. Di konsol, jalankan `window.__game.variants()` dan cocokkan `labels.props` dengan `sand: Dune`, `rock: Sandstone`, `tree: Oak`, `bush: Cactus`.
+3. Panggil `window.__game.setPlanet('sakura', 1)`, lalu ulangi. `tree` harus berubah menjadi `Sakura` dan `bush` menjadi `Lavender`.
+4. Simpan screenshot bila ada perbedaan siluet/visibilitas. Jangan anggap langkah ini sebagai pengganti QA perangkat nyata.
 - Build lokal: app chunk 73,33 kB (gzip 23,96 kB); cache SW `tpf-shell-v0-16-0`.
 - **Belum diklaim lulus:** p95 device nyata masih 33,40 ms, install/offline fisik, landscape, cold start 4G, dan context loss/restore. Semua angka di atas Chromium headless.
 - Screenshot lokal seed 1: `/tmp/opencode/v016-terra.png`, `/tmp/opencode/v016-dune.png`, `/tmp/opencode/v016-aquaria.png`. Sudah dihasilkan dari build v0.16.0, tetapi belum diverifikasi secara visual oleh manusia; bukan artefak rilis.
