@@ -1,0 +1,81 @@
+{
+  "app": "Tiny Planet Factory",
+  "appVersion": "0.21.0",
+  "collectedAt": "2026-11-22T23:36:25.139Z",
+  "durationMs": 172560,
+  "frames": 284,
+  "p50ms": 33.2,
+  "p95ms": 33.5,
+  "fps": 30.1,
+  "bootMs": 305,
+  "quality": {
+    "tier": "medium",
+    "downgrades": 0
+  },
+  "scene": {
+    "drawCalls": 20,
+    "objects": 399,
+    "stage": 5,
+    "mission": "complete",
+    "completedEvents": 2,
+    "wildlifeAgents": 16,
+    "discoveredSpecies": 5,
+    "extinctSpecies": 0,
+    "contextLost": true
+  },
+  "save": {
+    "tick": 87,
+    "objects": 399,
+    "level": 4,
+    "persistent": true
+  },
+  "network": {
+    "online": true,
+    "visibility": "visible"
+  },
+  "orientation": {
+    "type": "portrait-primary",
+    "angle": 0
+  },
+  "layout": {
+    "topbarBottom": 68,
+    "buildTop": 72,
+    "objective": {
+      "x": 10,
+      "y": 541,
+      "w": 340,
+      "h": 53,
+      "right": 350,
+      "bottom": 594
+    },
+    "inventory": {
+      "x": 10,
+      "y": 602,
+      "w": 340,
+      "h": 66,
+      "right": 350,
+      "bottom": 668
+    },
+    "centerElement": "CANVAS",
+    "planetCenterVisible": true,
+    "objectiveOverlapsInventory": false,
+    "topbarOverlapsBuild": false
+  },
+  "runtime": {
+    "scriptSrc": "https://deploy-preview-41--tinyplanetfactory.netlify.app/assets/index-BiS1XGVG.js",
+    "serviceWorker": {
+      "controller": true,
+      "scriptUrl": "https://deploy-preview-41--tinyplanetfactory.netlify.app/sw.js"
+    }
+  },
+  "device": {
+    "userAgent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Mobile Safari/537.36",
+    "cores": 8,
+    "memoryGb": 8,
+    "dpr": 3,
+    "viewport": "360x678",
+    "standalone": false,
+    "serviceWorker": true,
+    "installPromptSeen": true
+  }
+}
