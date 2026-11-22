@@ -298,7 +298,7 @@ Delapan gate yang dijalankan:
 | Terrain | `test:terrain` | normalisasi render, radius, idempoten, 9 planet |
 | Smoke | `test:smoke` | vertical slice browser, WebGL2, UI, persistensi |
 | Device | `test:device` | mobile emulasi, quality, pinch sintetis, context loss |
-| QA load | `test:qa-load` | 94 objek, seed 1, p95 ≤33,40 ms, draw call budget |
+| QA load | `test:qa-load` | 94 objek, seed 1, p95 ≤33 ms, draw call budget |
 | Menu | `test:menu` | 9 planet, switching, tutorial, layout |
 | Layout | `test:layout` | bounding box UI 390×844 dan 1280×800 |
 
@@ -339,7 +339,7 @@ Lalu memajukan 16 tick agar cuaca Hujan aktif. Ini memastikan gate selalu menguj
 Target gate:
 
 - p50 ≈ 16,7 ms pada headless
-- p95 ≤ 33,40 ms
+- p95 ≤ 33 ms
 - 94 objek
 - tier medium tanpa downgrade
 - draw call ≤20 saat Hujan/Badai/Salju, ≤18 saat Cerah
@@ -395,10 +395,10 @@ Invalid `?planet=` atau `setPlanet(id)` jatuh ke `terra`.
 |---|---|---|
 | Android p50 | ≥30 FPS | Device baseline 30,1–59,2 FPS |
 | Android p95 | ≤33 ms | Device baseline 33,40 ms — **belum lulus** |
-| Headless p95 | ≤33,40 ms | 16,80 ms pada `test:qa-load` |
+| Headless p95 | ≤33 ms | 16,80 ms pada `test:qa-load` |
 | Desktop | 60 FPS | Terpenuhi pada headless |
 | Boot | <5 s | QA boot 0,24–2,03 s device; bukan cold-start 4G penuh |
-| App chunk | <100 kB | 65,43 kB / gzip 21,47 kB |
+| App chunk | <100 kB | 80,49 kB / gzip 26,42 kB |
 | Draw call cerah | ≤18 | 15 pada emulasi `test:device`; 19 adalah baseline pra-facet; gate pasca-facet memakai ≤18 |
 | Draw call hujan | ≤20 | 20, sama dengan baseline sebelum facet |
 | Triangle per tipe | Gate `test:scale` | 34–276 triangle tergantung tipe |

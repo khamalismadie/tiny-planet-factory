@@ -118,7 +118,7 @@ src/
 3. **Terrain render** — normalisasi idempoten dan radius 0,85–1,15 untuk kesembilan planet.
 4. **Smoke browser** (Chromium headless) — WebGL2 boot, 13 tombol objek, klik menanam objek, feedback placement aktif, akselerasi 120 ticks, fauna muncul, misi selesai, HUD berubah, persistensi setelah reload, DNA round-trip lewat UI, service worker terdaftar, resize mobile, dan boot/simulasi untuk kesembilan planet.
 5. **Device check** (emulasi mobile Chromium) — quality override, overlay performa, pinch dua jari lewat CDP, dan adaptive downgrade. Context loss/restore tetap diverifikasi manual di perangkat nyata (checklist `docs/QA-DEVICE.md` #6).
-6. **QA load** — seed 1, 94 objek, tier medium, 16 tick ke cuaca Hujan, p95 ≤ 33,40 ms, dan draw call ≤18 saat Cerah / ≤20 saat Hujan-Badai-Salju.
+6. **QA load** — seed 1, 94 objek, tier medium, 16 tick ke cuaca Hujan, p95 ≤ 33 ms, dan draw call ≤18 saat Cerah / ≤20 saat Hujan-Badai-Salju.
 7. **Menu** — 9 planet, switching, guide 4 langkah, dan perilaku pause-safe.
 8. **Layout** — target sentuh ≥48 dp di 360×640, 390×844, dan 844×390 tanpa overflow.
 

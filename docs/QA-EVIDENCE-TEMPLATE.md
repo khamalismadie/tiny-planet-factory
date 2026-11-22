@@ -8,6 +8,14 @@ File ini bukan hasil QA. Ini hanya wadah agar laporan dari tombol **Salin hasil 
 
 Template sengaja berisi `0`, `null`, dan `<ISI: ...>`. Validator akan menolaknya sampai benar-benar diganti dengan data dari perangkat. Jangan mengarang angka atau mencentang issue hanya karena format lulus.
 
+## Jangan tertukar dengan telemetry
+
+Validator hanya menerima hasil `window.__game.qaReport()`. Export telemetry opt-in — field `sessionId`, `events`, `optedIn`, `version` — **bukan** bukti QA dan tetap akan ditolak. Gunakan tombol **Salin hasil QA**, bukan **Salin telemetry**. Jika ragu, jalankan di console:
+
+```js
+JSON.stringify(window.__game.qaReport(), null, 2)
+```
+
 ## Sebelum mulai
 
 1. Catat commit/build yang diuji: `appVersion`, `runtime.scriptSrc`, dan `runtime.serviceWorker.scriptUrl`.

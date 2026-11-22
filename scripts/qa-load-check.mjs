@@ -56,7 +56,7 @@ const drawCallBudget = atmospheric ? 20 : 18;
 assert(report.scene.objects === objects, `objek QA ${report.scene.objects},expected ${objects}`);
 assert(report.quality.tier === tier, `quality tier ${report.quality.tier}, expected ${tier}`);
 assert(report.quality.downgrades === 0, `adaptive downgrade terjadi ${report.quality.downgrades}x`);
-assert(report.p95ms <= 33.4, `p95 ${report.p95ms} ms melebihi baseline 33,40 ms`);
+assert(report.p95ms <= 33, `p95 ${report.p95ms} ms melebihi target 33 ms`);
 assert(report.scene.drawCalls <= drawCallBudget,
   `draw call ${report.scene.drawCalls} melebihi budget ${drawCallBudget} untuk cuaca ${weather}`);
 const unexpected = errors.filter((error) => !isKnownShaderWarning(error));

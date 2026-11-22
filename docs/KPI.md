@@ -32,7 +32,7 @@ Telemetri di Tiny Planet Factory **opt-in**, tersimpan lokal di `localStorage` d
 ## KPI turunan
 
 - **Time-to-first-frame (TTFF)**: median `boot.bootMs`. Target < 5 s pada 4G.
-- **Frame health**: median `qa_report.p50ms` dan p95 `qa_report.p95ms`. Target Android menengah: p95 ≤ 33 ms; status terkini baseline device 33,40 ms (**belum lulus**). Adaptive turun bila p95 > 34 ms selama 120 frame; gate headless memakai ≤ 33,40 ms.
+- **Frame health**: median `qa_report.p50ms` dan p95 `qa_report.p95ms`. Target Android menengah: p95 ≤ 33 ms; status terkini baseline device 33,40 ms (**belum lulus**). Adaptive turun bila p95 > 34 ms selama 120 frame; gate headless memakai ≤ 33 ms.
 - **Core-loop completion**: persentase sesi dengan `mission_complete`. Target vertical slice: ≥ 60% sesi yang aktif ≥ 3 menit.
 - **Tool adoption**: distribusi `placement.type`. Dipakai untuk melihat apakah pemain menemukan satwa dan alat air.
 - **Stability**: jumlah `context_loss` per 100 sesi. Target 0 pada perangkat target.
