@@ -52,6 +52,7 @@ Yang **tidak** boleh terjadi:
 | #13 | SPR-06 | Closed |
 | #14 | SPR-08 | Closed |
 | #15 | Snapshot & mapping ini | Closed |
+| #19 | Rapikan catatan pasca-SPR-06/08 | Closed |
 
 ---
 
