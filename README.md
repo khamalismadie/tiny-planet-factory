@@ -16,6 +16,22 @@ Build memakai `NODE_OPTIONS=--max-old-space-size=4096` karena bundler PixiJS 3D 
 
 Rilisan aktif `v0.16.0`. Deploy produksi HTTPS di <https://tinyplanetfactory.netlify.app/> melalui auto-deploy Netlify dari `main`. Hook QA di produksi: `?debug=1`, `?perf=1`, `?quality=low|medium|high`, `?eco=1`, `?menu=0`, `?planet=...`, `?seed=N`, dan `?qa=1&qaSeconds=45&qaObjects=N` (`qaObjects` maks 96, `qaSeconds` maks 180). Varian aktif bisa dibaca lewat `window.__game.variants()` (indices + labels) saat `?debug=1`.
 
+### Cek cepat varian
+
+```bash
+npm run preview
+# Buka http://127.0.0.1:4173/?debug=1&seed=1&planet=dune&menu=0
+```
+
+Lalu di konsol browser:
+
+```js
+window.__game.variants()
+// { indices: { props: {...}, species: {...} }, labels: { props: {...}, species: {...} } }
+```
+
+Dengan seed `1`, Dune memakai `sand: Dune`, `rock: Sandstone`, `tree: Oak`, dan `bush: Cactus`. Katalog lengkap ada di `docs/ASSET-CATALOG.md`.
+
 ## Kontrol
 
 - Geser / drag: memutar kamera 360°.
