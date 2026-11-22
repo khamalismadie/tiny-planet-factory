@@ -90,4 +90,23 @@ npm run qa:evidence -- docs/QA-EVIDENCE-TEMPLATE.json
 npm run qa:evidence -- report-landscape.json --landscape
 ```
 
+## Validasi banyak file sekaligus
+
+Taruh semua laporan dalam satu folder, lalu:
+
+```bash
+npm run qa:evidence:batch -- qa-evidence
+```
+
+Flag dipilih otomatis dari nama file:
+
+| Nama file | Flag |
+|---|---|
+| `report-offline.json` | `--standalone --offline` |
+| `report-update.json` | `--standalone` |
+| `report-landscape.json` | `--landscape` |
+| `report-portrait.json`, `report-p95-*.json`, `report-context-loss.json` | tanpa flag |
+
+File `report-*.json` lain tetap divalidasi tanpa flag dan diberi catatan agar diperiksa manual. Perintah ini bukan gate `npm test` dan tidak menutup issue.
+
 `EVIDENCE OK` hanya berarti format dan angka dalam laporan konsisten dengan target. Penutupan issue #5–#8 tetap memerlukan lampiran asli dan interpretasi manusia.
