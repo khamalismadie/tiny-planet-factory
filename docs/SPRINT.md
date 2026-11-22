@@ -68,7 +68,7 @@ Jika perangkat fisik tidak tersedia, SPR-01, SPR-02, SPR-03, dan SPR-08 berubah 
 | SPR-04 | Landscape check & perbaikan panel yang menutup planet | 3 | P0 | UI dev | To Do |
 | SPR-05 | Tutup gap p95 device `33,40 ms → ≤33 ms` bila terreproduksi | 4 | P0 | Render dev | To Do |
 | SPR-06 | Audit draw call seed-identik pasca-facet; pastikan tidak ada regresi | 2 | P1 | Render dev | To Do |
-| SPR-07 | Sinkronisasi documentation drift ke doc sumber | 2 | P1 | PM/dok | To Do |
+| SPR-07 | Sinkronisasi documentation drift ke doc sumber | 2 | P1 | PM/dok | Done (`126b682`) |
 | SPR-08 | Release gate `v0.15.10` + remote verify + ZIP artefak | 1 | P0 | PM + QA | To Do |
 
 **Total:** 24 poin.
