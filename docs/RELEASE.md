@@ -343,6 +343,8 @@ Status jujur: fitur campaign sudah ada di `main`, tetapi klaim produksi dan real
 - [x] Copy target 61–100 dan `docs/CAMPAIGN.md` menyebut skor turunan, bukan klaim manusia/alien literal.
 - [x] `test:sim` memverifikasi 100/100 misi reachable, tidak ada `always` di level 61–100, skor terikat 0–100, tier 1–5, dan skor naik bersama level.
 - [x] Build lokal app chunk 75,09 kB (gzip 24,59 kB); cache SW `tpf-shell-v0-18-0`.
+- [x] PR #35 merge ke `main` @ `fa79f03`; issue #34 closed.
+- [x] Preview `https://deploy-preview-35--tinyplanetfactory.netlify.app/` memakai bundle `index-9P4aUINi.js` / cache `tpf-shell-v0-18-0`; remote `npm test` 8/8 PASS (log `/tmp/opencode/npm-test-preview-35.log`).
 - [ ] **Belum di-deploy.** Produksi tetap bundle v0.16.0 `index-Cl2SK4zO.js` / cache `tpf-shell-v0-16-0`.
 - [ ] QA perangkat nyata v0.18.0 belum dijalankan; P0 Sprint 09 tetap OPEN.
 
