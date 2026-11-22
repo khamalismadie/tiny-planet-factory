@@ -1,6 +1,6 @@
 # KPI & Telemetri
 
-Telemetri di Tiny Planet Factory **opt-in**, tersimpan lokal di `localStorage` dengan kunci `tpf.telemetry.v1`, dan tidak pernah dikirim ke server secara otomatis. Pemain bisa menyalin atau menghapus datanya lewat tombol **Telemetri**. Ekspor JSON menyertakan `app`, `version` (`0.16.0`), dan maksimal 250 event terakhir.
+Telemetri di Tiny Planet Factory **opt-in**, tersimpan lokal di `localStorage` dengan kunci `tpf.telemetry.v1`, dan tidak pernah dikirim ke server secara otomatis. Pemain bisa menyalin atau menghapus datanya lewat tombol **Telemetri**. Ekspor JSON menyertakan `app`, `version` (`0.17.0` pada `main`; produksi masih `0.16.0`), dan maksimal 250 event terakhir.
 
 ## Event yang dicatat
 

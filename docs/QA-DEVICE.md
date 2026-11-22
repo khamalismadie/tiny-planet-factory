@@ -128,3 +128,11 @@ Remote produksi v0.15.9 (`https://tinyplanetfactory.netlify.app/`, commit `ea8f9
 - **Belum diklaim lulus:** p95 device nyata masih 33,40 ms, install/offline fisik, landscape, cold start 4G, dan context loss/restore. Semua angka di atas Chromium headless.
 - Screenshot lokal seed 1: `/tmp/opencode/v016-terra.png`, `/tmp/opencode/v016-dune.png`, `/tmp/opencode/v016-aquaria.png`. Sudah dihasilkan dari build v0.16.0, tetapi belum diverifikasi secara visual oleh manusia; bukan artefak rilis.
 - Remote produksi v0.16.0 (`https://tinyplanetfactory.netlify.app/`, commit `e71e6c1`, bundle `index-Cl2SK4zO.js`): `npm test` **8/8 PASS** pada attempt ke-2 (attempt pertama smoke timeout 30 s karena kondisi jaringan sesaat, bukan error aplikasi). Manifest/sw 200, cache `tpf-shell-v0-16-0` dengan 12 entri, controller aktif, dan offline reload menampilkan canvas tanpa error. Ini bukan pengganti install fisik → airplane mode → update pada Android.
+
+## Hasil lokal v0.17.0 — campaign & leveling (2026-11-22)
+
+- Build lokal `main`: app chunk 75,00 kB (gzip 24,55 kB), cache SW `tpf-shell-v0-17-0`, tanpa circular chunk warning.
+- `npm test` lokal 8/8 PASS. `test:sim` menambah cek 100 misi unik, kurva kuadratik, batas era, migrasi level lama, reward misi pertama, progres ocean, dan penolakan misi locked.
+- `test:smoke` memakai hook `window.__game.campaign()` untuk memverifikasi 100 misi/10 era dan progres misi aktif; `test:menu` memeriksa label `Level x/100` dan panel campaign tertutup saat normal play.
+- `?debug=1&campaign=1&menu=0` menampilkan 10 era dan 100 baris misi tanpa error konsol; 40 baris bertanda locked.
+- **Belum di-deploy dan belum diuji di perangkat nyata.** Semua angka di atas berasal dari Chromium headless/local build; P0 Sprint 09 tetap OPEN.

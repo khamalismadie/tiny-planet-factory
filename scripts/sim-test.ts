@@ -1,9 +1,12 @@
 import { QUALITY, suggestQuality } from '../src/app/quality.ts';
+import { CAMPAIGN_TARGETS, campaignCopy } from '../src/content/campaignCopy.ts';
 import { ensureEventState } from '../src/content/missions.ts';
 import { WEATHER_DEFS } from '../src/content/weather.ts';
 import { OBJECT_DEFS, OBJECT_ORDER } from '../src/content/objects.ts';
 import { SPECIES_ORDER } from '../src/content/species.ts';
 import { PLANET_CONFIGS, PLANET_IDS } from '../src/content/planets/index.ts';
+import { completeCampaignMission, missionProgress, syncCampaignMission } from '../src/sim/campaign.ts';
+import { CAMPAIGN, CAMPAIGN_BY_LEVEL, campaignMissionForLevel, MISSION_TYPE_LABELS } from '../src/sim/campaignRules.ts';
 import { decodePlanetDna, encodePlanetDna, encodePlanetDnaLegacy } from '../src/sim/dna.ts';
 import { ecosystemConfigFor, guildAgentCapacity, guildFoodSourceIds, guildStatus, isSupportedPlanet } from '../src/sim/eco/guilds.ts';
 import { HabitatManager } from '../src/sim/eco/habitat.ts';
@@ -1001,5 +1004,40 @@ assert(
   legacyLevel6 && legacyLevel6.progression.xp >= cumulativeXp(6),
   'migrasi harus menaikkan XP ke ambang level lama',
 );
+
+// v0.17.0: katalog campaign, runtime misi, dan batas era terkunci.
+assert(CAMPAIGN.length === 100, 'katalog campaign harus 100 misi');
+assert(CAMPAIGN_TARGETS.length === 100, 'copy campaign harus 100 entri');
+assert(new Set(CAMPAIGN.map((mission) => mission.id)).size === 100, 'id misi harus unik');
+assert(CAMPAIGN.every((mission, index) => mission.level === index + 1), 'level misi harus 1..100');
+assert(CAMPAIGN_BY_LEVEL[0].id === 'era1-01', 'misi pertama harus era1-01');
+assert(campaignMissionForLevel(100).id === 'era10-10', 'misi terakhir harus era10-10');
+assert(CAMPAIGN.filter((mission) => mission.locked).length === 40, 'misi 61-100 harus terkunci');
+assert(Object.keys(MISSION_TYPE_LABELS).length === 6, 'harus ada 6 tipe quest');
+assert(campaignCopy(61).note.includes('Terkunci'), 'copy misi terkunci harus jelas');
+
+const campaignPlanet = createPlanet(5150, 'Kampanye');
+assert(campaignPlanet.mission.id === 'era1-01', 'planet baru harus memakai misi era1-01');
+tickN(campaignPlanet, 3);
+assert(campaignPlanet.progression.xp >= 100, 'misi pertama harus memberi 100 XP dalam 3 tick');
+assert(campaignPlanet.progression.level >= 2, 'reward misi pertama harus membuka level 2');
+assert(campaignPlanet.mission.id === 'era1-02', 'level 2 harus otomatis mengaktifkan misi berikutnya');
+const nextMissionPlanet = createPlanet(5151, 'Lanjut Misi');
+nextMissionPlanet.progression.level = 2;
+syncCampaignMission(nextMissionPlanet);
+assert(nextMissionPlanet.mission.id === 'era1-02', 'level 2 harus mengaktifkan misi era1-02');
+
+const oceanProgressPlanet = createPlanet(5152, 'Progres Laut');
+assert(placeObject(oceanProgressPlanet, 'ocean', [0, 1, 0]), 'misi laut: ocean harus terpasang');
+assert(
+  missionProgress(oceanProgressPlanet, campaignMissionForLevel(41)) >= 1,
+  'misi level 41 harus progres dari objek ocean',
+);
+
+const lockedPlanet = createPlanet(5153, 'Era Terkunci');
+lockedPlanet.progression.level = 61;
+syncCampaignMission(lockedPlanet);
+assert(lockedPlanet.mission.id === 'era7-01', 'level 61 harus memakai misi era7-01');
+assert(completeCampaignMission(lockedPlanet) === null, 'misi terkunci tidak boleh memberi reward');
 
 console.log('PASS: sim');

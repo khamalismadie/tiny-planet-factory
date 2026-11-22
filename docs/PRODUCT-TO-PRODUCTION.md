@@ -1,7 +1,7 @@
 # Product → Production Pipeline — Tiny Planet Factory
 
 > **Status:** living document  
-> **Versi produk terkait:** `v0.16.0`  
+> **Versi produk terkait:** `v0.17.0` (`main`, unreleased) · produksi `v0.16.0`  
 > **Terakhir diverifikasi:** 2026-11-22  
 > **Production:** <https://tinyplanetfactory.netlify.app/>  
 > **Commit rilis v0.15.9:** `ea8f9b9`  
@@ -99,9 +99,10 @@ Setiap konflik yang ditemukan harus dicatat di bagian **Known documentation drif
 - Quality tier `low`/`medium`/`high` dengan adaptive downgrade saat p95 > 34 ms.
 - PWA: manifest, ikon, service worker cache-first/stale-while-revalidate, fallback offline, update prompt.
 - Telemetri **opt-in**, local-only, tanpa server.
-- Hook QA: `?debug=1`, `?perf=1`, `?qa=1`, `?qaObjects=N`, `?eco=1`, `?planet=...`, `?menu=0`, `?seed=N`, `window.__game`.
+- Hook QA: `?debug=1`, `?perf=1`, `?qa=1`, `?qaObjects=N`, `?eco=1`, `?campaign=1`, `?planet=...`, `?menu=0`, `?seed=N`, `window.__game`.
 - Low-poly v0.15.9: satu merged geometry per tipe, vertex colors, AO per-facet, bayangan kontak baked, facet bertahap, warna lereng, awan 10×6.
 - Asset variants v0.16.0: 49 pilihan / 43 builder unik, resolver `seed + planetId`, bias visual 9 planet, satu geometri aktif per tipe, tanpa perubahan sim/DNA/schema. Katalog: `docs/ASSET-CATALOG.md`.
+- Campaign v0.17.0: 100 level / 10 era, 100 main mission, 6 tipe quest, kurva XP kuadratik, HUD campaign, hook `?campaign=1`, dan `window.__game.campaign()`. DNA Points/Bio Energy masih derived; misi 61–100 locked. Katalog: `docs/CAMPAIGN.md`.
 
 ### 3.2 Backlog terbuka
 
@@ -254,6 +255,7 @@ Contoh:
 v0.15.9: faceted diorama polish
 docs: record v0.15.9 remote QA
 v0.16.0: deterministic asset variants (49 pilihan / 43 builder)
+v0.17.0: campaign 100 level / 10 era (unreleased on main)
 ```
 
 ### Versioning
