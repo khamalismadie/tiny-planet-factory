@@ -4,7 +4,7 @@ File ini bukan hasil QA. Ini hanya wadah agar laporan dari tombol **Salin hasil 
 
 - Template laporan: `docs/QA-EVIDENCE-TEMPLATE.json`
 - Prosedur lengkap: `docs/QA-DEVICE.md`
-- Validator: `npm run qa:evidence -- <file> [--standalone] [--offline] [--landscape]`
+- Validator: `npm run qa:evidence -- <file> [--standalone] [--offline] [--landscape] [--expect-version <v>] [--expect-bundle <file.js>]`
 
 Template sengaja berisi `0`, `null`, dan `<ISI: ...>`. Validator akan menolaknya sampai benar-benar diganti dengan data dari perangkat. Jangan mengarang angka atau mencentang issue hanya karena format lulus.
 
@@ -108,5 +108,19 @@ Flag dipilih otomatis dari nama file:
 | `report-portrait.json`, `report-p95-*.json`, `report-context-loss.json` | tanpa flag |
 
 File `report-*.json` lain tetap divalidasi tanpa flag dan diberi catatan agar diperiksa manual. Perintah ini bukan gate `npm test` dan tidak menutup issue.
+
+## Memastikan build yang diuji
+
+Untuk menolak laporan dari build lama atau preview lain, tambahkan flag opsional:
+
+```bash
+npm run qa:evidence -- report-portrait.json \
+  --expect-version 0.21.0 --expect-bundle index-BiS1XGVG.js
+
+npm run qa:evidence:batch -- qa-evidence \
+  --expect-version 0.21.0 --expect-bundle index-BiS1XGVG.js
+```
+
+Flag ini memeriksa `appVersion` dan `runtime.scriptSrc`. Bila produksi v0.21.0 sudah di-deploy, gunakan bundle produksi yang aktif, bukan `index-BiS1XGVG.js` dari preview.
 
 `EVIDENCE OK` hanya berarti format dan angka dalam laporan konsisten dengan target. Penutupan issue #5–#8 tetap memerlukan lampiran asli dan interpretasi manusia.

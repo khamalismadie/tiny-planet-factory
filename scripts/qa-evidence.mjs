@@ -1,11 +1,32 @@
 import { readFile } from 'node:fs/promises';
 
-const args = process.argv.slice(2);
-const flags = new Set(args.filter((arg) => arg.startsWith('--')));
-const file = args.find((arg) => !arg.startsWith('--'));
+const rawArgs = process.argv.slice(2);
+const flags = new Set();
+let file;
+let expectedVersion = null;
+let expectedBundle = null;
+
+for (let i = 0; i < rawArgs.length; i += 1) {
+  const arg = rawArgs[i];
+  if (arg.startsWith('--')) {
+    flags.add(arg);
+    if (arg === '--expect-version' || arg === '--expect-bundle') {
+      const value = rawArgs[i + 1];
+      if (!value || value.startsWith('--')) {
+        console.error(`${arg} butuh nilai.`);
+        process.exit(1);
+      }
+      if (arg === '--expect-version') expectedVersion = value;
+      else expectedBundle = value;
+      i += 1;
+    }
+    continue;
+  }
+  if (!file) file = arg;
+}
 
 if (!file) {
-  console.error('Usage: npm run qa:evidence -- <laporan-qa.json> [--offline] [--standalone] [--landscape]');
+  console.error('Usage: npm run qa:evidence -- <laporan-qa.json> [--offline] [--standalone] [--landscape] [--expect-version <v>] [--expect-bundle <file.js>]');
   process.exit(1);
 }
 
@@ -46,6 +67,12 @@ if (flags.has('--landscape')) {
     && report.layout?.objectiveOverlapsInventory === false
     && report.layout?.topbarOverlapsBuild === false;
 }
+if (expectedVersion) {
+  checks.appVersionSesuai = report.appVersion === expectedVersion;
+}
+if (expectedBundle) {
+  checks.bundleSesuai = String(report.runtime?.scriptSrc ?? '').includes(expectedBundle);
+}
 
 const budgets = {
   p95: {
@@ -59,6 +86,7 @@ const budgets = {
 console.log(JSON.stringify({
   file,
   appVersion: report.appVersion ?? null,
+  expected: { version: expectedVersion, bundle: expectedBundle },
   collectedAt: report.collectedAt ?? null,
   viewport: report.device?.viewport ?? null,
   orientation: report.orientation ?? null,
