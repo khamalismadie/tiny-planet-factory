@@ -52,6 +52,8 @@ Flag opsional: `--standalone` menuntut `device.standalone === true`, `--offline`
 
 Gunakan `docs/QA-EVIDENCE-TEMPLATE.json` sebagai wadah isi laporan dan `docs/QA-EVIDENCE-TEMPLATE.md` sebagai checklist lampiran #5–#8. Template sengaja gagal divalidasi sampai diisi dengan data perangkat nyata.
 
+Untuk instruksi per issue, lihat `docs/QA-ISSUE-PLAYBOOK.md` (#5, #6, #8) dan `docs/QA-P95-REMEASURE.md` (#7).
+
 Quality tier:
 
 | Tier | Icosphere detail | Prop capacity | Fauna capacity | Cloud | Drop |
