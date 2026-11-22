@@ -377,6 +377,8 @@ Status jujur: tutorial berjalan di `main`, tetapi produksi dan real-device masih
 - [x] Validator manual `npm run qa:evidence -- <file> [--offline] [--standalone] [--landscape]` tidak masuk `npm test` dan tidak menutup issue otomatis.
 - [x] `npm test` lokal tetap 8/8 PASS; gate tidak ditambah.
 - [x] Build lokal app chunk 80,49 kB (gzip 26,41 kB); cache SW `tpf-shell-v0-20-0`.
+- [x] PR #39 merge ke `main` @ `d51f3a6`; issue #38 closed.
+- [x] Preview `https://deploy-preview-39--tinyplanetfactory.netlify.app/` memakai bundle `index-Btwodwou.js` / cache `tpf-shell-v0-20-0`; remote `npm test` 8/8 PASS (log `/tmp/opencode/npm-test-preview-39.log`).
 - [ ] **Belum di-deploy.** Produksi tetap bundle v0.16.0 `index-Cl2SK4zO.js` / cache `tpf-shell-v0-16-0`.
 - [ ] Issue #5–#8 tetap OPEN sampai laporan + screenshot perangkat nyata dilampirkan.
 
