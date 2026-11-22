@@ -77,6 +77,21 @@ PROP_VARIANT_LABELS
 SPECIES_VARIANT_LABELS
 ```
 
+Contoh pemakaian:
+
+```ts
+import { createAssetResolvers } from './assetGeometry';
+
+const resolvers = createAssetResolvers(1, 'dune');
+const treeGeometry = resolvers.props('tree');   // Oak
+const deerGeometry = resolvers.species('deer'); // Antelope
+
+resolvers.indices.props.tree; // 0
+resolvers.labels.props.tree;  // 'Oak'
+```
+
+Geometri di-cache berdasarkan `key + index` yang sudah ter-resolve, bukan `seed + planet` mentah. Dua resolver dengan pilihan varian sama memakai objek geometry yang sama.
+
 Konsumen:
 
 - `PropRenderer` memakai `resolver.props`.
