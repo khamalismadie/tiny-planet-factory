@@ -113,7 +113,7 @@ Untuk mengukur ulang p95 pada kandidat v0.21.0, gunakan `docs/QA-P95-REMEASURE.m
 
 ## Catatan headless
 
-`npm run test:device` sudah menguji pinch sintetis, quality override, adaptive downgrade, dan hook `loseContext()`/`restoreContext()` di Chromium headless. Namun Chromium headless tidak bisa mengembalikan konteks WebGL sungguhan setelah `WEBGL_lose_context.restoreContext()`, jadi **checklist #6 tetap wajib** dilakukan di perangkat nyata.
+`npm run test:device` sudah menguji pinch sintetis, quality override, adaptive downgrade, dan hook `loseContext()`/`restoreContext()` di Chromium headless. Namun Chromium headless tidak bisa mengembalikan konteks WebGL sungguhan setelah `WEBGL_lose_context.restoreContext()`, jadi **checklist #5 tetap wajib** dilakukan di perangkat nyata.
 
 > Catatan (v0.14.3): verifikasi localhost secure-context sudah lolos untuk manifest installable shape, service worker control, precache shell + chunk, offline reload, dan tanpa page error. Ini **bukan** pengganti verifikasi HTTPS + Android nyata pada baris 7–8 di atas.
 
@@ -135,7 +135,7 @@ Catatan interpretasi:
 - Frame rate **30,1–59,2 FPS** memenuhi target minimum 30 FPS, termasuk pada beban 94 objek. Namun p95 **33,40 ms** konsisten **0,40 ms di atas** ambang 33 ms, sehingga baris #2 pada matriks di atas **belum dicentang lulus penuh**.
 - Boot yang dilaporkan QaProbe adalah **0,24–2,03 s** sejak hook mulai, bukan cold-start 4G penuh dari ikon PWA; baris #1 masih memerlukan pengukuran terpisah.
 - Service worker aktif pada semua run. `installPromptSeen` terlihat pada sebagian run; `standalone: false` karena aplikasi dibuka dari browser, bukan dari ikon yang sudah dipasang. Baris #7–#8 (install → airplane mode, update) **masih belum terverifikasi**.
-- Tidak ada context loss pada semua run; ini melengkapi tetapi tidak menggantikan checklist #6 untuk background/GPU reset nyata.
+- Tidak ada context loss pada semua run; ini melengkapi tetapi tidak menggantikan checklist #5 untuk background/GPU reset nyata.
 - Catatan v0.15.6–v0.15.9: normalisasi bentuk planet, perubahan cuaca, facet/contact shadow, dan layout landscape mengubah apa yang harus diamati. Angka di atas adalah baseline pra-v0.15.6 dan wajib diulang; lihat `docs/SPRINT.md` SPR-03.
 
 ## Hasil lokal v0.15.9 (2026-11-22)
@@ -159,7 +159,7 @@ Remote produksi v0.15.9 (`https://tinyplanetfactory.netlify.app/`, commit `ea8f9
 3. Panggil `window.__game.setPlanet('sakura', 1)`, lalu ulangi. `tree` harus berubah menjadi `Sakura` dan `bush` menjadi `Lavender`.
 4. Simpan screenshot bila ada perbedaan siluet/visibilitas. Jangan anggap langkah ini sebagai pengganti QA perangkat nyata.
 - Build lokal: app chunk 73,33 kB (gzip 23,96 kB); cache SW `tpf-shell-v0-16-0`.
-- **Belum diklaim lulus:** p95 device nyata masih 33,40 ms, install/offline fisik, landscape, cold start 4G, dan context loss/restore. Semua angka di atas Chromium headless.
+- **Belum diklaim lulus:** p95 device nyata masih 33,40 ms, install/offline fisik, landscape, cold start 4G, dan context loss/restore. Angka headless di atas berasal dari Chromium; tabel perangkat nyata di bagian sebelumnya tetap data Itel S686LN.
 - Screenshot lokal seed 1: `/tmp/opencode/v016-terra.png`, `/tmp/opencode/v016-dune.png`, `/tmp/opencode/v016-aquaria.png`. Sudah dihasilkan dari build v0.16.0, tetapi belum diverifikasi secara visual oleh manusia; bukan artefak rilis.
 - Remote produksi v0.16.0 (`https://tinyplanetfactory.netlify.app/`, commit `e71e6c1`, bundle `index-Cl2SK4zO.js`): `npm test` **8/8 PASS** pada attempt ke-2 (attempt pertama smoke timeout 30 s karena kondisi jaringan sesaat, bukan error aplikasi). Manifest/sw 200, cache `tpf-shell-v0-16-0` dengan 12 entri, controller aktif, dan offline reload menampilkan canvas tanpa error. Ini bukan pengganti install fisik → airplane mode → update pada Android.
 

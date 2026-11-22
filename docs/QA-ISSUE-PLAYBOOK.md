@@ -6,6 +6,7 @@ Dokumen ini memetakan bukti yang harus dilampirkan ke tiap issue. Ia **bukan** h
 - Produksi tetap v0.16.0. Jangan mencampur bukti produksi dengan bukti v0.21.0.
 - Template laporan: `docs/QA-EVIDENCE-TEMPLATE.json`.
 - Checklist umum: `docs/QA-EVIDENCE-TEMPLATE.md`.
+- Validasi banyak laporan: `npm run qa:evidence:batch -- <folder>`.
 - Paket p95 / #7: `docs/QA-P95-REMEASURE.md`.
 - Prosedur lengkap: `docs/QA-DEVICE.md`.
 
