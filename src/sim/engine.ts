@@ -2,6 +2,8 @@ import { EVENT_DEFS, createEventState } from '../content/missions';
 import { OBJECT_DEFS, OBJECT_ORDER, UNLOCK_LEVEL } from '../content/objects';
 import { WEATHER_DEFS } from '../content/weather';
 import { inferBiome } from './biome';
+import { completeCampaignMission, missionProgress, syncCampaignMission } from './campaign';
+import { campaignMissionForLevel } from './campaignRules';
 import { appendEvent, makePlanetEvent, nextEventIndex } from './events';
 import { initializeEcosystem, stepEcosystem } from './eco/manager';
 import { ecosystemConfigFor, ecosystemConfigOf, isSupportedPlanet } from './eco/guilds';
@@ -119,7 +121,7 @@ export function createPlanet(seed: number, name = 'Planet Baru', planetId = 'ter
     atmosphere: { cloudCoverage: 15, windStrength: 20, precipitation: 10 },
     weather: { type: 'sunny', intensity: 0.6, remainingTicks: 14 },
     progression: { level, xp: 0, unlockedObjects: unlockedForLevel(level) },
-    mission: { id: 'mission-hijaukan', status: 'active', holdTicks: 0 },
+    mission: { id: campaignMissionForLevel(level).id, status: 'active', holdTicks: 0 },
     events: createEventState(),
     warning: null,
     stage: 1,
@@ -632,13 +634,14 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
   planet.progression.xp += healthy * 0.12 + (eco.vegetation > 20 ? 0.08 : 0);
   events.push(...refreshProgression(planet));
 
-  const missionTarget = e.oxygen >= 45 && e.water >= 40 && e.stability >= 60;
-  if (planet.mission.status === 'active') {
-    planet.mission.holdTicks = missionTarget ? planet.mission.holdTicks + 1 : 0;
+  syncCampaignMission(planet);
+  const activeMission = campaignMissionForLevel(planet.progression.level);
+  if (planet.mission.status === 'active' && !activeMission.locked) {
+    const missionDone = missionProgress(planet, activeMission) >= 1;
+    planet.mission.holdTicks = missionDone ? planet.mission.holdTicks + 1 : 0;
     if (planet.mission.holdTicks >= 3) {
-      planet.mission.status = 'complete';
-      planet.progression.xp += 25;
-      events.push('Misi “Hijaukan Planet” selesai! +25 XP');
+      const completed = completeCampaignMission(planet);
+      if (completed) events.push(`Misi “${completed.title}” selesai! +${completed.rewardXp} XP`);
     }
   }
 
@@ -655,6 +658,7 @@ export function simulateTick(planet: PlanetState, record = true): TickEvents {
     }
   }
   events.push(...refreshProgression(planet));
+  syncCampaignMission(planet);
 
   planet.stage = computeStage(planet);
   planet.biome = inferBiome(planet.environment, planet.ecosystem);
