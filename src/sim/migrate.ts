@@ -6,6 +6,7 @@ import { isSupportedPlanet } from './eco/guilds';
 import { initializeEcosystem } from './eco/manager';
 import { CURRENT_ECOSYSTEM_VERSION, normalizeEcoState } from './eco/state';
 import { createPlanet, planetNameFromSeed } from './engine';
+import { preserveLegacyProgression } from './progression';
 import type {
   Biome,
   Environment,
@@ -144,6 +145,10 @@ export function migratePlanet(raw: unknown, fallbackPlanetId = 'terra'): PlanetS
   const rawAtmosphere = isRecord(raw.atmosphere) ? raw.atmosphere : {};
   const rawWeather = isRecord(raw.weather) ? raw.weather : {};
   const rawProgression = isRecord(raw.progression) ? raw.progression : {};
+  const progression = preserveLegacyProgression(
+    num(rawProgression.level, base.progression.level),
+    num(rawProgression.xp, base.progression.xp),
+  );
   const rawMission = isRecord(raw.mission) ? raw.mission : {};
   const terrainConfig = mergeTerrain(raw.terrainConfig);
   const weatherType = WEATHER_TYPES.includes(rawWeather.type as WeatherType)
@@ -199,8 +204,8 @@ export function migratePlanet(raw: unknown, fallbackPlanetId = 'terra'): PlanetS
       remainingTicks: num(rawWeather.remainingTicks, base.weather.remainingTicks),
     },
     progression: {
-      level: Math.max(1, Math.floor(num(rawProgression.level, base.progression.level))),
-      xp: num(rawProgression.xp, base.progression.xp),
+      level: progression.level,
+      xp: progression.xp,
       unlockedObjects: Array.isArray(rawProgression.unlockedObjects)
         ? rawProgression.unlockedObjects.filter((type): type is ObjectType => OBJECT_ORDER.includes(type as ObjectType))
         : base.progression.unlockedObjects,

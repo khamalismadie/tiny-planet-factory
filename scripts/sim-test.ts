@@ -18,6 +18,7 @@ import {
   simulateTick,
 } from '../src/sim/engine.ts';
 import { migratePlanet, CURRENT_SCHEMA_VERSION } from '../src/sim/migrate.ts';
+import { cumulativeXp, eraForLevel, levelForXp, MAX_LEVEL, xpStep } from '../src/sim/progression.ts';
 import { replayEvents } from '../src/sim/replay.ts';
 import { deserializePlanet, serializePlanet } from '../src/sim/serialize.ts';
 import type { PlanetState } from '../src/sim/types.ts';
@@ -110,7 +111,7 @@ assert(planet.environment.oxygen >= 45, `oksigen terlalu rendah: ${planet.enviro
 assert(planet.environment.water >= 40, `air terlalu rendah: ${planet.environment.water}`);
 assert(maxStability >= 60, `stabilitas pernah mencapai 60: ${maxStability}`);
 assert(planet.mission.status === 'complete', 'misi harus selesai');
-assert(planet.progression.level >= 3, `level terlalu rendah: ${planet.progression.level}`);
+assert(planet.progression.level >= 2, `level terlalu rendah: ${planet.progression.level}`);
 assert(planet.stage >= 3, `tahap terlalu rendah: ${planet.stage}`);
 
 const code = encodeDna(planet);
@@ -950,9 +951,9 @@ Object.assign(idealPlanet.environment, {
 idealPlanet.ecosystem.vegetation = 60;
 assert(computeStage(idealPlanet) === 6, 'semua metrik ideal harus melaporkan stage 6');
 const xpMastery = createPlanet(9001, 'Level Enam');
-xpMastery.progression.xp = 260;
+xpMastery.progression.xp = cumulativeXp(6);
 simulateTick(xpMastery, false);
-assert(xpMastery.progression.level === 6, `threshold 260 XP harus membuka level 6: ${xpMastery.progression.level}`);
+assert(xpMastery.progression.level === 6, `ambang level 6 harus terbuka: ${xpMastery.progression.level}`);
 
 assert(WEATHER_DEFS.storm.rain > WEATHER_DEFS.rain.rain, 'badai harus lebih basah dari hujan');
 assert(WEATHER_DEFS.storm.sunlight < WEATHER_DEFS.rain.sunlight, 'badai harus lebih gelap dari hujan');
@@ -973,5 +974,32 @@ assert(suggestQuality(40, 'high', 'high') === 'medium', 'p95 tinggi harus menuru
 assert(suggestQuality(40, 'low', 'low') === null, 'kualitas low tidak bisa turun lagi');
 assert(suggestQuality(12, 'medium', 'high') === 'high', 'p95 rendah boleh naik sampai baseline');
 assert(suggestQuality(12, 'medium', 'medium') === null, 'tidak boleh naik melewati baseline');
+
+// v0.17.0: kurva 100 level dan 10 era harus deterministik.
+assert(xpStep(1) === 100, 'XP 1→2 harus 100');
+assert(xpStep(10) === 730, 'XP 10→11 harus 730');
+assert(xpStep(25) === 3580, 'XP 25→26 harus 3580 sesuai rumus');
+assert(xpStep(50) === 13330, 'XP 50→51 harus 13330 sesuai rumus');
+assert(xpStep(99) === 50570, 'XP 99→100 harus 50570 sesuai rumus');
+assert(levelForXp(0) === 1, 'XP nol harus level 1');
+assert(levelForXp(cumulativeXp(MAX_LEVEL)) === MAX_LEVEL, 'ambang terakhir harus level 100');
+assert(cumulativeXp(MAX_LEVEL) < 0xffffffff, 'total XP harus muat di u32 DNA');
+for (let level = 2; level <= MAX_LEVEL; level++) {
+  assert(xpStep(level) > xpStep(level - 1), `kurva XP harus naik di level ${level}`);
+}
+assert(eraForLevel(1).name === 'Genesis', 'era 1 harus Genesis');
+assert(eraForLevel(10).name === 'Genesis', 'level 10 masih Genesis');
+assert(eraForLevel(11).name === 'Primordial', 'level 11 harus Primordial');
+assert(eraForLevel(100).name === 'Cosmic Age', 'level 100 harus Cosmic Age');
+
+const legacyLevel6 = migratePlanet({
+  ...JSON.parse(JSON.stringify(createPlanet(4242, 'Save Lama'))),
+  progression: { level: 6, xp: 260, unlockedObjects: [] },
+});
+assert(legacyLevel6 && legacyLevel6.progression.level === 6, 'migrasi tidak boleh menurunkan level lama');
+assert(
+  legacyLevel6 && legacyLevel6.progression.xp >= cumulativeXp(6),
+  'migrasi harus menaikkan XP ke ambang level lama',
+);
 
 console.log('PASS: sim');
