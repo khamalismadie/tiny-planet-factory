@@ -87,6 +87,15 @@ const checks = {
   stillRenderingAfterQualityChange: low.drawCalls > 0,
   qaProbeWorks: !!qaReport && qaReport.frames > 0 && qaReport.p95ms > 0 && qaReport.quality.tier === 'low',
   qaLoadObjects: qaReport?.scene.objects === 30,
+  qaEvidenceFields: typeof qaReport?.appVersion === 'string'
+    && Number.isFinite(qaReport?.save?.tick)
+    && typeof qaReport?.network?.online === 'boolean'
+    && typeof qaReport?.orientation?.type === 'string'
+    && typeof qaReport?.runtime?.scriptSrc === 'string',
+  qaLayoutEvidence: qaReport?.layout?.centerElement === 'CANVAS'
+    && qaReport?.layout?.planetCenterVisible === true
+    && qaReport?.layout?.objectiveOverlapsInventory === false
+    && qaReport?.layout?.topbarOverlapsBuild === false,
 };
 
 console.log(JSON.stringify({

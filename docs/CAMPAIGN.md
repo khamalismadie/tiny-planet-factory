@@ -1,6 +1,6 @@
 # Tiny Planet Factory — Campaign & Leveling
 
-> **Versi:** v0.19.0 (unreleased di `main`; produksi masih v0.16.0)  
+> **Versi:** v0.20.0 (unreleased di `main`; produksi masih v0.16.0)  
 > **Source of truth:** `src/sim/progression.ts`, `src/sim/campaignRules.ts`, `src/content/campaignCopy.ts`
 
 ## Core loop
@@ -31,7 +31,7 @@ Total XP untuk mencapai level 100: **1.723.920** — masih muat di field DNA `u3
 
 ## Tiga jalur progresi
 
-| Mata uang | Status v0.19.0 | Sumber |
+| Mata uang | Status v0.20.0 | Sumber |
 |---|---|---|
 | Planet XP | Tersimpan di state/DNA | Aksi simulasi + reward misi |
 | DNA Points | **Derived, belum disimpan** | Jumlah spesies ditemukan |
@@ -63,7 +63,7 @@ DNA Points dan Bio Energy sengaja belum menjadi field DNA baru sampai P0 QA pera
 - **Peradaban** (`civilization`)
 - **Legendaris** (`legendary`)
 
-Daily, weekly, monthly, seasonal, hidden, dan achievement collection **belum diimplementasikan**; ini bukan fitur rilis v0.19.0.
+Daily, weekly, monthly, seasonal, hidden, dan achievement collection **belum diimplementasikan**; ini bukan fitur rilis v0.20.0.
 
 ## 10 era · 100 main mission
 

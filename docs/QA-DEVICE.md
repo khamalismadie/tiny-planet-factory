@@ -37,6 +37,19 @@ https://<host>/?debug=1&perf=1&quality=medium
 - `seed=N` — mengunci seed planet agar cuaca dan penempatan QA deterministik; dipakai `test:qa-load` dengan `seed=1`
 - `qaSeconds=N` — durasi probe, dipotong aplikasi ke maksimal **180 s**
 
+### Paket bukti v0.20.0
+
+Laporan yang disalin tombol **Salin hasil QA** kini membawa:
+`appVersion`, `save` (tick/objek/level + ketersediaan penyimpanan), `network` (`online`, visibilitas), `orientation`, `layout` (posisi topbar/build/objective/inventory, `centerElement`, flag overlap), dan `runtime` (`scriptSrc` + SW controller/script URL). Paket ini dipakai untuk membuktikan #5, #6, #7, dan #8 tanpa menambah gate `npm test`.
+
+Validator manual (tidak masuk `npm test`):
+
+```bash
+npm run qa:evidence -- laporan-dari-perangkat.json --standalone --offline --landscape
+```
+
+Flag opsional: `--standalone` menuntut `device.standalone === true`, `--offline` menuntut `network.online === false`, `--landscape` menuntut orientasi landscape dan `layout.planetCenterVisible === true` tanpa overlap panel. Validator tetap mengingatkan bahwa laporan harus dilampirkan ke issue; ia tidak menutup issue.
+
 Quality tier:
 
 | Tier | Icosphere detail | Prop capacity | Fauna capacity | Cloud | Drop |
@@ -66,6 +79,21 @@ Adaptive quality otomatis menurunkan tier bila p95 > 34 ms selama 120 frame. Tid
 | 13 | Responsive | Portrait → landscape → portrait saat bermain | Tidak ada panel yang menutupi planet sepenuhnya |
 | 14 | Konsol | Seluruh sesi | Tidak ada error aplikasi (error shader saat context loss dicatat terpisah) |
 | 15 | Fauna otonom | Bangun laut/danau/pohon/bunga, tunggu 60–120 tick; cek `wildlife()` | Kijang, ikan, serangga, burung muncul; agen bergerak; draw call < 150; tidak ada error batch |
+
+## Runbook bukti fisik #5–#8 (v0.20.0)
+
+Semua langkah berikut wajib dilakukan di perangkat nyata. Headless hanya dipakai sebagai smoke, bukan bukti.
+
+1. **Siapkan build.** Install PWA dari HTTPS, buka dari ikon, lalu buka  
+   `?debug=1&perf=1&quality=medium&qa=1&qaObjects=94&qaSeconds=180`.
+2. **Sesi A — portrait #5/#7.** Biarkan probe 180 s. Salin laporan QA, simpan sebagai `report-portrait.json`, dan lampirkan ke #5. Jika `p95ms > 33`, lampirkan juga ke #7; jangan tutup #7.
+3. **Sesi B — landscape #8.** Putar ke `844×390`, ulangi probe lebih singkat (`qaSeconds=45`), salin sebagai `report-landscape.json`. Lampirkan screenshot yang menampilkan planet di tengah. Periksa `layout.planetCenterVisible === true`, `objectiveOverlapsInventory === false`, dan `topbarOverlapsBuild === false`.
+4. **Sesi C — offline #6.** Catat `save.tick`/`save.objects` sebelum airplane mode. Aktifkan airplane mode, buka ulang dari ikon PWA, tunggu canvas interaktif, tanam satu objek, lalu salin laporan. Expected: `device.standalone === true`, `runtime.serviceWorker.controller === true`, `network.online === false`, dan `save` terbaca.
+5. **Sesi D — update #6.** Kembali online, deploy build baru, buka aplikasi lama dari ikon, catat apakah prompt update muncul, lalu pastikan `save.tick`/`save.objects` tidak hilang setelah aplikasi dimuat ulang.
+6. **Validasi lokal.** Jalankan `npm run qa:evidence -- <file> --standalone --offline --landscape` sesuai konteks sesi. `EVIDENCE OK` berarti format bukti konsisten, bukan pengganti lampiran perangkat.
+7. **Context loss (#5).** Background aplikasi 30 s / ganti aplikasi / paksa GPU reset, lalu buka lagi. Catat apakah render lanjut tanpa crash. Hook `loseContext()`/`restoreContext()` di `?debug=1` hanya alat bantu, bukan bukti.
+
+Status ditutup hanya bila laporan + screenshot asli ada di issue terkait dan angka p95 memenuhi target.
 
 ## Perangkat minimum yang disarankan
 
