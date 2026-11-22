@@ -4,7 +4,28 @@ import { basename, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const args = process.argv.slice(2);
-const dir = args.find((arg) => !arg.startsWith('--')) ?? 'qa-evidence';
+let dir;
+const passthrough = [];
+
+for (let i = 0; i < args.length; i += 1) {
+  const arg = args[i];
+  if (arg.startsWith('--')) {
+    passthrough.push(arg);
+    if (arg === '--expect-version' || arg === '--expect-bundle') {
+      const value = args[i + 1];
+      if (!value || value.startsWith('--')) {
+        console.error(`${arg} butuh nilai.`);
+        process.exit(1);
+      }
+      passthrough.push(value);
+      i += 1;
+    }
+    continue;
+  }
+  if (!dir) dir = arg;
+}
+
+dir ??= 'qa-evidence';
 const here = dirname(fileURLToPath(import.meta.url));
 const validator = join(here, 'qa-evidence.mjs');
 
@@ -37,7 +58,7 @@ for (const name of files) {
   const rule = flagRules.find(([pattern]) => pattern.test(name));
   const flags = rule?.[1] ?? [];
   const file = join(dir, name);
-  const result = spawnSync(process.execPath, [validator, file, ...flags], {
+  const result = spawnSync(process.execPath, [validator, file, ...flags, ...passthrough], {
     encoding: 'utf8',
   });
 
