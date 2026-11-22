@@ -39,7 +39,7 @@ Yang **tidak** boleh terjadi:
 | Draw call | 20 saat Hujan, sama dengan baseline; ≤18 saat Cerah | `test:qa-load`, baseline |
 | Fitur baru | v0.16.0 variants sudah aktif; planet/biome tetap ditahan | keputusan Nine Worlds QA-first |
 
-> **Catatan v0.16.0:** 49 varian aset diimplementasikan di luar Sprint 09 sesuai persetujuan user. Ini tidak menambah planet/biome, tipe objek, atau schema DNA, dan **tidak menutup** SPR-01…SPR-08. Deploy v0.16.0 sudah aktif; P0 QA tetap OPEN.
+> **Catatan v0.16.0:** 49 varian aset diimplementasikan di luar Sprint 09 sesuai persetujuan user. Ini tidak menambah planet/biome, tipe objek, atau schema DNA, dan **tidak menutup P0** SPR-01…SPR-05. SPR-06 dan SPR-08 sudah Done; deploy v0.16.0 aktif.
 
 ### Mapping GitHub Issues ↔ Sprint 09
 
@@ -68,7 +68,7 @@ Kapasitas di bawah adalah **asumsi perencanaan**, bukan data historis.
 
 **Total kapasitas rencana:** 24 story points.
 
-Jika perangkat fisik tidak tersedia, SPR-01, SPR-02, SPR-03, dan SPR-08 berubah menjadi **BLOCKED**, bukan PASS.
+Jika perangkat fisik tidak tersedia, SPR-01…SPR-05 berubah menjadi **BLOCKED**, bukan PASS.
 
 ---
 
