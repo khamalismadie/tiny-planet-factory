@@ -5,6 +5,7 @@
 > **Terakhir diverifikasi:** 2026-11-22  
 > **Production:** <https://tinyplanetfactory.netlify.app/>  
 > **Commit rilis v0.15.9:** `ea8f9b9`  
+> **Commit rilis v0.16.0:** `e71e6c1`  
 > **Commit dokumentasi QA v0.15.9:** `0c6b658`  
 > **Commit docs pipeline & sprint:** `421c8d6`
 
