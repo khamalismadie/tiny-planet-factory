@@ -2,10 +2,13 @@ import { EVENT_DEFS } from '../content/missions';
 import { CATEGORY_LABELS, OBJECT_DEFS, OBJECT_ORDER, UNLOCK_LEVEL } from '../content/objects';
 import { SPECIES_DEFS, SPECIES_ORDER } from '../content/species';
 import { WEATHER_DEFS } from '../content/weather';
+import { missionView } from '../sim/campaign';
+import { MISSION_TYPE_LABELS } from '../sim/campaignRules';
 import { STAGE_NAMES } from '../sim/engine';
 import { scoreHabitat } from '../sim/eco/habitat';
 import { ecosystemConfigOf, guildStatus } from '../sim/eco/guilds';
 import { habitatContextFor } from '../sim/eco/manager';
+import { eraForLevel } from '../sim/progression';
 import type { EnvKey, ObjectType, PlanetState } from '../sim/types';
 
 export interface HudCallbacks {
@@ -219,10 +222,11 @@ export class Hud {
   update(planet: PlanetState, selected: ObjectType | null): void {
     this.nameLabel.textContent = planet.name;
     this.stageLabel.textContent = `Tahap ${planet.stage} — ${STAGE_NAMES[planet.stage]}`;
+    const level = planet.progression.level;
     const compact = typeof window !== 'undefined' && window.matchMedia('(max-width: 480px)').matches;
     this.levelLabel.textContent = compact
-      ? `Lv${planet.progression.level}`
-      : `Level ${planet.progression.level} · ${Math.floor(planet.progression.xp)} XP`;
+      ? `Lv${level}/100`
+      : `Level ${level}/100 · ${Math.floor(planet.progression.xp)} XP`;
 
     for (const key of ENV_KEYS) {
       const value = planet.environment[key];
@@ -256,18 +260,24 @@ export class Hud {
         return `<div class="event${done ? ' done' : ''}" data-event="${event.id}">${done ? '✓' : '○'} ${event.title} <span>${event.progressLabel(progress.progress, event.target)}</span></div>`;
       }).join('');
 
-    const e = planet.environment;
-    const missionDone = planet.mission.status === 'complete';
+    const view = missionView(planet);
+    const era = eraForLevel(level);
+    const percent = Math.round(view.progress * 100);
+    const missionDone = view.status === 'complete';
     this.mission.innerHTML = missionDone
-      ? '<strong>Misi selesai</strong><br>Hijaukan Planet ✓'
-      : `<strong>Misi: Hijaukan Planet</strong><br>Oksigen ≥ 45 (${Math.round(e.oxygen)}) · Air ≥ 40 (${Math.round(e.water)}) · Stabilitas ≥ 60 (${Math.round(e.stability)})<br>Tahan ${planet.mission.holdTicks}/3 tick`;
+      ? `<strong>Misi selesai</strong><br>${view.title} ✓<br>${MISSION_TYPE_LABELS[view.type]} · +${view.rewardXp} XP`
+      : view.locked
+        ? `<strong>Misi: ${view.title}</strong><br>Terkunci — mekanik era ini belum tersedia.`
+        : `<strong>Misi: ${view.title}</strong><br>${MISSION_TYPE_LABELS[view.type]} · progres ${percent}%<br>Tahan ${view.holdTicks}/3 tick · +${view.rewardXp} XP`;
 
     const stage = Math.max(1, Math.min(6, planet.stage));
     const missionLine = missionDone
-      ? 'Misi Hijaukan ✓'
-      : `Misi O₂ ${Math.round(e.oxygen)}/45 · Air ${Math.round(e.water)}/40 · Stabil ${Math.round(e.stability)}/60 · ${planet.mission.holdTicks}/3`;
+      ? `Misi ${view.title} selesai ✓`
+      : view.locked
+        ? `Misi ${view.title} terkunci`
+        : `Misi ${view.title} · ${percent}% · ${view.holdTicks}/3`;
     this.objectiveStrip.innerHTML =
-      `<span class="objective-stage">Tahap ${stage} — ${STAGE_NAMES[stage]}</span>` +
+      `<span class="objective-stage">${era.name} · Lv ${level}/100</span>` +
       `<span class="objective-goal">${STAGE_GOALS[stage]}</span>` +
       `<span class="objective-mission${missionDone ? ' done' : ''}">${missionLine}</span>`;
 

@@ -115,6 +115,15 @@
       .modal .dna-label { display: block; margin-top: 10px; font-size: 12px; color: var(--muted); }
       .modal .dna-status { margin-top: 10px; font-size: 12px; color: #ffd479; }
       .modal .row { display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end; flex-wrap: wrap; }
+      .campaign-card { width: min(560px, 100%); }
+      #campaign-list { max-height: min(58vh, 420px); overflow-y: auto; margin-top: 10px; padding-right: 4px; }
+      .campaign-era { margin-top: 10px; font-size: 12px; color: var(--amber); font-weight: 700; }
+      .campaign-row { display: flex; gap: 8px; padding: 5px 6px; border-bottom: 1px solid rgba(255,255,255,.06); font-size: 11px; line-height: 1.4; }
+      .campaign-row .lv { color: var(--muted); font: 10px var(--mono); min-width: 26px; }
+      .campaign-row .title { color: var(--text); min-width: 120px; }
+      .campaign-row .goal { color: var(--muted); flex: 1; }
+      .campaign-row.locked { opacity: .55; }
+      .campaign-row.current { background: rgba(89, 226, 173, .09); border-radius: 6px; }
 
       .main-menu {
         position: fixed; z-index: 38; inset: 0; display: grid; place-items: center; padding: 24px;
@@ -279,6 +288,14 @@
       </div>
     </div>
     <div id="toast"></div>
+    <div id="campaign-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="campaign-title">
+      <div class="card campaign-card">
+        <h2 id="campaign-title">Kampanye Planet</h2>
+        <p style="font-size:13px;color:var(--muted)">10 era · 100 misi. Misi 61–100 tersedia sebagai katalog dan terkunci sampai mekanik era tersebut dibangun.</p>
+        <div id="campaign-list">Memuat katalog misi…</div>
+        <div class="row"><button id="campaign-close">Tutup</button></div>
+      </div>
+    </div>
     <div id="telemetry-modal" class="modal hidden">
       <div class="card">
         <h2>Telemetri (opsional)</h2>

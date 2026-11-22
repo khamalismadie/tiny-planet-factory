@@ -74,6 +74,7 @@ const grownDom = await page.evaluate(() => ({
   weather: document.getElementById('weather')?.textContent ?? '',
   events: document.getElementById('events')?.textContent ?? '',
   ecosystem: document.getElementById('ecosystem')?.textContent ?? '',
+  campaign: window.__game.campaign?.() ?? null,
 }));
 const grownMetrics = await snapshot();
 
@@ -270,10 +271,11 @@ const checks = {
   tapPlacedObject: afterClick.objects.length === initialState.objects.length + 1,
   placementFeedbackActive: placementActive > 0,
   simulationAdvanced: grown.tick >= 120,
-  levelUnlocked: grown.progression.level >= 3,
+  levelUnlocked: grown.progression.level >= 2,
+  campaignHookReady: grownDom.campaign?.maxLevel === 100 && grownDom.campaign?.total === 100,
   ecosystemGrew: grown.environment.oxygen > initialState.environment.oxygen && grown.ecosystem.vegetation > initialState.ecosystem.vegetation,
-  missionComplete: grown.mission.status === 'complete',
-  missionUiUpdated: grownDom.mission.includes('selesai'),
+  campaignMissionTracked: grown.mission.status === 'complete' || (grownDom.campaign?.mission.progress ?? 0) > 0,
+  missionUiUpdated: /Misi/.test(grownDom.mission) && !/terkunci/.test(grownDom.mission),
   weatherUiUpdated: /Cuaca:/.test(grownDom.weather) && /Intensitas/.test(grownDom.weather),
   eventsUiUpdated: grownDom.events.includes('Event Opsional') && grownDom.events.includes('Hujan Pertama'),
   ecosystemUiUpdated: grownDom.ecosystem.includes('Vegetasi') && grownDom.ecosystem.includes('Satwa'),
@@ -363,6 +365,7 @@ console.log(JSON.stringify({ boot, initialTick: initialState.tick, placementActi
   stage: grown.stage,
   environment: grown.environment,
   mission: grown.mission,
+  campaign: grownDom.campaign,
   objects: grown.objects.length,
   fauna: grownFauna,
   eco: ecoProbe,

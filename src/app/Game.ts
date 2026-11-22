@@ -3,12 +3,15 @@ import { ensureEventState } from '../content/missions';
 import { OBJECT_DEFS, OBJECT_ORDER, UNLOCK_LEVEL } from '../content/objects';
 import { SPECIES_ORDER } from '../content/species';
 import { WEATHER_DEFS } from '../content/weather';
+import { missionView } from '../sim/campaign';
+import { CAMPAIGN, campaignMissionForLevel, MISSION_TYPE_LABELS } from '../sim/campaignRules';
 import { scoreHabitat } from '../sim/eco/habitat';
 import { ecosystemConfigFor, ecosystemConfigOf, foodWebLinks, guildStatus, isSupportedPlanet, supportedPlanetIds } from '../sim/eco/guilds';
 import { habitatContextFor } from '../sim/eco/manager';
 import { placeObject, createPlanet, planetNameFromSeed, simulateTick, STAGE_NAMES, TICK_MS } from '../sim/engine';
 import { decodePlanetDna, encodePlanetDna, type PlanetDnaCodes } from '../sim/dna';
 import { migratePlanet } from '../sim/migrate';
+import { ERAS, eraForLevel, MAX_LEVEL } from '../sim/progression';
 import type { ObjectType, PlanetState } from '../sim/types';
 import { detectQuality, QUALITY, type QualitySettings, type QualityTier } from './quality';
 import { PerfMonitor } from './PerfMonitor';
@@ -53,6 +56,7 @@ export class Game {
   private qa: QaProbe | null = null;
   private qaReport: QaReport | null = null;
   private qaPanel: HTMLElement | null = null;
+  private campaignPanel: HTMLElement | null = null;
   private previewBackup: PlanetState | null = null;
   private sessionEnded = false;
 
@@ -117,6 +121,7 @@ export class Game {
     this.buildScene();
     this.buildHud();
     this.buildMenu();
+    this.setupCampaignPanel(params.has('campaign'));
     this.buildInput();
     this.instrument();
     this.bindLifecycle();
@@ -126,7 +131,7 @@ export class Game {
 
     registerPwa((message) => this.hud.notify(message, true));
 
-    const skipMenu = params.has('debug') || params.has('qa') || params.has('planet') || params.get('menu') === '0';
+    const skipMenu = params.has('debug') || params.has('qa') || params.has('campaign') || params.has('planet') || params.get('menu') === '0';
     if (skipMenu) this.menu.hide();
     else this.openMenu();
   }
@@ -268,6 +273,40 @@ export class Game {
     this.paused = this.menuWasPaused;
   }
 
+  private setupCampaignPanel(open: boolean): void {
+    this.campaignPanel = document.getElementById('campaign-modal');
+    document.getElementById('campaign-close')?.addEventListener('click', () => this.campaignPanel?.classList.add('hidden'));
+    this.campaignPanel?.addEventListener('click', (event) => {
+      if (event.target === this.campaignPanel) this.campaignPanel?.classList.add('hidden');
+    });
+    if (open) void this.openCampaignPanel();
+  }
+
+  private async openCampaignPanel(): Promise<void> {
+    const list = document.getElementById('campaign-list');
+    if (!list) return;
+    const { campaignCopy } = await import('../content/campaignCopy');
+    const level = this.state.progression.level;
+    list.innerHTML = ERAS.map((era) => {
+      const rows = CAMPAIGN.filter((mission) => mission.level >= era.start && mission.level <= era.end)
+        .map((mission) => {
+          const copy = campaignCopy(mission.level);
+          const status = mission.locked
+            ? 'locked'
+            : mission.level < level || (mission.level === level && this.state.mission.status === 'complete')
+              ? 'done'
+              : mission.level === level
+                ? 'current'
+                : '';
+          const mark = status === 'done' ? '✓ ' : mission.locked ? '🔒 ' : '';
+          return `<div class="campaign-row ${status}"><span class="lv">${mission.level}</span><span class="title">${mark}${mission.title}</span><span class="goal">${copy.target}</span></div>`;
+        })
+        .join('');
+      return `<div class="campaign-era">Era ${era.index + 1} — ${era.name} · Lv ${era.start}–${era.end}</div>${rows}`;
+    }).join('');
+    this.campaignPanel?.classList.remove('hidden');
+  }
+
   private buildInput(): void {
     new SurfaceInput(this.scene.view, this.scene.planet.mesh, {
       getSelectedType: () => this.selected,
@@ -346,6 +385,21 @@ export class Game {
     if (debug) {
       (window as unknown as Record<string, unknown>).__game = {
         state: () => this.state,
+        campaign: () => {
+          const view = missionView(this.state);
+          return {
+            level: this.state.progression.level,
+            maxLevel: MAX_LEVEL,
+            xp: this.state.progression.xp,
+            era: eraForLevel(this.state.progression.level).name,
+            mission: view,
+            missionId: campaignMissionForLevel(this.state.progression.level).id,
+            typeLabel: MISSION_TYPE_LABELS[view.type],
+            total: CAMPAIGN.length,
+            eras: ERAS.length,
+            lockedFrom: CAMPAIGN.find((mission) => mission.locked)?.level ?? null,
+          };
+        },
         variants: () => ({ indices: this.scene.variantIndices(), labels: this.scene.variantLabels() }),
         eco: () => this.state.eco,
         cryo: () => this.state.eco.cryo,
