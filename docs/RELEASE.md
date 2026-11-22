@@ -303,7 +303,8 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [x] Hook QA `?debug=1` → `window.__game.variants()` (indices + labels); katalog di `docs/ASSET-CATALOG.md`.
 - [x] App chunk 73,33 kB (gzip 23,96 kB) dan cache service worker `tpf-shell-v0-16-0`.
 - [x] `npm test` lokal 8/8 PASS; draw call Hujan tetap 20, p95 headless 16,80 ms.
-- [ ] QA perangkat nyata untuk v0.16.0 belum dijalankan; P0 Sprint 09 tetap OPEN. Deploy produksi menyusul setelah commit ini.
+- [x] Deploy produksi `main` @ `e71e6c1` ke <https://tinyplanetfactory.netlify.app/>; bundle `index-Cl2SK4zO.js`; remote `npm test` 8/8 PASS; cache `tpf-shell-v0-16-0` dan offline reload PASS.
+- [ ] QA perangkat nyata untuk v0.16.0 belum dijalankan; P0 Sprint 09 tetap OPEN.
 
 ## 3. QA perangkat nyata
 
