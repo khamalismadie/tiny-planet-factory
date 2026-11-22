@@ -2,7 +2,7 @@
 
 Gunakan checklist ini sebelum publish build produksi.
 
-> **Status pembacaan v0.15.9:** angka 360 tick pada phase v0.10–v0.14 adalah spesifikasi historis. Sejak v0.15.4, semua siklus musim aktif berada pada **106–120 tick** (divalidasi `test:sim`). Bagian bertanda v0.4–v0.14 adalah catatan rilis, bukan klaim kondisi saat ini; lihat §2u–§2ab untuk status terkini. `main` adalah v0.17.0 (unreleased); produksi masih v0.16.0.
+> **Status pembacaan v0.15.9:** angka 360 tick pada phase v0.10–v0.14 adalah spesifikasi historis. Sejak v0.15.4, semua siklus musim aktif berada pada **106–120 tick** (divalidasi `test:sim`). Bagian bertanda v0.4–v0.14 adalah catatan rilis, bukan klaim kondisi saat ini; lihat §2u–§2ab untuk status terkini. `main` adalah v0.18.0 (unreleased); produksi masih v0.16.0.
 
 ## 1. Prasyarat
 
@@ -19,7 +19,7 @@ npm run build
 PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 ```
 
-- [ ] `npm run build` tanpa error. Chunk vendor: `pixi-core` + `pixi-3d`, app chunk < 100 kB (v0.17.0: 75,00 kB / gzip 24,55 kB; produksi v0.16.0: 73,33 kB).
+- [ ] `npm run build` tanpa error. Chunk vendor: `pixi-core` + `pixi-3d`, app chunk < 100 kB (v0.18.0: 75,09 kB / gzip 24,59 kB; produksi v0.16.0: 73,33 kB).
 - [ ] `PASS: sim`
 - [ ] `PASS: art scale`
 - [ ] `PASS: terrain render`
@@ -332,6 +332,21 @@ Ringkasan status P0 pasca-v0.16.0:
 - [ ] QA perangkat nyata v0.17.0 tidak dijalankan; P0 Sprint 09 tetap OPEN.
 
 Status jujur: fitur campaign sudah ada di `main`, tetapi klaim produksi dan real-device masih mengacu ke v0.16.0.
+
+## 2ac. Advanced Systems / Misi 61–100 (v0.18.0 — unreleased di `main`)
+
+- [x] Misi 61–100 tidak lagi locked; `CAMPAIGN` tidak punya entri `locked: true`.
+- [x] Era 7–10 memakai check nyata `civilization`, `industry`, `ai`, dan `cosmic` pada `src/sim/advanced.ts`.
+- [x] Skor 0–100 dan tier 1–5 diturunkan dari state sim yang ada; tidak ada objek, planet, biome, atau field DNA baru. `schemaVersion` tetap 3.
+- [x] Rumus: Peradaban = populasi + stabilitas + air + jaring makanan + level; Industri = energi + objek + populasi + level; AI = biodiversitas + agen + jaring makanan + stabilitas + level; Kosmik = tahap + energi + biodiversitas + level.
+- [x] HUD menampilkan `Sistem <nama>: <skor>/100`; hook `window.__game.campaign()` menyertakan `systems.scores` dan `systems.tiers`.
+- [x] Copy target 61–100 dan `docs/CAMPAIGN.md` menyebut skor turunan, bukan klaim manusia/alien literal.
+- [x] `test:sim` memverifikasi 100/100 misi reachable, tidak ada `always` di level 61–100, skor terikat 0–100, tier 1–5, dan skor naik bersama level.
+- [x] Build lokal app chunk 75,09 kB (gzip 24,59 kB); cache SW `tpf-shell-v0-18-0`.
+- [ ] **Belum di-deploy.** Produksi tetap bundle v0.16.0 `index-Cl2SK4zO.js` / cache `tpf-shell-v0-16-0`.
+- [ ] QA perangkat nyata v0.18.0 belum dijalankan; P0 Sprint 09 tetap OPEN.
+
+Status jujur: 100 misi sekarang aktif di `main`, tetapi produksi dan real-device masih mengacu ke v0.16.0.
 
 ## 3. QA perangkat nyata
 

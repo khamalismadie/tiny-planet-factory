@@ -1,4 +1,5 @@
 import { QUALITY, suggestQuality } from '../src/app/quality.ts';
+import { ADVANCED_SYSTEMS, advancedSnapshot, advancedSystemScore } from '../src/sim/advanced.ts';
 import { CAMPAIGN_TARGETS, campaignCopy } from '../src/content/campaignCopy.ts';
 import { ensureEventState } from '../src/content/missions.ts';
 import { WEATHER_DEFS } from '../src/content/weather.ts';
@@ -6,7 +7,7 @@ import { OBJECT_DEFS, OBJECT_ORDER } from '../src/content/objects.ts';
 import { SPECIES_ORDER } from '../src/content/species.ts';
 import { PLANET_CONFIGS, PLANET_IDS } from '../src/content/planets/index.ts';
 import { completeCampaignMission, missionProgress, syncCampaignMission } from '../src/sim/campaign.ts';
-import { CAMPAIGN, CAMPAIGN_BY_LEVEL, campaignMissionForLevel, MISSION_TYPE_LABELS } from '../src/sim/campaignRules.ts';
+import { CAMPAIGN, CAMPAIGN_BY_LEVEL, campaignMissionForLevel, MISSION_TYPE_LABELS, type MissionCheck } from '../src/sim/campaignRules.ts';
 import { decodePlanetDna, encodePlanetDna, encodePlanetDnaLegacy } from '../src/sim/dna.ts';
 import { ecosystemConfigFor, guildAgentCapacity, guildFoodSourceIds, guildStatus, isSupportedPlanet } from '../src/sim/eco/guilds.ts';
 import { HabitatManager } from '../src/sim/eco/habitat.ts';
@@ -1003,7 +1004,7 @@ assert(suggestQuality(40, 'low', 'low') === null, 'kualitas low tidak bisa turun
 assert(suggestQuality(12, 'medium', 'high') === 'high', 'p95 rendah boleh naik sampai baseline');
 assert(suggestQuality(12, 'medium', 'medium') === null, 'tidak boleh naik melewati baseline');
 
-// v0.17.0: kurva 100 level dan 10 era harus deterministik.
+// v0.18.0: kurva 100 level dan 10 era harus deterministik.
 assert(xpStep(1) === 100, 'XP 1→2 harus 100');
 assert(xpStep(10) === 730, 'XP 10→11 harus 730');
 assert(xpStep(25) === 3580, 'XP 25→26 harus 3580 sesuai rumus');
@@ -1030,16 +1031,16 @@ assert(
   'migrasi harus menaikkan XP ke ambang level lama',
 );
 
-// v0.17.0: katalog campaign, runtime misi, dan batas era terkunci.
+// v0.18.0: katalog campaign, runtime misi, dan sistem era lanjutan.
 assert(CAMPAIGN.length === 100, 'katalog campaign harus 100 misi');
 assert(CAMPAIGN_TARGETS.length === 100, 'copy campaign harus 100 entri');
 assert(new Set(CAMPAIGN.map((mission) => mission.id)).size === 100, 'id misi harus unik');
 assert(CAMPAIGN.every((mission, index) => mission.level === index + 1), 'level misi harus 1..100');
 assert(CAMPAIGN_BY_LEVEL[0].id === 'era1-01', 'misi pertama harus era1-01');
 assert(campaignMissionForLevel(100).id === 'era10-10', 'misi terakhir harus era10-10');
-assert(CAMPAIGN.filter((mission) => mission.locked).length === 40, 'misi 61-100 harus terkunci');
+assert(CAMPAIGN.every((mission) => !mission.locked), 'misi 61-100 harus aktif');
 assert(Object.keys(MISSION_TYPE_LABELS).length === 6, 'harus ada 6 tipe quest');
-assert(campaignCopy(61).note.includes('Terkunci'), 'copy misi terkunci harus jelas');
+assert(campaignCopy(61).note.includes('Skor Peradaban'), 'copy era lanjutan harus menjelaskan skor turunan');
 
 const campaignPlanet = createPlanet(5150, 'Kampanye');
 assert(campaignPlanet.mission.id === 'era1-01', 'planet baru harus memakai misi era1-01');
@@ -1059,13 +1060,31 @@ assert(
   'misi level 41 harus progres dari objek ocean',
 );
 
-const lockedPlanet = createPlanet(5153, 'Era Terkunci');
-lockedPlanet.progression.level = 61;
-syncCampaignMission(lockedPlanet);
-assert(lockedPlanet.mission.id === 'era7-01', 'level 61 harus memakai misi era7-01');
-assert(completeCampaignMission(lockedPlanet) === null, 'misi terkunci tidak boleh memberi reward');
+const advancedPlanet = createPlanet(5153, 'Era Lanjutan');
+advancedPlanet.progression.level = 61;
+syncCampaignMission(advancedPlanet);
+assert(advancedPlanet.mission.id === 'era7-01', 'level 61 harus memakai misi era7-01');
+assert(completeCampaignMission(advancedPlanet) !== null, 'misi era7 tidak boleh terkunci lagi');
+assert(CAMPAIGN.every((mission) => !mission.locked), 'semua misi 1-100 harus aktif');
+assert(
+  CAMPAIGN.slice(60).every((mission) => mission.check.kind !== 'always'),
+  'misi 61-100 harus punya check nyata, bukan always',
+);
+const advancedSnapshotLow = advancedSnapshot({ ...advancedPlanet, progression: { ...advancedPlanet.progression, level: 61 } });
+const advancedSnapshotHigh = advancedSnapshot({ ...advancedPlanet, progression: { ...advancedPlanet.progression, level: 100 } });
+for (const system of Object.keys(ADVANCED_SYSTEMS) as Array<keyof typeof ADVANCED_SYSTEMS>) {
+  const low = advancedSnapshotLow.scores[system];
+  const high = advancedSnapshotHigh.scores[system];
+  assert(low >= 0 && low <= 100, `skor ${system} harus 0-100`);
+  assert(high >= low, `skor ${system} harus naik bersama level`);
+  assert(advancedSnapshotLow.tiers[system] >= 1 && advancedSnapshotLow.tiers[system] <= 5, `tier ${system} harus 1-5`);
+}
+assert(
+  advancedSystemScore(advancedPlanet, 'cosmic') === advancedSystemScore({ ...advancedPlanet }, 'cosmic'),
+  'skor sistem lanjutan harus deterministik',
+);
 
-// v0.17.0: setiap misi aktif harus bisa dicapai lewat aksi simulator nyata,
+// v0.18.0: setiap misi aktif harus bisa dicapai lewat aksi simulator nyata,
 // bukan hanya punya definisi yang valid. State-state ini dibangun dari
 // createPlanet + placeObject + simulateTick (atau pencarian cuaca deterministik).
 tickN(mastery, 40);
@@ -1087,11 +1106,21 @@ const auditAquaPlan: ObjectType[] = [
   ...Array<ObjectType>(8).fill('tree'), ...Array<ObjectType>(5).fill('bush'),
   ...Array<ObjectType>(5).fill('flower'),
 ];
+const auditBigPlan: ObjectType[] = [
+  ...Array<ObjectType>(10).fill('sand'), ...Array<ObjectType>(10).fill('rock'),
+  ...Array<ObjectType>(6).fill('hill'), ...Array<ObjectType>(6).fill('mountain'),
+  ...Array<ObjectType>(15).fill('ocean'), ...Array<ObjectType>(10).fill('lake'),
+  ...Array<ObjectType>(40).fill('tree'), ...Array<ObjectType>(25).fill('bush'),
+  ...Array<ObjectType>(20).fill('flower'), ...Array<ObjectType>(20).fill('grass'),
+  ...Array<ObjectType>(10).fill('deer'), ...Array<ObjectType>(6).fill('fox'),
+  ...Array<ObjectType>(12).fill('bird'),
+];
 const auditStates: Array<{ name: string; state: PlanetState }> = [
   { name: 'mastery', state: mastery },
   { name: 'fauna', state: buildAuditState('mycelia', auditFaunaPlan, 28, 1337) },
   { name: 'reef', state: buildAuditState('aquaria', auditReefPlan, 30, 1337) },
   { name: 'aqua', state: buildAuditState('aquaria', auditAquaPlan, 180, 1337) },
+  { name: 'big', state: buildAuditState('terra', auditBigPlan, 120, 1337) },
   {
     name: 'rain',
     state: findWeatherState('terra', 'rain', ['lake', 'tree'] as const, 80, 4242),
@@ -1101,8 +1130,14 @@ const auditStates: Array<{ name: string; state: PlanetState }> = [
     state: findWeatherState('glaciere', 'snow', ['rock', 'hill', 'tree'] as const, 80, 901),
   },
 ];
+const isAdvancedCheck = (check: MissionCheck): boolean =>
+  check.kind === 'civilization' || check.kind === 'industry' || check.kind === 'ai' || check.kind === 'cosmic';
+const withAuditLevel = (state: PlanetState, level: number): PlanetState => ({
+  ...state,
+  progression: { ...state.progression, level },
+});
 const unreachableMissions: string[] = [];
-for (const mission of CAMPAIGN.slice(0, 60)) {
+for (const mission of CAMPAIGN) {
   const check = mission.check;
   let best = 0;
   let source = '-';
@@ -1116,7 +1151,8 @@ for (const mission of CAMPAIGN.slice(0, 60)) {
     source = 'placement';
   } else {
     for (const entry of auditStates) {
-      const value = missionProgress(entry.state, mission);
+      const candidate = isAdvancedCheck(check) ? withAuditLevel(entry.state, mission.level) : entry.state;
+      const value = missionProgress(candidate, mission);
       if (value > best) {
         best = value;
         source = entry.name;
@@ -1129,7 +1165,7 @@ for (const mission of CAMPAIGN.slice(0, 60)) {
   }
 }
 console.log('campaign reachability', {
-  missions: 60,
+  missions: CAMPAIGN.length,
   states: auditStates.length,
   unreachable: unreachableMissions.length,
 });

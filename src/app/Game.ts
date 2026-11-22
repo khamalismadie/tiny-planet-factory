@@ -1,4 +1,5 @@
 import { Application, UPDATE_PRIORITY } from 'pixi.js';
+import { advancedSnapshot } from '../sim/advanced';
 import { ensureEventState } from '../content/missions';
 import { OBJECT_DEFS, OBJECT_ORDER, UNLOCK_LEVEL } from '../content/objects';
 import { SPECIES_ORDER } from '../content/species';
@@ -398,6 +399,7 @@ export class Game {
             total: CAMPAIGN.length,
             eras: ERAS.length,
             lockedFrom: CAMPAIGN.find((mission) => mission.locked)?.level ?? null,
+            systems: advancedSnapshot(this.state),
           };
         },
         variants: () => ({ indices: this.scene.variantIndices(), labels: this.scene.variantLabels() }),

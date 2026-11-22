@@ -1,3 +1,4 @@
+import { ADVANCED_SYSTEMS, type AdvancedSystem } from '../sim/advanced';
 import { campaignMissionForLevel } from '../sim/campaignRules';
 
 // Teks panjang dipisah dari aturan agar tidak masuk app chunk utama.
@@ -69,49 +70,49 @@ export const CAMPAIGN_TARGETS: string[] = [
   'Capai 20 agen fauna aktif.',
   'Miliki 5 biome stabil (tahap 6).',
 
-  'Introduksi manusia pertama.',
-  'Bangun 5 rumah.',
-  'Bangun 3 lahan pertanian.',
-  'Produksi 5 jenis bahan pangan.',
-  'Introduksi 3 hewan ternak.',
-  'Capai 20 penduduk.',
-  'Bangun sistem distribusi air.',
-  'Aktifkan pertukaran sumber daya.',
-  'Capai 50 penduduk.',
-  'Bangun desa mandiri.',
+  'Capai skor Peradaban 30.',
+  'Capai skor Peradaban 35.',
+  'Capai skor Peradaban 40.',
+  'Capai skor Peradaban 45.',
+  'Capai skor Peradaban 50.',
+  'Capai skor Peradaban 55.',
+  'Capai skor Peradaban 60.',
+  'Capai skor Peradaban 65.',
+  'Capai skor Peradaban 68.',
+  'Capai skor Peradaban 70.',
 
-  'Bangun workshop.',
-  'Ekstrak 3 jenis mineral.',
-  'Produksi energi pertama.',
-  'Bangun 3 turbin angin.',
-  'Bangun 5 panel surya.',
-  'Bangun 2 fasilitas industri.',
-  'Buka sistem transportasi.',
-  'Kelola polusi industri.',
-  'Gunakan 50% energi terbarukan.',
-  'Stabilkan ekonomi dan lingkungan.',
+  'Capai skor Industri 50.',
+  'Capai skor Industri 52.',
+  'Capai skor Industri 54.',
+  'Capai skor Industri 56.',
+  'Capai skor Industri 58.',
+  'Capai skor Industri 60.',
+  'Capai skor Industri 62.',
+  'Capai skor Industri 64.',
+  'Capai skor Industri 66.',
+  'Capai skor Industri 68.',
 
-  'Bangun research center.',
-  'Buka 5 upgrade DNA.',
-  'Otomatiskan pertanian.',
-  'Buat 3 sanctuary.',
-  'Kelola perubahan iklim.',
-  'Bangun ekosistem otomatis.',
-  'Buka AI planet management.',
-  'Evolusikan 5 spesies.',
-  'Capai 90% planet health.',
-  'Bangun peradaban berkelanjutan.',
+  'Capai skor AI 65.',
+  'Capai skor AI 67.',
+  'Capai skor AI 69.',
+  'Capai skor AI 71.',
+  'Capai skor AI 73.',
+  'Capai skor AI 75.',
+  'Capai skor AI 77.',
+  'Capai skor AI 79.',
+  'Capai skor AI 81.',
+  'Capai skor AI 83.',
 
-  'Temukan energi kosmik.',
-  'Temukan 3 spesies alien.',
-  'Bangun crystal biome.',
-  'Ciptakan 5 pulau melayang.',
-  'Bangkitkan 3 spesies purba.',
-  'Hubungkan 5 biome.',
-  'Evolusikan 10 spesies.',
-  'Capai ekosistem mandiri.',
-  'Selesaikan semua milestone utama.',
-  'Selesaikan seluruh campaign.',
+  'Capai skor Kosmik 55.',
+  'Capai skor Kosmik 57.',
+  'Capai skor Kosmik 59.',
+  'Capai skor Kosmik 61.',
+  'Capai skor Kosmik 63.',
+  'Capai skor Kosmik 65.',
+  'Capai skor Kosmik 67.',
+  'Capai skor Kosmik 69.',
+  'Capai skor Kosmik 71.',
+  'Capai skor Kosmik 73.',
 ];
 
 export interface CampaignCopy {
@@ -119,11 +120,28 @@ export interface CampaignCopy {
   note: string;
 }
 
+function advancedSystemOf(check: ReturnType<typeof campaignMissionForLevel>['check']): AdvancedSystem | null {
+  switch (check.kind) {
+    case 'civilization':
+    case 'industry':
+    case 'ai':
+    case 'cosmic':
+      return check.kind;
+    default:
+      return null;
+  }
+}
+
 export function campaignCopy(level: number): CampaignCopy {
   const index = Math.max(1, Math.min(CAMPAIGN_TARGETS.length, Math.floor(level))) - 1;
   const mission = campaignMissionForLevel(level);
+  const system = advancedSystemOf(mission.check);
   return {
     target: CAMPAIGN_TARGETS[index],
-    note: mission.locked ? 'Terkunci — mekanik era ini belum tersedia.' : 'Dapat diselesaikan dengan sistem saat ini.',
+    note: mission.locked
+      ? 'Terkunci — mekanik era ini belum tersedia.'
+      : system
+        ? `Skor ${ADVANCED_SYSTEMS[system].label} diturunkan dari ${ADVANCED_SYSTEMS[system].inputs}.`
+        : 'Dapat diselesaikan dengan sistem saat ini.',
   };
 }

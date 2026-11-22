@@ -1,3 +1,4 @@
+import { ADVANCED_SYSTEMS, advancedSystemScore, type AdvancedSystem } from './advanced';
 import { campaignMissionForLevel, type CampaignMission } from './campaignRules';
 import { foodWebLinks } from './eco/guilds';
 import type { PlanetState } from './types';
@@ -37,6 +38,23 @@ export function missionProgress(planet: PlanetState, mission: CampaignMission): 
       return ratio(foodWebLinks(planet).length, check.target);
     case 'stage':
       return ratio(planet.stage, check.target);
+    case 'civilization':
+    case 'industry':
+    case 'ai':
+    case 'cosmic':
+      return ratio(advancedSystemScore(planet, check.kind), check.target);
+  }
+}
+
+function systemForCheck(check: CampaignMission['check']): AdvancedSystem | null {
+  switch (check.kind) {
+    case 'civilization':
+    case 'industry':
+    case 'ai':
+    case 'cosmic':
+      return check.kind;
+    default:
+      return null;
   }
 }
 
@@ -67,10 +85,13 @@ export interface MissionView {
   holdTicks: number;
   rewardXp: number;
   locked: boolean;
+  system: string | null;
+  systemScore: number | null;
 }
 
 export function missionView(planet: PlanetState): MissionView {
   const mission = campaignMissionForLevel(planet.progression.level);
+  const system = systemForCheck(mission.check);
   return {
     id: mission.id,
     title: mission.title,
@@ -80,5 +101,7 @@ export function missionView(planet: PlanetState): MissionView {
     holdTicks: planet.mission.holdTicks,
     rewardXp: mission.rewardXp,
     locked: mission.locked,
+    system: system ? ADVANCED_SYSTEMS[system].label : null,
+    systemScore: system ? Math.round(advancedSystemScore(planet, system)) : null,
   };
 }

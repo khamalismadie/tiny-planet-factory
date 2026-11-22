@@ -1,6 +1,6 @@
 # Tiny Planet Factory — Campaign & Leveling
 
-> **Versi:** v0.17.0 (unreleased di `main`; produksi masih v0.16.0)  
+> **Versi:** v0.18.0 (unreleased di `main`; produksi masih v0.16.0)  
 > **Source of truth:** `src/sim/progression.ts`, `src/sim/campaignRules.ts`, `src/content/campaignCopy.ts`
 
 ## Core loop
@@ -31,7 +31,7 @@ Total XP untuk mencapai level 100: **1.723.920** — masih muat di field DNA `u3
 
 ## Tiga jalur progresi
 
-| Mata uang | Status v0.17.0 | Sumber |
+| Mata uang | Status v0.18.0 | Sumber |
 |---|---|---|
 | Planet XP | Tersimpan di state/DNA | Aksi simulasi + reward misi |
 | DNA Points | **Derived, belum disimpan** | Jumlah spesies ditemukan |
@@ -63,13 +63,26 @@ DNA Points dan Bio Energy sengaja belum menjadi field DNA baru sampai P0 QA pera
 - **Peradaban** (`civilization`)
 - **Legendaris** (`legendary`)
 
-Daily, weekly, monthly, seasonal, hidden, dan achievement collection **belum diimplementasikan**; ini bukan fitur rilis v0.17.0.
+Daily, weekly, monthly, seasonal, hidden, dan achievement collection **belum diimplementasikan**; ini bukan fitur rilis v0.18.0.
 
 ## 10 era · 100 main mission
 
-Misi 1–60 dievaluasi dari state simulator yang sudah ada. Misi 61–100 tetap terdaftar sebagai katalog, tetapi **locked** karena mekanik manusia, industri, AI, dan kosmik belum dibangun. Misi terkunci tidak memberi XP dan tidak pernah ditandai selesai.
+Misi 1–60 dievaluasi dari state simulator yang sudah ada. Misi 61–100 juga **aktif** sejak v0.18.0, tetapi memakai skor sistem lanjutan yang diturunkan dari sim yang sama. Tidak ada entitas manusia, pabrik, AI, atau alien literal yang ditambahkan; target era 7–10 adalah proxy yang jujur dari populasi, energi, biodiversitas, dan tahap planet.
 
-> **Kalibrasi reachability:** `test:sim` membangun state nyata lewat `createPlanet`, `placeObject`, dan `simulateTick` untuk membuktikan semua 60 misi aktif bisa mencapai progres 1. Target fauna disesuaikan dengan kapasitas aktual simulator (state teruji mencapai 21 agen dan 9 ikan), sehingga label “spesies” tetap dibaca sebagai proxy jumlah agen.
+> **Kalibrasi reachability:** `test:sim` membangun state nyata lewat `createPlanet`, `placeObject`, dan `simulateTick` untuk membuktikan semua 100 misi bisa mencapai progres 1. Target fauna disesuaikan dengan kapasitas aktual simulator (state teruji mencapai 21 agen dan 9 ikan), sehingga label “spesies” tetap dibaca sebagai proxy jumlah agen.
+
+### Sistem lanjutan (era 7–10)
+
+Skor sistem lanjutan berkisar 0–100 dan sengaja **derived-only**: tidak disimpan di DNA, tidak mengubah `schemaVersion: 3`, dan tidak menambah objek/planet/biome.
+
+| Sistem | Input skor | Tampilan |
+|---|---|---|
+| Peradaban | populasi 30%, stabilitas 20%, air 15%, jaring makanan 15%, level 20% | `Sistem Peradaban: <skor>/100` |
+| Industri | energi 30%, objek terbangun 25%, populasi 15%, level 30% | `Sistem Industri: <skor>/100` |
+| AI | biodiversitas 25%, agen 20%, jaring makanan 20%, stabilitas 15%, level 20% | `Sistem AI: <skor>/100` |
+| Kosmik | tahap 25%, energi 15%, biodiversitas 20%, level 40% | `Sistem Kosmik: <skor>/100` |
+
+Tier sistem adalah `min(5, floor(skor / 20) + 1)`. Hook QA `window.__game.campaign().systems` mengembalikan `{ scores, tiers }` untuk keperluan verifikasi.
 
 ### Era 1 — Genesis (Level 1–10)
 
@@ -179,16 +192,16 @@ Tema: Manusia dan desa.
 
 | Level | ID | Misi | Target | Tipe | Reward XP | Status |
 |---:|---|---|---|---|---:|---|
-| 61 | era7-01 | Manusia Pertama | Introduksi manusia pertama. | Peradaban | 500 | locked |
-| 62 | era7-02 | Desa Kecil | Bangun 5 rumah. | Peradaban | 500 | locked |
-| 63 | era7-03 | Ladang Pertama | Bangun 3 lahan pertanian. | Produksi | 500 | locked |
-| 64 | era7-04 | Pasokan Makanan | Produksi 5 jenis bahan pangan. | Produksi | 500 | locked |
-| 65 | era7-05 | Peternakan | Introduksi 3 hewan ternak. | Peradaban | 500 | locked |
-| 66 | era7-06 | Pertumbuhan Komunitas | Capai 20 penduduk. | Peradaban | 500 | locked |
-| 67 | era7-07 | Pengelolaan Air | Bangun sistem distribusi air. | Produksi | 500 | locked |
-| 68 | era7-08 | Ekonomi Desa | Aktifkan pertukaran sumber daya. | Peradaban | 500 | locked |
-| 69 | era7-09 | Masyarakat Berkembang | Capai 50 penduduk. | Peradaban | 500 | locked |
-| 70 | era7-10 | Peradaban Dimulai | Bangun desa mandiri. | Legendaris | 500 | locked |
+| 61 | era7-01 | Manusia Pertama | Capai skor Peradaban 30. | Peradaban | 500 | aktif |
+| 62 | era7-02 | Desa Kecil | Capai skor Peradaban 35. | Peradaban | 500 | aktif |
+| 63 | era7-03 | Ladang Pertama | Capai skor Peradaban 40. | Produksi | 500 | aktif |
+| 64 | era7-04 | Pasokan Makanan | Capai skor Peradaban 45. | Produksi | 500 | aktif |
+| 65 | era7-05 | Peternakan | Capai skor Peradaban 50. | Peradaban | 500 | aktif |
+| 66 | era7-06 | Pertumbuhan Komunitas | Capai skor Peradaban 55. | Peradaban | 500 | aktif |
+| 67 | era7-07 | Pengelolaan Air | Capai skor Peradaban 60. | Produksi | 500 | aktif |
+| 68 | era7-08 | Ekonomi Desa | Capai skor Peradaban 65. | Peradaban | 500 | aktif |
+| 69 | era7-09 | Masyarakat Berkembang | Capai skor Peradaban 68. | Peradaban | 500 | aktif |
+| 70 | era7-10 | Peradaban Dimulai | Capai skor Peradaban 70. | Legendaris | 500 | aktif |
 
 ### Era 8 — Industrial Age (Level 71–80)
 
@@ -196,16 +209,16 @@ Tema: Teknologi dan industri.
 
 | Level | ID | Misi | Target | Tipe | Reward XP | Status |
 |---:|---|---|---|---|---:|---|
-| 71 | era8-01 | Workshop Pertama | Bangun workshop. | Peradaban | 500 | locked |
-| 72 | era8-02 | Operasi Pertambangan | Ekstrak 3 jenis mineral. | Produksi | 500 | locked |
-| 73 | era8-03 | Penemuan Energi | Produksi energi pertama. | Produksi | 500 | locked |
-| 74 | era8-04 | Tenaga Angin | Bangun 3 turbin angin. | Produksi | 500 | locked |
-| 75 | era8-05 | Revolusi Surya | Bangun 5 panel surya. | Produksi | 500 | locked |
-| 76 | era8-06 | Pertumbuhan Industri | Bangun 2 fasilitas industri. | Peradaban | 500 | locked |
-| 77 | era8-07 | Sistem Transportasi | Buka sistem transportasi. | Peradaban | 500 | locked |
-| 78 | era8-08 | Dampak Lingkungan | Kelola polusi industri. | Ekosistem | 500 | locked |
-| 79 | era8-09 | Teknologi Hijau | Gunakan 50% energi terbarukan. | Produksi | 500 | locked |
-| 80 | era8-10 | Peradaban Berkelanjutan | Stabilkan ekonomi dan lingkungan. | Legendaris | 500 | locked |
+| 71 | era8-01 | Workshop Pertama | Capai skor Industri 50. | Peradaban | 500 | aktif |
+| 72 | era8-02 | Operasi Pertambangan | Capai skor Industri 52. | Produksi | 500 | aktif |
+| 73 | era8-03 | Penemuan Energi | Capai skor Industri 54. | Produksi | 500 | aktif |
+| 74 | era8-04 | Tenaga Angin | Capai skor Industri 56. | Produksi | 500 | aktif |
+| 75 | era8-05 | Revolusi Surya | Capai skor Industri 58. | Produksi | 500 | aktif |
+| 76 | era8-06 | Pertumbuhan Industri | Capai skor Industri 60. | Peradaban | 500 | aktif |
+| 77 | era8-07 | Sistem Transportasi | Capai skor Industri 62. | Peradaban | 500 | aktif |
+| 78 | era8-08 | Dampak Lingkungan | Capai skor Industri 64. | Ekosistem | 500 | aktif |
+| 79 | era8-09 | Teknologi Hijau | Capai skor Industri 66. | Produksi | 500 | aktif |
+| 80 | era8-10 | Peradaban Berkelanjutan | Capai skor Industri 68. | Legendaris | 500 | aktif |
 
 ### Era 9 — Advanced Age (Level 81–90)
 
@@ -213,16 +226,16 @@ Tema: Ekosistem futuristik.
 
 | Level | ID | Misi | Target | Tipe | Reward XP | Status |
 |---:|---|---|---|---|---:|---|
-| 81 | era9-01 | Riset Lanjutan | Bangun research center. | Peradaban | 500 | locked |
-| 82 | era9-02 | Penemuan Genetik | Buka 5 upgrade DNA. | Penemuan | 500 | locked |
-| 83 | era9-03 | Pertanian Cerdas | Otomatiskan pertanian. | Produksi | 500 | locked |
-| 84 | era9-04 | Perlindungan Satwa | Buat 3 sanctuary. | Ekosistem | 500 | locked |
-| 85 | era9-05 | Kendali Iklim | Kelola perubahan iklim. | Ekosistem | 500 | locked |
-| 86 | era9-06 | Ekosistem Otomatis | Bangun ekosistem otomatis. | Ekosistem | 500 | locked |
-| 87 | era9-07 | Kecerdasan Buatan | Buka AI planet management. | Peradaban | 500 | locked |
-| 88 | era9-08 | Evolusi Genetik | Evolusikan 5 spesies. | Penemuan | 500 | locked |
-| 89 | era9-09 | Optimasi Planet | Capai 90% planet health. | Ekosistem | 500 | locked |
-| 90 | era9-10 | Peradaban Sempurna | Bangun peradaban berkelanjutan. | Legendaris | 500 | locked |
+| 81 | era9-01 | Riset Lanjutan | Capai skor AI 65. | Peradaban | 500 | aktif |
+| 82 | era9-02 | Penemuan Genetik | Capai skor AI 67. | Penemuan | 500 | aktif |
+| 83 | era9-03 | Pertanian Cerdas | Capai skor AI 69. | Produksi | 500 | aktif |
+| 84 | era9-04 | Perlindungan Satwa | Capai skor AI 71. | Ekosistem | 500 | aktif |
+| 85 | era9-05 | Kendali Iklim | Capai skor AI 73. | Ekosistem | 500 | aktif |
+| 86 | era9-06 | Ekosistem Otomatis | Capai skor AI 75. | Ekosistem | 500 | aktif |
+| 87 | era9-07 | Kecerdasan Buatan | Capai skor AI 77. | Peradaban | 500 | aktif |
+| 88 | era9-08 | Evolusi Genetik | Capai skor AI 79. | Penemuan | 500 | aktif |
+| 89 | era9-09 | Optimasi Planet | Capai skor AI 81. | Ekosistem | 500 | aktif |
+| 90 | era9-10 | Peradaban Sempurna | Capai skor AI 83. | Legendaris | 500 | aktif |
 
 ### Era 10 — Cosmic Age (Level 91–100)
 
@@ -230,21 +243,21 @@ Tema: Planet legendaris.
 
 | Level | ID | Misi | Target | Tipe | Reward XP | Status |
 |---:|---|---|---|---|---:|---|
-| 91 | era10-01 | Penemuan Kosmik | Temukan energi kosmik. | Eksplorasi | 500 | locked |
-| 92 | era10-02 | Kehidupan Alien | Temukan 3 spesies alien. | Penemuan | 500 | locked |
-| 93 | era10-03 | Dunia Kristal | Bangun crystal biome. | Eksplorasi | 500 | locked |
-| 94 | era10-04 | Pulau Melayang | Ciptakan 5 pulau melayang. | Eksplorasi | 500 | locked |
-| 95 | era10-05 | Makhluk Purba | Bangkitkan 3 spesies purba. | Penemuan | 500 | locked |
-| 96 | era10-06 | Jaringan Planet | Hubungkan 5 biome. | Peradaban | 500 | locked |
-| 97 | era10-07 | Evolusi Kosmik | Evolusikan 10 spesies. | Penemuan | 500 | locked |
-| 98 | era10-08 | Planet Hidup | Capai ekosistem mandiri. | Legendaris | 1000 | locked |
-| 99 | era10-09 | Penjaga Semesta | Selesaikan semua milestone utama. | Legendaris | 2000 | locked |
-| 100 | era10-10 | Dewa Pencipta | Selesaikan seluruh campaign. | Legendaris | 2000 | locked |
+| 91 | era10-01 | Penemuan Kosmik | Capai skor Kosmik 55. | Eksplorasi | 500 | aktif |
+| 92 | era10-02 | Kehidupan Alien | Capai skor Kosmik 57. | Penemuan | 500 | aktif |
+| 93 | era10-03 | Dunia Kristal | Capai skor Kosmik 59. | Eksplorasi | 500 | aktif |
+| 94 | era10-04 | Pulau Melayang | Capai skor Kosmik 61. | Eksplorasi | 500 | aktif |
+| 95 | era10-05 | Makhluk Purba | Capai skor Kosmik 63. | Penemuan | 500 | aktif |
+| 96 | era10-06 | Jaringan Planet | Capai skor Kosmik 65. | Peradaban | 500 | aktif |
+| 97 | era10-07 | Evolusi Kosmik | Capai skor Kosmik 67. | Penemuan | 500 | aktif |
+| 98 | era10-08 | Planet Hidup | Capai skor Kosmik 69. | Legendaris | 1000 | aktif |
+| 99 | era10-09 | Penjaga Semesta | Capai skor Kosmik 71. | Legendaris | 2000 | aktif |
+| 100 | era10-10 | Dewa Pencipta | Capai skor Kosmik 73. | Legendaris | 2000 | aktif |
 
 ## Hook QA
 
-- `?debug=1` → `window.__game.campaign()` (level, era, misi aktif, progress, total misi).
-- `?campaign=1` → panel 10 era/100 misi; status aktif/selesai/terkunci.
+- `?debug=1` → `window.__game.campaign()` (level, era, misi aktif, progress, total misi, `systems.scores`, `systems.tiers`).
+- `?campaign=1` → panel 10 era/100 misi; status aktif/selesai tanpa kunci.
 - `?menu=0` → lewat menu saat menguji panel campaign.
 
 Buka panel campaign tidak mengubah sim, DNA, atau draw call.
