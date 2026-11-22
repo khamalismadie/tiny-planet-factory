@@ -37,7 +37,7 @@ https://<host>/?debug=1&perf=1&quality=medium
 - `seed=N` — mengunci seed planet agar cuaca dan penempatan QA deterministik; dipakai `test:qa-load` dengan `seed=1`
 - `qaSeconds=N` — durasi probe, dipotong aplikasi ke maksimal **180 s**
 
-### Paket bukti v0.20.0
+### Paket bukti v0.20.0+ (berlaku juga di v0.21.0)
 
 Laporan yang disalin tombol **Salin hasil QA** kini membawa:
 `appVersion`, `save` (tick/objek/level + ketersediaan penyimpanan), `network` (`online`, visibilitas), `orientation`, `layout` (posisi topbar/build/objective/inventory, `centerElement`, flag overlap), dan `runtime` (`scriptSrc` + SW controller/script URL). Paket ini dipakai untuk membuktikan #5, #6, #7, dan #8 tanpa menambah gate `npm test`.
@@ -80,7 +80,7 @@ Adaptive quality otomatis menurunkan tier bila p95 > 34 ms selama 120 frame. Tid
 | 14 | Konsol | Seluruh sesi | Tidak ada error aplikasi (error shader saat context loss dicatat terpisah) |
 | 15 | Fauna otonom | Bangun laut/danau/pohon/bunga, tunggu 60–120 tick; cek `wildlife()` | Kijang, ikan, serangga, burung muncul; agen bergerak; draw call < 150; tidak ada error batch |
 
-## Runbook bukti fisik #5–#8 (v0.20.0)
+## Runbook bukti fisik #5–#8 (v0.20.0+, dipakai v0.21.0)
 
 Semua langkah berikut wajib dilakukan di perangkat nyata. Headless hanya dipakai sebagai smoke, bukan bukti.
 

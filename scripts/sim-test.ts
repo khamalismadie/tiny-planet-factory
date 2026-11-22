@@ -11,6 +11,7 @@ import { CAMPAIGN, CAMPAIGN_BY_LEVEL, campaignMissionForLevel, MISSION_TYPE_LABE
 import { decodePlanetDna, encodePlanetDna, encodePlanetDnaLegacy } from '../src/sim/dna.ts';
 import { ecosystemConfigFor, guildAgentCapacity, guildFoodSourceIds, guildStatus, isSupportedPlanet } from '../src/sim/eco/guilds.ts';
 import { HabitatManager } from '../src/sim/eco/habitat.ts';
+import { habitatContextFor } from '../src/sim/eco/manager.ts';
 import { validateAllPlanetConfigs, speciesRegistry } from '../src/sim/eco/registry.ts';
 import { createEcoState } from '../src/sim/eco/state.ts';
 import {
@@ -226,6 +227,59 @@ for (const id of PLANET_IDS) {
   const cycle = config!.climate.seasons.reduce((sum, season) => sum + season.durationTicks, 0);
   assert(cycle <= 120, `siklus musim ${id} terlalu panjang untuk sesi mobile: ${cycle} tick`);
   assert(cycle >= 100, `siklus musim ${id} terlalu pendek: ${cycle} tick`);
+}
+
+// v0.21.0: hazard yang benar-benar dipakai habitat harus masih dikenal
+// planet yang bersangkutan. Alias lama (badai-hujan generik, dll.) sudah
+// dinormalisasi oleh canonicalHazard sebelum masuk ke habitat context.
+for (const config of PLANET_CONFIGS) {
+  const base = createPlanet(777, 'Sinkronisasi', config.id);
+  const variants: PlanetState[] = [];
+  const addVariant = (mutate: (planet: PlanetState) => void) => {
+    const variant = JSON.parse(JSON.stringify(base)) as PlanetState;
+    mutate(variant);
+    variants.push(variant);
+  };
+  addVariant(() => {});
+  addVariant((planet) => { planet.weather.type = 'storm'; });
+  addVariant((planet) => { planet.weather.type = 'snow'; });
+  addVariant((planet) => { planet.environment.water = 10; });
+  if (config.specialSystems.includes('freeze-thaw')) {
+    addVariant((planet) => { planet.eco.cryo.thawStress = 90; });
+  }
+  if (config.specialSystems.includes('volcanic-eruption')) {
+    addVariant((planet) => { planet.eco.volcano.eruptionStress = 90; });
+    addVariant((planet) => { planet.eco.volcano.lavaFlow = 90; });
+    addVariant((planet) => { planet.eco.volcano.ash = 90; });
+    addVariant((planet) => { planet.eco.volcano.heat = 90; });
+  }
+  if (config.specialSystems.includes('coral-health')) {
+    addVariant((planet) => { planet.eco.ocean.bleaching = 90; });
+    addVariant((planet) => { planet.eco.ocean.current = 90; });
+    addVariant((planet) => { planet.environment.temperature = 40; });
+  }
+  if (config.specialSystems.includes('fungal-network')) {
+    addVariant((planet) => { planet.eco.fungal.networkStress = 90; });
+    addVariant((planet) => { planet.eco.fungal.spores = 90; });
+    addVariant((planet) => { planet.environment.humidity = 98; });
+  }
+  if (config.specialSystems.includes('floating-connectivity') || config.id === 'cosmos') {
+    addVariant((planet) => { planet.eco.sky.isolationStress = 90; });
+    addVariant((planet) => { planet.eco.sky.wind = 90; });
+    addVariant((planet) => { planet.environment.water = 30; });
+  }
+  if (config.specialSystems.includes('leaf-fall')) {
+    addVariant((planet) => { planet.eco.forest.frostStress = 90; });
+    addVariant((planet) => { planet.eco.forest.leafLitter = 90; });
+  }
+  for (const variant of variants) {
+    const hazard = habitatContextFor(variant, config).hazard;
+    if (!hazard) continue;
+    assert(
+      config.climate.hazards.includes(hazard),
+      `${config.id}: hazard "${hazard}" tidak dideklarasikan di climate.hazards`,
+    );
+  }
 }
 
 const determinismPlan = ['tree', 'rock', 'grass', 'bush', 'hill', 'lake'] as const;
@@ -1041,6 +1095,62 @@ assert(campaignMissionForLevel(100).id === 'era10-10', 'misi terakhir harus era1
 assert(CAMPAIGN.every((mission) => !mission.locked), 'misi 61-100 harus aktif');
 assert(Object.keys(MISSION_TYPE_LABELS).length === 6, 'harus ada 6 tipe quest');
 assert(campaignCopy(61).note.includes('Skor Peradaban'), 'copy era lanjutan harus menjelaskan skor turunan');
+
+// v0.21.0: copy panel campaign harus menyebut angka dan kata kunci mechanic
+// yang sama dengan check yang dijalankan runtime.
+function copyMentionsCheck(check: MissionCheck, copy: string): boolean {
+  if ('target' in check) {
+    const number = new RegExp(`(^|[^0-9])${check.target}([^0-9]|$)`);
+    if (!number.test(copy)) return false;
+  }
+  const lower = copy.toLowerCase();
+  switch (check.kind) {
+    case 'always':
+      return true;
+    case 'object':
+      return (check.type === 'ocean' ? ['samudra', 'laut'] : [OBJECT_DEFS[check.type].label.toLowerCase()])
+        .some((hint) => lower.includes(hint));
+    case 'env': {
+      const hints: Record<string, string> = {
+        water: 'air', energy: 'energi', oxygen: 'oksigen', fertility: 'kesuburan',
+      };
+      return lower.includes(hints[check.key] ?? check.key.toLowerCase());
+    }
+    case 'eco': {
+      const hints: Record<string, string> = {
+        population: 'populasi', health: 'kesehatan', vegetation: 'vegetasi',
+      };
+      return lower.includes(hints[check.key] ?? check.key.toLowerCase());
+    }
+    case 'species':
+      return lower.includes('spesies');
+    case 'agents':
+      return lower.includes('agen');
+    case 'fishAgents':
+      return lower.includes('ikan');
+    case 'weather':
+      return lower.includes(check.type === 'rain' ? 'hujan' : 'salju');
+    case 'web':
+      return lower.includes('jaring');
+    case 'stage':
+      return lower.includes('tahap');
+    case 'civilization':
+      return lower.includes('peradaban');
+    case 'industry':
+      return lower.includes('industri');
+    case 'ai':
+      return lower.includes('ai');
+    case 'cosmic':
+      return lower.includes('kosmik');
+  }
+}
+for (const mission of CAMPAIGN) {
+  const copy = campaignCopy(mission.level).target;
+  assert(
+    copyMentionsCheck(mission.check, copy),
+    `copy misi #${mission.level} tidak sinkron: "${copy}" vs ${JSON.stringify(mission.check)}`,
+  );
+}
 
 const campaignPlanet = createPlanet(5150, 'Kampanye');
 assert(campaignPlanet.mission.id === 'era1-01', 'planet baru harus memakai misi era1-01');

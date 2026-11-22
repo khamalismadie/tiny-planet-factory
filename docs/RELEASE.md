@@ -2,7 +2,7 @@
 
 Gunakan checklist ini sebelum publish build produksi.
 
-> **Status pembacaan v0.15.9:** angka 360 tick pada phase v0.10–v0.14 adalah spesifikasi historis. Sejak v0.15.4, semua siklus musim aktif berada pada **106–120 tick** (divalidasi `test:sim`). Bagian bertanda v0.4–v0.14 adalah catatan rilis, bukan klaim kondisi saat ini; lihat §2u–§2ab untuk status terkini. `main` adalah v0.20.0 (unreleased); produksi masih v0.16.0.
+> **Status pembacaan v0.15.9:** angka 360 tick pada phase v0.10–v0.14 adalah spesifikasi historis. Sejak v0.15.4, semua siklus musim aktif berada pada **106–120 tick** (divalidasi `test:sim`). Bagian bertanda v0.4–v0.14 adalah catatan rilis, bukan klaim kondisi saat ini; lihat §2u–§2ab untuk status terkini. `main` adalah v0.21.0 (unreleased); produksi masih v0.16.0.
 
 ## 1. Prasyarat
 
@@ -19,7 +19,7 @@ npm run build
 PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 ```
 
-- [ ] `npm run build` tanpa error. Chunk vendor: `pixi-core` + `pixi-3d`, app chunk < 100 kB (v0.20.0: 80,49 kB / gzip 26,41 kB; produksi v0.16.0: 73,33 kB).
+- [ ] `npm run build` tanpa error. Chunk vendor: `pixi-core` + `pixi-3d`, app chunk < 100 kB (v0.21.0: 80,49 kB / gzip 26,42 kB; produksi v0.16.0: 73,33 kB).
 - [ ] `PASS: sim`
 - [ ] `PASS: art scale`
 - [ ] `PASS: terrain render`
@@ -383,6 +383,31 @@ Status jujur: tutorial berjalan di `main`, tetapi produksi dan real-device masih
 - [ ] Issue #5–#8 tetap OPEN sampai laporan + screenshot perangkat nyata dilampirkan.
 
 Status jujur: instrumentasi dan runbook sudah siap, tetapi tidak ada klaim QA fisik baru.
+
+## 2af. Sinkronisasi Habitat & Mekanik Planet (v0.21.0 — unreleased di `main`)
+
+| Planet | Spesies | Siklus musim | Hazard sinkron |
+|---|---:|---:|---|
+| Terra | 12 | 119 tick | ya (legacy climate sengaja dipertahankan) |
+| Dune | 12 | 120 tick | ya (alias badai-pasir/kekeringan-ekstrem) |
+| Glaciera | 12 | 120 tick | ya (alias badai-salju/gelombang-dingin-ekstrem) |
+| Inferna | 12 | 106 tick | ya |
+| Aquaria | 12 | 120 tick | ya |
+| Mycelia | 11 | 120 tick | ya (alias gangguan-jaringan-miselium) |
+| Sakura | 11 | 120 tick | ya |
+| Aurelia | 11 | 120 tick | ya |
+| Cosmos | 10 | 110 tick | ya |
+
+- [x] `climate.hazards` tidak lagi metadata mati: resolver label generik dinormalisasi ke hazard yang dideklarasikan tiap planet (`badai-pasir`, `badai-salju`, `gelombang-dingin-ekstrem`, `kekeringan-ekstrem`, `gangguan-jaringan-miselium`, dll.).
+- [x] `test:sim` membuktikan setiap hazard yang benar-benar dipakai `habitatContextFor()` masih terdaftar di `climate.hazards` planet bersangkutan.
+- [x] 100 copy misi kini menyebut angka dan kata kunci yang sama dengan `MissionCheck`; klaim “spesies jamur/reptil” ditandai sebagai proxy, bukan mechanic baru.
+- [x] `test:sim` menolak copy yang angkanya tidak cocok atau kata kunci mechanic-nya meleset; gate tetap 8 buah.
+- [x] Tidak ada planet, biome, objek, unlock, field DNA, atau `schemaVersion` baru.
+- [x] Build lokal app chunk 80,49 kB (gzip 26,42 kB); cache SW `tpf-shell-v0-21-0`.
+- [ ] **Belum di-deploy.** Produksi tetap bundle v0.16.0 `index-Cl2SK4zO.js` / cache `tpf-shell-v0-16-0`.
+- [ ] Issue #5–#8 tetap OPEN; perubahan ini tidak menutup QA perangkat nyata.
+
+Status jujur: audit sinkronisasi menyentuh data/config dan copy, bukan menambah sistem ekologis baru.
 
 ## 3. QA perangkat nyata
 

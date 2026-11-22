@@ -29,7 +29,7 @@ Yang **tidak** boleh terjadi:
 
 | Area | Kondisi awal | Sumber |
 |---|---|---|
-| Versi | `v0.20.0` di `main` (unreleased); produksi `v0.16.0` | `package.json`, `README.md` |
+| Versi | `v0.21.0` di `main` (unreleased); produksi `v0.16.0` | `package.json`, `README.md` |
 | Deploy | Netlify produksi aktif, commit `e71e6c1`, bundle `index-Cl2SK4zO.js` | `README.md`, `docs/RELEASE.md` §2aa, `docs/QA-DEVICE.md` |
 | Test lokal | 8/8 PASS | log lokal 2026-11-22 |
 | Test remote | 8/8 PASS | log produksi 2026-11-22 |
@@ -37,7 +37,7 @@ Yang **tidak** boleh terjadi:
 | QA device | **OPEN** — baseline pra-v0.15.6, belum diulang untuk v0.16.0/v0.17.0 | `docs/QA-DEVICE.md` |
 | p95 device | **33,40 ms**, target ≤33 ms | `docs/QA-DEVICE.md` |
 | Draw call | 20 saat Hujan, sama dengan baseline; ≤18 saat Cerah | `test:qa-load`, baseline |
-| Fitur baru | v0.20.0 instrumentasi + runbook bukti QA fisik; planet/biome tetap ditahan | keputusan Nine Worlds QA-first |
+| Fitur baru | v0.21.0 sinkronisasi hazard/copy planet; planet/biome tetap ditahan | keputusan Nine Worlds QA-first |
 
 > **Catatan v0.16.0:** 49 varian aset diimplementasikan di luar Sprint 09 sesuai persetujuan user. Ini tidak menambah planet/biome, tipe objek, atau schema DNA, dan **tidak menutup P0** SPR-01…SPR-05. SPR-06 dan SPR-08 sudah Done; deploy v0.16.0 aktif.
 >
