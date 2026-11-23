@@ -140,6 +140,8 @@ Hasil: `EVIDENCE REVIEW: planetTidakTertutup, p95MasihDiAtas33ms`. #8 tetap OPEN
 
 - `device.standalone: true`, SW controller aktif, save persisten, objek `14`.
 - `network.online: true` — koneksi masih dilaporkan aktif, sehingga belum memenuhi #6 offline.
+- Attempt 2 mengulang dengan Wi-Fi/mobile data mati tetapi tetap `online: true` pada origin loopback `127.0.0.1`.
+- Kemungkinan `navigator.onLine` menganggap interface loopback sebagai aktif. #6 perlu diuji dari origin HTTPS jarak jauh, bukan localhost.
 - Disimpan sebagai bukti mentah; bukan `report-offline.json` yang lulus.
 
 ## Isi saat ini — arsip preview #41

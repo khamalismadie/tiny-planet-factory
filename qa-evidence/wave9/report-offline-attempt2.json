@@ -1,0 +1,81 @@
+{
+  "app": "Tiny Planet Factory",
+  "appVersion": "0.21.0",
+  "collectedAt": "2026-11-23T14:22:42.354Z",
+  "durationMs": 30030,
+  "frames": 1168,
+  "p50ms": 33.2,
+  "p95ms": 33.4,
+  "fps": 30.1,
+  "bootMs": 1048,
+  "quality": {
+    "tier": "medium",
+    "downgrades": 0
+  },
+  "scene": {
+    "drawCalls": 9,
+    "objects": 169,
+    "stage": 2,
+    "mission": "complete",
+    "completedEvents": 2,
+    "wildlifeAgents": 2,
+    "discoveredSpecies": 1,
+    "extinctSpecies": 0,
+    "contextLost": false
+  },
+  "save": {
+    "tick": 72,
+    "objects": 169,
+    "level": 3,
+    "persistent": true
+  },
+  "network": {
+    "online": true,
+    "visibility": "visible"
+  },
+  "orientation": {
+    "type": "portrait-primary",
+    "angle": 0
+  },
+  "layout": {
+    "topbarBottom": 68,
+    "buildTop": 72,
+    "objective": {
+      "x": 10,
+      "y": 597,
+      "w": 340,
+      "h": 53,
+      "right": 350,
+      "bottom": 650
+    },
+    "inventory": {
+      "x": 10,
+      "y": 658,
+      "w": 340,
+      "h": 66,
+      "right": 350,
+      "bottom": 724
+    },
+    "centerElement": "CANVAS",
+    "planetCenterVisible": true,
+    "objectiveOverlapsInventory": false,
+    "topbarOverlapsBuild": false
+  },
+  "runtime": {
+    "scriptSrc": "http://127.0.0.1:4181/assets/index-BnlhvdGl.js",
+    "serviceWorker": {
+      "controller": true,
+      "scriptUrl": "http://127.0.0.1:4181/sw.js"
+    }
+  },
+  "device": {
+    "userAgent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/157.0.0.0 Mobile Safari/537.36",
+    "cores": 8,
+    "memoryGb": 8,
+    "dpr": 3,
+    "viewport": "360x734",
+    "standalone": true,
+    "serviceWorker": true,
+    "installPromptSeen": false
+  }
+}
