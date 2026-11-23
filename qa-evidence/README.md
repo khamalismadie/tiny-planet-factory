@@ -4,9 +4,9 @@ Folder ini menyimpan laporan hasil `window.__game.qaReport()` dari perangkat nya
 
 Jangan mengubah isi file setelah disalin. Simpan satu file per sesi.
 
-## Build Wave 9 — evidence pertama REVIEW
+## Build Wave 9 — 2 laporan REVIEW
 
-Laporan pertama untuk bundle `index-BnlhvdGl.js` sudah masuk di `qa-evidence/wave9/report-p95-run1.json` dan berstatus **REVIEW / TIDAK LULUS** (p95 `33,4 ms`, tier `low`, 1 downgrade). Paket pengumpulan buktinya ada di `docs/QA-HANDOFF-WAVE9.md`. Simpan laporan berikutnya di `qa-evidence/wave9/` agar tidak tercampur dengan arsip preview #41, lalu validasi dengan `--expect-bundle index-BnlhvdGl.js`.
+Dua laporan untuk bundle `index-BnlhvdGl.js` sudah masuk di `qa-evidence/wave9/` dan keduanya berstatus **REVIEW / TIDAK LULUS** (p95 `33,4 ms`). Paket pengumpulan buktinya ada di `docs/QA-HANDOFF-WAVE9.md`. Simpan laporan berikutnya di folder yang sama agar tidak tercampur dengan arsip preview #41, lalu validasi dengan `--expect-bundle index-BnlhvdGl.js`.
 
 ### `wave9/report-p95-run1.json`
 
@@ -32,6 +32,25 @@ EVIDENCE REVIEW: p95MasihDiAtas33ms
 ```
 
 Laporan ini **tidak** menutup #7 maupun #5: p95 `33,4 ms` melebihi target `≤ 33 ms`, dan kualitas adaptif turun ke `low` dengan 1 downgrade meski probe memakai `?quality=medium`.
+
+### `wave9/report-p95-run2.json`
+
+- Build: v0.21.0 Wave 9 — `index-BnlhvdGl.js`, `tpf-shell-v0-21-0`.
+- Sumber: perangkat nyata via bridge OpenCode, viewport `360x622`, DPR 3, portrait.
+- Durasi probe: `180029` ms dengan `7181` frame.
+- p50 **33,1 ms**, p95 **33,4 ms**, FPS **30,2**, boot **607 ms**.
+- Draw call `19`, objek `188`, tier **medium / 0 downgrade**, `contextLost: false`.
+- Save persisten: tick `186`, objek `188`, level `4`.
+- SW controller aktif; `standalone: false`.
+
+```bash
+npm run qa:evidence -- qa-evidence/wave9/report-p95-run2.json \
+  --expect-version 0.21.0 --expect-bundle index-BnlhvdGl.js
+```
+
+Hasil: `EVIDENCE REVIEW: p95MasihDiAtas33ms`.
+
+Run 2 tidak menutup #7 karena p95 tetap `33,4 ms` dan objek `188`, bukan `94`. Objek membengkak karena save run 1 tidak dihapus sebelum `qaObjects=94` ditambahkan; `populateQaObjects()` menambah ke state yang sudah ada. Run berikutnya harus memakai helper `?fresh=1` yang menghapus IndexedDB sebelum probe.
 
 ## Isi saat ini — arsip preview #41
 

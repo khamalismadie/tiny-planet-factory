@@ -138,22 +138,22 @@ Hook `loseContext()` / `restoreContext()` di `?debug=1` hanya alat bantu, **buka
 4. Tutup `#5` terakhir, setelah `#6/#7/#8` dan semua bukti umbrella lengkap.
 5. Deploy produksi v0.21.0 hanya setelah keempatnya closed.
 
-## Hasil run pertama
+## Hasil run 1–2
 
-`qa-evidence/wave9/report-p95-run1.json` sudah dikumpulkan dari perangkat nyata lewat bridge OpenCode pada `http://127.0.0.1:4173/` dan divalidasi dengan bundle yang benar.
+Kedua laporan dikumpulkan dari perangkat nyata lewat bridge OpenCode pada `http://127.0.0.1:4173/` dan divalidasi dengan bundle yang benar.
 
-- p50 `16,9 ms`, p95 **33,4 ms**, FPS `59,2`.
-- Objek `94`, draw call `17`, `contextLost: false`, save persisten.
-- Tier turun ke `low` dengan 1 downgrade meski probe memakai `?quality=medium`.
-- Validator: **EVIDENCE REVIEW: p95MasihDiAtas33ms**.
+| Run | p50 | p95 | FPS | Objek | Quality | Hasil |
+|---|---:|---:|---:|---:|---|---|
+| 1 | 16,9 ms | 33,4 ms | 59,2 | 94 | low / 1 downgrade | REVIEW |
+| 2 | 33,1 ms | 33,4 ms | 30,2 | 188 | medium / 0 downgrade | REVIEW |
 
-Ini **belum** menutup #7. Masih dibutuhkan minimal 3 run dengan `p95 ≤ 33 ms`, tier `medium`, dan 0 downgrade. Target tidak diturunkan.
+Keduanya **belum** menutup #7. Run 1 gagal pada tier/downgrade; run 2 gagal pada objek karena save lama tidak dihapus sebelum `qaObjects=94` ditambahkan. Dibutuhkan minimal 3 run dengan `p95 ≤ 33 ms`, objek `94`, tier `medium`, dan 0 downgrade. Target tidak diturunkan.
 
-Helper sementara ada di `http://127.0.0.1:4173/qa-helper.html` selama preview lokal berjalan; tombol **Salin laporan QA** menyalin `qaReport()` langsung ke clipboard perangkat.
+Helper sementara ada di `http://127.0.0.1:4173/qa-helper.html` selama preview lokal berjalan; tombol **Salin laporan QA** menyalin `qaReport()` langsung ke clipboard perangkat. Untuk run berikutnya gunakan `http://127.0.0.1:4173/qa-helper.html?fresh=1`: helper menghapus `indexedDB` bernama `tiny-planet-factory` sebelum memuat probe, sehingga `qaObjects=94` tidak menumpuk di save lama.
 
 ## Status saat ini
 
 - Semua fitur Wave 1–9 sudah di-push, tetapi **belum di-deploy**.
-- Evidence pertama untuk `index-BnlhvdGl.js` sudah ada, tetapi **REVIEW / TIDAK LULUS**.
+- Dua evidence p95 untuk `index-BnlhvdGl.js` sudah ada, keduanya **REVIEW / TIDAK LULUS**.
 - Issue `#5–#8` masih OPEN.
 - Produksi tetap v0.16.0.

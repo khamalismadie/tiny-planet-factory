@@ -23,16 +23,19 @@ Semua langkah di bawah wajib di perangkat Android nyata. Headless hanya smoke.
 | 3 | `report-p95-v021-run3.json` | 33,4 ms | `false` | 94 | low / 1 downgrade | REVIEW |
 | 4 | `report-p95-v021-run4.json` | 33,4 ms | `false` | 94 | low / 1 downgrade | REVIEW |
 | 5 | `wave9/report-p95-run1.json` | 33,4 ms | `false` | 94 | low / 1 downgrade | REVIEW |
+| 6 | `wave9/report-p95-run2.json` | 33,4 ms | `false` | 188 | medium / 0 downgrade | REVIEW |
 
-Batch arsip lama: `0 OK, 4 REVIEW, 4 file dari qa-evidence`. Run 5 berasal dari bundle Wave 9 `index-BnlhvdGl.js` dan divalidasi terpisah di `qa-evidence/wave9/`:
+Batch arsip lama: `0 OK, 4 REVIEW, 4 file dari qa-evidence`. Run 5–6 berasal dari bundle Wave 9 `index-BnlhvdGl.js` dan divalidasi terpisah di `qa-evidence/wave9/`:
 
 ```bash
 npm run qa:evidence -- qa-evidence/wave9/report-p95-run1.json \
   --expect-version 0.21.0 --expect-bundle index-BnlhvdGl.js
+npm run qa:evidence -- qa-evidence/wave9/report-p95-run2.json \
+  --expect-version 0.21.0 --expect-bundle index-BnlhvdGl.js
 # EVIDENCE REVIEW: p95MasihDiAtas33ms
 ```
 
-**Belum ada laporan yang lulus.** Run 3–5 sudah memenuhi `objects: 94` dan `contextLost: false`, tetapi p95 tetap `33,4 ms` dan adaptive quality masih turun ke `low`. `docs/QA-P95-REMEASURE.md` mengklasifikasikan 33,40 ms sebagai kuantisasi VSync 60 Hz; target `≤ 33 ms` **tidak** diturunkan dan #7 tetap OPEN.
+**Belum ada laporan yang lulus.** Run 5 memenuhi `objects: 94` tetapi turun ke `low`; run 6 mempertahankan `medium / 0 downgrade` tetapi `objects: 188` karena save lama tidak dihapus sebelum `qaObjects=94` ditambahkan. Keduanya p95 `33,4 ms`. `docs/QA-P95-REMEASURE.md` mengklasifikasikan 33,40 ms sebagai kuantisasi VSync 60 Hz; target `≤ 33 ms` **tidak** diturunkan dan #7 tetap OPEN.
 
 `main` v0.21.0 unreleased; commit aktif selalu `git rev-parse HEAD`. Produksi tetap v0.16.0.
 
@@ -44,7 +47,7 @@ npm run qa:evidence -- qa-evidence/wave9/report-p95-run1.json \
 
 | Bukti | File / lampiran | Catatan |
 |---|---|---|
-| Frame budget 30 FPS | `report-p95-v021-run1..4.json` + `wave9/report-p95-run1.json` | p95 tetap ≤ 33 ms; saat ini 5/5 REVIEW |
+| Frame budget 30 FPS | `report-p95-v021-run1..4.json` + `wave9/report-p95-run1..2.json` | p95 tetap ≤ 33 ms; saat ini 6/6 REVIEW |
 | Cold start 4G dari ikon PWA | video + angka waktu | Bukan `bootMs` QaProbe; itu hanya sejak hook mulai |
 | Pinch zoom | video atau sebelum/sesudah `camera().distance` | Dua jari, tanpa rotasi liar |
 | Drag 360° | video | Kamera tidak terbalik di kutub |
