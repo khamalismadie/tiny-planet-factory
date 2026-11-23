@@ -12,7 +12,7 @@ Dokumen ini hanya paket pengukuran. **Target tetap p95 ≤ 33 ms** seperti issue
 | Cache SW | `tpf-shell-v0-21-0` |
 | Produksi | masih `v0.16.0` / `index-Cl2SK4zO.js` — **jangan dipakai untuk pengukuran ini** |
 
-Paket ini terikat pada preview #41. Build lokal `main` pasca-commit `71a8809`–`c7bb1e2` menghasilkan `index-CtauFPra.js` dan belum punya evidence p95; lihat `docs/LOCAL-FEATURE-WAVES.md`. Jangan mencampur laporan dari dua bundle tersebut.
+Paket ini terikat pada preview #41. Build lokal `main` pasca-commit `71a8809`–`f0193de` menghasilkan `index-BnlhvdGl.js` dan belum punya evidence p95; lihat `docs/LOCAL-FEATURE-WAVES.md`. Jangan mencampur laporan dari dua bundle tersebut.
 
 Verifikasi build sebelum mulai:
 

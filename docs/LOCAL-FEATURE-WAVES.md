@@ -6,12 +6,12 @@ Dokumen ini mencatat fitur-fitur kecil yang dikembangkan **lokal di `main` setel
 
 | Item | Nilai |
 |---|---|
-| Commit fitur terakhir | `c7bb1e2` |
+| Commit fitur terakhir | `f0193de` |
 | `package.json` | `0.21.0` |
 | Cache SW | `tpf-shell-v0-21-0` |
-| Bundle lokal pada commit ini | `index-CtauFPra.js` |
+| Bundle lokal pada commit ini | `index-BnlhvdGl.js` |
 | App chunk | 92,97 kB / gzip 30,34 kB |
-| Chunk lazy `ecopediaView` | 17,67 kB / gzip 5,47 kB |
+| Chunk lazy `ecopediaView` | 20,10 kB / gzip 6,11 kB |
 | `npm test` | 8/8 PASS |
 
 Hash bundle di atas **hanya berlaku untuk commit ini**. Setiap build berikutnya harus dibaca ulang dari `dist/index.html` dan dipakai secara konsisten pada validator evidence.
@@ -82,6 +82,15 @@ Hash bundle di atas **hanya berlaku untuk commit ini**. Setiap build berikutnya 
 - Teks UI menyatakan eksplisit bahwa mekanik pemangkasan tidak diimplementasikan.
 - Modul `src/ui/habitatAdvisory.ts` masuk chunk lazy `ecopediaView`.
 
+### Wave 9 — fitur DB `#6` + `#45` — `f0193de`
+
+- Panel **Perlindungan Satwa & Konservasi** menurunkan dua advisory dari state fauna/habitat existing:
+  - `#6 Wildlife Protection`: kapasitas populasi, pangan, dan faktor pembatas tiap spesies relevan.
+  - `#45 Wildlife Sanctuary`: dukungan area dari vegetasi, air, biodiversitas, dan stabilitas.
+- Spesies belum ditemukan dan tidak aktif tidak dihitung sebagai kegagalan konservasi.
+- Teks UI menyatakan eksplisit bahwa tidak ada zona konservasi fisik atau misi baru.
+- Modul `src/ui/wildlifeAdvisory.ts` masuk chunk lazy `ecopediaView`.
+
 ## Batasan yang dipertahankan
 
 - Tidak ada planet, biome, objek, unlock, misi campaign, field DNA, atau `schemaVersion` baru.
@@ -94,19 +103,19 @@ Hash bundle di atas **hanya berlaku untuk commit ini**. Setiap build berikutnya 
 
 Laporan yang sudah terarsip di `qa-evidence/` dibuat terhadap bundle preview #41 `index-BiS1XGVG.js`. Laporan itu **tidak membuktikan** build lokal pasca-wave ini.
 
-Jika QA fisik dijalankan pada build `c7bb1e2`, gunakan:
+Jika QA fisik dijalankan pada build `f0193de`, gunakan:
 
 ```bash
 npm run qa:evidence -- laporan.json \
   --expect-version 0.21.0 \
-  --expect-bundle index-CtauFPra.js
+  --expect-bundle index-BnlhvdGl.js
 ```
 
 Untuk `qa:evidence:batch`, pakai flag yang sama. Jangan menurunkan target atau mengabaikan `--expect-bundle` agar laporan dari build lain tidak diterima.
 
 ## Belum dilakukan
 
-- Wave 1–7 dan commit docs `052c1ca` sudah di-push ke `origin/main`; commit Wave 8 `c7bb1e2` belum di-push.
+- Wave 1–8 dan commit docs `9266378` sudah di-push ke `origin/main`; commit Wave 9 `f0193de` belum di-push.
 - Belum ada deploy produksi.
 - Belum ada bukti fisik #5–#8 untuk build ini.
 - Fitur DB P2/P3 dan mekanik resource/sosial/real-world tetap tertunda.
