@@ -1,6 +1,7 @@
 import { habitatAdvice, speciesInsights, weatherInsight, describeHabitatFactor, restorationMilestones, environmentRisks } from '../sim/insights';
 import { localAchievements } from './achievements';
 import { planetHealthIndex } from './healthIndex';
+import { forestManagementAdvisory, pollinatorGardenAdvisory } from './habitatAdvisory';
 import type { PlanetState } from '../sim/types';
 
 type EcoSnapshot = { tick: number; stage: number; level: number; fertility: number; water: number; biodiversity: number; health: number; objects: number; species: number } | null;
@@ -91,6 +92,18 @@ export function renderEcopediaHtml(planet: PlanetState, ecoSnapshot: EcoSnapshot
       <div style="font-size:11px;color:#72869a;margin:4px 0">Bobot lokal, dihitung dari state yang sudah ada. Tidak memengaruhi simulasi atau gate QA.</div>
       ${healthRows}
     </div>`;
+
+  const habitatAdvisories = [pollinatorGardenAdvisory(planet), forestManagementAdvisory(planet)];
+  const habitatHtml = habitatAdvisories.map((entry) => `
+    <div class="ecopedia-item">
+      <div class="ecopedia-kv">
+        <strong>${esc(entry.label)}</strong>
+        <span class="ecopedia-pill ${entry.tone}">${esc(entry.status)}</span>
+      </div>
+      <div class="ecopedia-bar"><i style="width:${entry.score}%"></i></div>
+      <div style="font-size:11px;color:#72869a">${esc(entry.detail)}</div>
+      <div style="font-size:11px">${esc(entry.advice)}</div>
+    </div>`).join('');
 
   const env = planet.environment;
   const unlocked = new Set(planet.progression.unlockedObjects);
@@ -210,6 +223,11 @@ export function renderEcopediaHtml(planet: PlanetState, ecoSnapshot: EcoSnapshot
     <section class="ecopedia-section">
       <h3>Indeks Kesehatan Planet</h3>
       <div class="ecopedia-list">${healthHtml}</div>
+    </section>
+    <section class="ecopedia-section">
+      <h3>Kebun Penyerbuk &amp; Hutan</h3>
+      <div style="font-size:11px;color:#72869a;margin-bottom:8px">Advisory dari jumlah objek existing. Tidak ada mekanik pemangkasan, resource, atau objek baru.</div>
+      <div class="ecopedia-list">${habitatHtml}</div>
     </section>
     <section class="ecopedia-section">
       <h3>Aksi Restorasi Cepat</h3>
