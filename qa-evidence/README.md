@@ -144,6 +144,18 @@ Hasil: `EVIDENCE REVIEW: planetTidakTertutup, p95MasihDiAtas33ms`. #8 tetap OPEN
 - Kemungkinan `navigator.onLine` menganggap interface loopback sebagai aktif. #6 perlu diuji dari origin HTTPS jarak jauh, bukan localhost.
 - Disimpan sebagai bukti mentah; bukan `report-offline.json` yang lulus.
 
+### Origin HTTPS untuk uji offline #6
+
+Deploy draft Netlify berikut dipakai untuk menguji offline dari origin jarak jauh:
+
+```text
+https://6b045262361522f239ccf165--tinyplanetfactory.netlify.app/
+```
+
+- Context: `deploy-preview`, bukan produksi.
+- Bundle: `index-BnlhvdGl.js`, SW cache `tpf-shell-v0-21-0`.
+- Produksi sudah dikembalikan ke `index-Cl2SK4zO.js` / `tpf-shell-v0-16-0`.
+
 ## Isi saat ini — arsip preview #41
 
 Semua laporan di bawah berasal dari preview #41 `index-BiS1XGVG.js`.

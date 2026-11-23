@@ -6,6 +6,8 @@ Gunakan checklist ini sebelum publish build produksi.
 >
 > **Status QA v0.21.0 (2026-11-23):** 4 laporan p95 preview #41 di `qa-evidence/` plus 7 laporan Wave 9 `index-BnlhvdGl.js` di `qa-evidence/wave9/`, semuanya **REVIEW** (run 5–7 valid dengan p95 33,4 ms; run 3–4 memakai UA desktop dan tidak valid). #7 belum lulus; landscape #8 juga gagal karena `planetCenterVisible: false`; #5 dan #6 tetap OPEN. Deploy produksi ditahan sampai evidence asli lulus. Rincian: `docs/QA-ISSUE-PLAYBOOK.md`.
 
+> **Insiden deploy 2026-11-23:** auto-deploy Netlify dari `main` telah mempublikasikan v0.21.0 ke produksi lebih awal (deploy `6b0442c23292ad856e452a13`, 13:42 UTC), sebelum #5–#8 lulus. Produksi langsung dikembalikan ke `6b0298644a3808ba84bfc85d` (`e71e6c1`, `index-Cl2SK4zO.js`, `tpf-shell-v0-16-0`) dan diverifikasi kembali. Auto build Netlify dimatikan sementara (`stop_builds: true`) sampai QA selesai. Preview draft untuk QA offline: `https://6b045262361522f239ccf165--tinyplanetfactory.netlify.app/` (context `deploy-preview`, bukan produksi).
+
 > **Status fitur lokal pasca-preview #41:** commit `71a8809`–`f0193de` menambahkan wave insight/restorasi/advisory/offline/lencana/indeks kesehatan/advisory habitat dan satwa etis di `main` tanpa schema, gate, planet, biome, atau misi baru. Build lokal pada `f0193de` memakai `index-BnlhvdGl.js`, app chunk 92,97 kB / gzip 30,34 kB, dan `npm test` 8/8 PASS. Tujuh laporan Wave 9 sudah ada di `qa-evidence/wave9/`, tetapi semuanya **REVIEW** dan **tidak** menutup #5–#8. Rincian: `docs/LOCAL-FEATURE-WAVES.md`. Paket pengumpulan bukti fisik untuk build ini: `docs/QA-HANDOFF-WAVE9.md`.
 
 ## 1. Prasyarat
