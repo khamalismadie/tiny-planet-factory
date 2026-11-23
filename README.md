@@ -93,7 +93,7 @@ FTUE otomatis berjalan untuk save baru. `?tutorial=1` memaksa ulang dari langkah
 - Telemetri opt-in (tersimpan lokal, tanpa server) dengan modal penjelasan, ekspor JSON, dan hapus data.
 - Visual polish v0.15.9: satu merged geometry per tipe dengan warna per-facet, AO vertikal + bayangan kontak baked, shade lereng planet, awan 10×6, ground contact dari ekstent geometri, rim light, dan topbar mobile tanpa overflow. Standar visual ada di `docs/ART-DIRECTION.md`.
 - Asset varian v0.16.0: 49 pilihan (39 prop + 10 fauna) dari 43 builder unik, dipilih deterministik dari `seed + planetId`, satu geometri aktif per tipe, bias visual 9 planet, tanpa tekstur/DNA/draw call baru. Katalog ada di `docs/ASSET-CATALOG.md`.
-- Campaign v0.17.0: 100 level / 10 era, kurva XP kuadratik, 100 main mission dengan 6 tipe quest, HUD era+level+progress, panel `?campaign=1`, dan hook `window.__game.campaign()`. DNA Points/Bio Energy masih derived; misi 61–100 locked. Detail: `docs/CAMPAIGN.md`.
+- Campaign v0.17.0–v0.18.0: 100 level / 10 era, kurva XP kuadratik, 100 main mission dengan 6 tipe quest, HUD era+level+progress, panel `?campaign=1`, dan hook `window.__game.campaign()`. Semua 100 misi aktif sejak v0.18.0; DNA Points/Bio Energy tetap derived. Detail: `docs/CAMPAIGN.md`.
 
 ## Arsitektur
 
@@ -175,7 +175,7 @@ Program Nine Worlds menggantikan roadmap lama: Terra diselesaikan lebih dulu, la
 | `v0.15.8` | **Weather Scale Fix** — badai proporsional, lebih basah & gelap dari hujan, gate rasio cuaca. *(selesai)* |
 | `v0.15.9` | **Faceted Diorama Polish** — facet lowpoly + AO per-facet, kontak baked, warna lereng, awan 10×6; 8 gate test, chunk 65,43 kB, cache `tpf-shell-v0-15-9`. *(selesai)* |
 | `v0.16.0` | **Deterministic Asset Variants** — 49 pilihan varian, 43 builder unik, resolver `seed + planetId`, bias visual per planet, satu geometri aktif per tipe, tanpa draw call baru; chunk 72,65 kB, cache `tpf-shell-v0-16-0`. *(implemented; QA real-device still open)* |
-| `v0.17.0` | **Campaign & Leveling** — 100 level / 10 era, 100 main mission, 6 tipe quest, HUD campaign, dan panel QA. Misi 61–100 locked; produksi masih v0.16.0. *(implemented on main; unreleased)* |
+| `v0.17.0` | **Campaign & Leveling** — 100 level / 10 era, 100 main mission, 6 tipe quest, HUD campaign, dan panel QA. Misi 61–100 saat itu masih locked; aktif sejak v0.18.0. Produksi masih v0.16.0. *(implemented on main; unreleased)* |
 
 ## Langkah berikutnya
 

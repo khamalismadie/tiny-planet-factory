@@ -102,7 +102,7 @@ Setiap konflik yang ditemukan harus dicatat di bagian **Known documentation drif
 - Hook QA: `?debug=1`, `?perf=1`, `?qa=1`, `?qaObjects=N`, `?eco=1`, `?campaign=1`, `?planet=...`, `?menu=0`, `?seed=N`, `window.__game`.
 - Low-poly v0.15.9: satu merged geometry per tipe, vertex colors, AO per-facet, bayangan kontak baked, facet bertahap, warna lereng, awan 10×6.
 - Asset variants v0.16.0: 49 pilihan / 43 builder unik, resolver `seed + planetId`, bias visual 9 planet, satu geometri aktif per tipe, tanpa perubahan sim/DNA/schema. Katalog: `docs/ASSET-CATALOG.md`.
-- Campaign v0.17.0: 100 level / 10 era, 100 main mission, 6 tipe quest, kurva XP kuadratik, HUD campaign, hook `?campaign=1`, dan `window.__game.campaign()`. DNA Points/Bio Energy masih derived; misi 61–100 locked. Katalog: `docs/CAMPAIGN.md`.
+- Campaign v0.17.0–v0.18.0: 100 level / 10 era, 100 main mission, 6 tipe quest, kurva XP kuadratik, HUD campaign, hook `?campaign=1`, dan `window.__game.campaign()`. Semua 100 misi aktif sejak v0.18.0; DNA Points/Bio Energy tetap derived. Katalog: `docs/CAMPAIGN.md`.
 
 ### 3.2 Backlog terbuka
 

@@ -321,7 +321,7 @@ Ringkasan status P0 pasca-v0.16.0:
 - [x] Kurva XP kuadratik `100+25(L-1)+5(L-1)^2`, 100 level, 10 era, ambang kumulatif 1.723.920 XP (masih `u32`).
 - [x] Save/DNA lama dinormalisasi ke ambang level lama; `schemaVersion` tetap 3 dan tidak ada field DNA baru.
 - [x] 100 main mission / 10 era / 6 tipe quest di `src/sim/campaignRules.ts`; teks target di `src/content/campaignCopy.ts`.
-- [x] Misi 1–60 dievaluasi dari state sim yang ada; misi 61–100 locked, tidak memberi XP, dan tidak ditandai selesai.
+- [x] Misi 1–60 dievaluasi dari state sim yang ada; misi 61–100 locked, tidak memberi XP, dan tidak ditandai selesai (riwayat v0.17.0; aktif sejak v0.18.0).
 - [x] DNA Points dan Bio Energy masih **derived**, bukan field tersimpan.
 - [x] HUD menampilkan era, `Level x/100`, judul misi, dan progres; panel `?campaign=1` menampilkan 100 baris.
 - [x] Hook QA `?debug=1` → `window.__game.campaign()`.
