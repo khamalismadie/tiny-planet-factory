@@ -4,9 +4,9 @@ Folder ini menyimpan laporan hasil `window.__game.qaReport()` dari perangkat nya
 
 Jangan mengubah isi file setelah disalin. Simpan satu file per sesi.
 
-## Build Wave 9 — 2 laporan REVIEW
+## Build Wave 9 — 3 laporan REVIEW
 
-Dua laporan untuk bundle `index-BnlhvdGl.js` sudah masuk di `qa-evidence/wave9/` dan keduanya berstatus **REVIEW / TIDAK LULUS** (p95 `33,4 ms`). Paket pengumpulan buktinya ada di `docs/QA-HANDOFF-WAVE9.md`. Simpan laporan berikutnya di folder yang sama agar tidak tercampur dengan arsip preview #41, lalu validasi dengan `--expect-bundle index-BnlhvdGl.js`.
+Tiga laporan untuk bundle `index-BnlhvdGl.js` sudah masuk di `qa-evidence/wave9/` dan semuanya berstatus **REVIEW / TIDAK LULUS**. Paket pengumpulan buktinya ada di `docs/QA-HANDOFF-WAVE9.md`. Simpan laporan berikutnya di folder yang sama agar tidak tercampur dengan arsip preview #41, lalu validasi dengan `--expect-bundle index-BnlhvdGl.js`.
 
 ### `wave9/report-p95-run1.json`
 
@@ -50,7 +50,26 @@ npm run qa:evidence -- qa-evidence/wave9/report-p95-run2.json \
 
 Hasil: `EVIDENCE REVIEW: p95MasihDiAtas33ms`.
 
-Run 2 tidak menutup #7 karena p95 tetap `33,4 ms` dan objek `188`, bukan `94`. Objek membengkak karena save run 1 tidak dihapus sebelum `qaObjects=94` ditambahkan; `populateQaObjects()` menambah ke state yang sudah ada. Run berikutnya harus memakai helper `?fresh=1` yang menghapus IndexedDB sebelum probe.
+Run 2 tidak menutup #7 karena p95 tetap `33,4 ms` dan objek `188`, bukan `94`. Objek membengkak karena save run 1 tidak dihapus sebelum `qaObjects=94` ditambahkan; `populateQaObjects()` menambah ke state yang sudah ada. Run berikutnya harus memakai origin baru atau save kosong.
+
+### `wave9/report-p95-run3.json`
+
+- Build: v0.21.0 Wave 9 — `index-BnlhvdGl.js`, origin port `4174`.
+- UA: `X11; Linux x86_64` Chrome/157 — **bukan UA Android**.
+- Viewport `980x1845`, DPR 3, `objectiveOverlapsInventory: true`.
+- Durasi probe: `180045` ms dengan `4896` frame.
+- p50 **33,3 ms**, p95 **66,7 ms**, FPS **30,0**, boot **556 ms**.
+- Draw call `18`, objek `94`, tier `low`, 1 downgrade, `contextLost: false`.
+- SW controller aktif; `standalone: false`; `installPromptSeen: true`.
+
+```bash
+npm run qa:evidence -- qa-evidence/wave9/report-p95-run3.json \
+  --expect-version 0.21.0 --expect-bundle index-BnlhvdGl.js
+```
+
+Hasil: `EVIDENCE REVIEW: p95MasihDiAtas33ms`.
+
+Run 3 **tidak dihitung** sebagai pengukuran p95 Android yang valid: UA desktop, viewport bukan `360x678`, dan layout overlap. Ini tetap diarsipkan sebagai bukti mentah, bukan fixture.
 
 ## Isi saat ini — arsip preview #41
 

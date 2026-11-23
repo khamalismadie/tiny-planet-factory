@@ -117,5 +117,5 @@ Untuk `qa:evidence:batch`, pakai flag yang sama. Jangan menurunkan target atau m
 
 - Wave 1–9 dan commit docs `e810b3a` sudah di-push ke `origin/main`; tidak ada commit fitur yang tertinggal.
 - Belum ada deploy produksi.
-- Dua bukti fisik #7 untuk build ini sudah ada di `qa-evidence/wave9/`, keduanya **REVIEW** (p95 `33,4 ms`; run 1 tier `low`/1 downgrade, run 2 objek `188`). #5–#8 tetap OPEN.
+- Tiga bukti fisik #7 untuk build ini sudah ada di `qa-evidence/wave9/`, semuanya **REVIEW**; run 3 juga memakai UA desktop sehingga tidak valid. #5–#8 tetap OPEN.
 - Fitur DB P2/P3 dan mekanik resource/sosial/real-world tetap tertunda.
