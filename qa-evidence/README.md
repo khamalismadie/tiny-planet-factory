@@ -4,9 +4,9 @@ Folder ini menyimpan laporan hasil `window.__game.qaReport()` dari perangkat nya
 
 Jangan mengubah isi file setelah disalin. Simpan satu file per sesi.
 
-## Build Wave 9 — 4 laporan REVIEW
+## Build Wave 9 — 5 laporan REVIEW
 
-Empat laporan untuk bundle `index-BnlhvdGl.js` sudah masuk di `qa-evidence/wave9/` dan semuanya berstatus **REVIEW / TIDAK LULUS**. Paket pengumpulan buktinya ada di `docs/QA-HANDOFF-WAVE9.md`. Simpan laporan berikutnya di folder yang sama agar tidak tercampur dengan arsip preview #41, lalu validasi dengan `--expect-bundle index-BnlhvdGl.js`.
+Lima laporan untuk bundle `index-BnlhvdGl.js` sudah masuk di `qa-evidence/wave9/` dan semuanya berstatus **REVIEW / TIDAK LULUS**. Run 5 adalah satu-satunya yang valid secara Android sampai saat ini. Paket pengumpulan buktinya ada di `docs/QA-HANDOFF-WAVE9.md`. Simpan laporan berikutnya di folder yang sama agar tidak tercampur dengan arsip preview #41, lalu validasi dengan `--expect-bundle index-BnlhvdGl.js`.
 
 ### `wave9/report-p95-run1.json`
 
@@ -81,6 +81,25 @@ Run 3 **tidak dihitung** sebagai pengukuran p95 Android yang valid: UA desktop, 
 Hasil validator: `EVIDENCE REVIEW: p95MasihDiAtas33ms`.
 
 Run 4 juga **tidak dihitung**. Sebelum mengulang, matikan **Desktop site** di menu Chrome perangkat.
+
+### `wave9/report-p95-run5.json` — run valid pertama
+
+- Build: v0.21.0 Wave 9 — `index-BnlhvdGl.js`, origin port `4176`.
+- UA Android, viewport `360x678`, DPR 3, portrait, tanpa overlap.
+- Durasi probe: `180001` ms dengan `7171` frame.
+- p50 **33,2 ms**, p95 **33,4 ms**, FPS **30,1**, boot **473 ms**.
+- Draw call `20`, objek `94`, tier **medium / 0 downgrade**, `contextLost: false`.
+- Save persisten: tick `89`, objek `94`, level `4`.
+- SW controller aktif; `standalone: false`; `installPromptSeen: true`.
+
+```bash
+npm run qa:evidence -- qa-evidence/wave9/report-p95-run5.json \
+  --expect-version 0.21.0 --expect-bundle index-BnlhvdGl.js
+```
+
+Hasil: `EVIDENCE REVIEW: p95MasihDiAtas33ms`.
+
+Run 5 memenuhi semua syarat konfigurasi tetapi tetap gagal pada p95 `33,4 ms` (dan draw call `20` berada di batas atas). #7 tetap OPEN.
 
 ## Isi saat ini — arsip preview #41
 
