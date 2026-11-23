@@ -121,6 +121,21 @@ Batch Wave 9: `0 OK, 7 REVIEW, 7 file`. Tiga run valid semua p95 `33,4 ms`; #7 t
 
 Laporan landscape pertama dan kedua masih `portrait-primary` dan viewport `360x678`, sehingga **tidak memenuhi #8**. Kemungkinan auto-rotate perangkat masih mati. Disimpan sebagai bukti mentah, bukan hasil lulus.
 
+### `wave9/report-landscape.json`
+
+- Orientasi berhasil: `landscape-primary`, angle `90`.
+- Viewport perangkat `734x280` — lebih pendek dari target `844x390`.
+- `centerElement: "DIV"`, `planetCenterVisible: false`.
+- Objective/inventory tidak overlap; topbar/build tidak overlap.
+- p95 `33,4 ms`, tier `low / 1 downgrade`, draw call `18`, objek `30`.
+
+```bash
+npm run qa:evidence -- qa-evidence/wave9/report-landscape.json \
+  --expect-version 0.21.0 --expect-bundle index-BnlhvdGl.js --landscape
+```
+
+Hasil: `EVIDENCE REVIEW: planetTidakTertutup, p95MasihDiAtas33ms`. #8 tetap OPEN.
+
 ## Isi saat ini — arsip preview #41
 
 Semua laporan di bawah berasal dari preview #41 `index-BiS1XGVG.js`.

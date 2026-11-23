@@ -166,6 +166,8 @@ Jika belum ada build yang lebih baru, sub-langkah update **masih belum terverifi
 
 Kriteria #8: `orientation.type` landscape, `device.viewport` `844x390`, `layout.planetCenterVisible === true`, `objectiveOverlapsInventory === false`, `topbarOverlapsBuild === false`, dan screenshot asli ada di issue.
 
+Status build `index-BnlhvdGl.js`: `qa-evidence/wave9/report-landscape.json` berhasil merekam `landscape-primary`, tetapi viewport `734x280`, `centerElement: "DIV"`, dan `planetCenterVisible: false`. Validator: `EVIDENCE REVIEW: planetTidakTertutup, p95MasihDiAtas33ms`. #8 **belum lulus** dan memerlukan perbaikan/ulang ukuran landscape yang sesuai.
+
 ## Urutan penutupan yang aman
 
 1. #7 — p95 v0.21.0 terukur ≤ 33 ms.

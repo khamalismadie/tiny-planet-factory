@@ -160,5 +160,6 @@ Helper sementara ada di `http://127.0.0.1:4173/qa-helper.html` selama preview lo
 
 - Semua fitur Wave 1–9 sudah di-push, tetapi **belum di-deploy**.
 - Tujuh evidence p95 untuk `index-BnlhvdGl.js` sudah ada, semuanya **REVIEW / TIDAK LULUS**; run 5–7 valid tetapi p95 `33,4 ms`.
+- Evidence landscape sudah ada, tetapi `planetCenterVisible: false` pada viewport `734x280`; #8 **belum lulus**.
 - Issue `#5–#8` masih OPEN.
 - Produksi tetap v0.16.0.
