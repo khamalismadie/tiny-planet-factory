@@ -75,7 +75,7 @@ Catat angka apa adanya. Jangan membulatkan atau memilih run terbaik saja.
 ## Interpretasi
 
 - **p95 ≤ 33,00 ms**: #7 boleh ditutup bila laporan + screenshot asli ada dan field di atas terpenuhi.
-- **p95 ≈ 33,40 ms lagi**: catat sebagai kuantisasi vsync 60 Hz, tetapi **#7 tetap OPEN** karena target tertulis belum tercapai. Target tidak diturunkan; gate headless sudah diselaraskan ke ≤ 33 ms.
+- **p95 ≈ 33,40 ms lagi**: catat sebagai kuantisasi vsync 60 Hz, tetapi **#7 tetap OPEN** karena target tertulis belum tercapai. Target tidak diturunkan; gate headless sudah diselaraskan ke ≤ 33 ms. Tiga run Wave 9 yang valid (`report-p95-run5..7.json`) konsisten di `33,4 ms` dengan objek `94`, `medium`, dan 0 downgrade.
 - **p50 ≈ 33,20 ms**: FPS masih ≈30,1 dan memenuhi lapses minimum 30 FPS, tetapi p95 tetap harus dinilai terhadap 33 ms.
 - **Ada context loss / downgrade / draw call > 20**: ini bukan pengukuran p95 yang bersih; perbaiki kondisi dan ulangi.
 - **Build berbeda**: ulangi dari awal. Jangan mencampur angka produksi v0.16.0, preview #39, atau preview #41.

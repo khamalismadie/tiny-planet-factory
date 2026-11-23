@@ -150,14 +150,15 @@ Kedua laporan dikumpulkan dari perangkat nyata lewat bridge OpenCode pada `http:
 | 4 | 33,3 ms | 66,7 ms | 30,0 | 94 | low / 1 downgrade | REVIEW — UA desktop, tidak valid |
 | 5 | 33,2 ms | 33,4 ms | 30,1 | 94 | medium / 0 downgrade | REVIEW — valid, p95 saja |
 | 6 | 33,2 ms | 33,4 ms | 30,1 | 94 | medium / 0 downgrade | REVIEW — valid, p95 saja |
+| 7 | 33,2 ms | 33,4 ms | 30,1 | 94 | medium / 0 downgrade | REVIEW — valid, p95 saja |
 
-Run 3–4 tidak dihitung karena UA desktop. **Run 5–6 valid**: UA Android, viewport `360x678`, objek `94`, `medium / 0 downgrade`, tanpa overlap, tetapi p95 tetap `33,4 ms`. Dibutuhkan minimal 3 run valid dengan `p95 ≤ 33 ms`. Target tidak diturunkan.
+Run 3–4 tidak dihitung karena UA desktop. **Run 5–7 valid**: UA Android, viewport `360x678`, objek `94`, `medium / 0 downgrade`, tanpa overlap, tetapi ketiganya p95 `33,4 ms`. Minimal 3 run valid sudah terkumpul, namun #7 tetap OPEN karena target `≤ 33 ms` tidak tercapai. Target tidak diturunkan.
 
 Helper sementara ada di `http://127.0.0.1:4173/qa-helper.html` selama preview lokal berjalan; tombol **Salin laporan QA** menyalin `qaReport()` langsung ke clipboard perangkat. Untuk run berikutnya gunakan `http://127.0.0.1:4173/qa-helper.html?fresh=1`: helper menghapus `indexedDB` bernama `tiny-planet-factory` sebelum memuat probe, sehingga `qaObjects=94` tidak menumpuk di save lama.
 
 ## Status saat ini
 
 - Semua fitur Wave 1–9 sudah di-push, tetapi **belum di-deploy**.
-- Enam evidence p95 untuk `index-BnlhvdGl.js` sudah ada, semuanya **REVIEW / TIDAK LULUS**; run 5–6 valid tetapi p95 `33,4 ms`.
+- Tujuh evidence p95 untuk `index-BnlhvdGl.js` sudah ada, semuanya **REVIEW / TIDAK LULUS**; run 5–7 valid tetapi p95 `33,4 ms`.
 - Issue `#5–#8` masih OPEN.
 - Produksi tetap v0.16.0.
