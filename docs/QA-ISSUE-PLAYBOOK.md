@@ -53,6 +53,29 @@ Batch: `0 OK, 4 REVIEW, 4 file dari qa-evidence` — <https://github.com/khamali
 5. Ulangi dengan GPU reset/developer option bila tersedia.
 6. Hook `window.__game.loseContext()` / `restoreContext()` hanya alat bantu; **bukan bukti** #5.
 
+### Membedah context loss
+
+`qaReport().contextLost` adalah gabungan dari `contextEventLost || glContextLost`. Ambil juga rincian ini sebelum dan sesudah percobaan:
+
+```js
+JSON.stringify({
+  qa: window.__game.qaReport()?.contextLost ?? null,
+  contextEventLost: window.__game.metrics().contextEventLost,
+  glContextLost: window.__game.metrics().glContextLost,
+  downgrades: window.__game.metrics().downgrades,
+}, null, 2)
+```
+
+Artinya:
+
+- `contextEventLost: true` — canvas menerima `webglcontextlost` dan belum menerima `webglcontextrestored`.
+- `glContextLost: true` — `gl.isContextLost()` benar-benar mengembalikan `true` saat itu.
+- `downgrades` — adaptive quality sudah pernah turun atau belum.
+
+Run 1 hanya menyimpan gabungan `contextLost: true`, jadi penyebabnya **belum bisa dipastikan**: bisa background/GPU reset nyata, bisa event lost tanpa restore yang terekam. Jangan menyimpulkan root cause hanya dari FPS atau draw call yang tampak normal.
+
+Simpan cuplikan `metrics()` sebagai lampiran pendukung #5. Ini bukan pengganti video/screenshot, dan bukan ekspor telemetri.
+
 ### Kriteria penutupan #5
 
 - #6, #7, #8 sudah closed dengan bukti asli.
