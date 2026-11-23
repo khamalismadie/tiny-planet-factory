@@ -214,6 +214,20 @@
       .guide-map > div { display: grid; grid-template-columns: 92px 1fr; gap: 8px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 9px; background: rgba(12, 20, 30, .7); }
       .guide-map span { color: var(--mint); font-size: 11px; }
       .guide-map p { margin: 0; font-size: 11px; line-height: 1.45; color: var(--muted); }
+      .ecopedia-card { width: min(680px, 100%); max-height: min(82vh, 760px); overflow: auto; }
+      .ecopedia-grid { display: grid; gap: 12px; }
+      .ecopedia-section { border: 1px solid var(--line); border-radius: 12px; padding: 12px; background: rgba(255,255,255,.02); }
+      .ecopedia-section h3 { margin: 0 0 8px; font-size: 13px; color: var(--mint); }
+      .ecopedia-list { display: grid; gap: 8px; font-size: 12px; color: var(--muted); }
+      .ecopedia-item { border-top: 1px solid #24313f; padding-top: 8px; }
+      .ecopedia-item:first-child { border-top: 0; padding-top: 0; }
+      .ecopedia-item strong { color: var(--text); }
+      .ecopedia-kv { display: flex; justify-content: space-between; gap: 8px; font-size: 11px; }
+      .ecopedia-bar { height: 4px; border-radius: 2px; background: #1e2b38; overflow: hidden; margin: 4px 0; }
+      .ecopedia-bar > i { display: block; height: 100%; background: var(--amber); }
+      .ecopedia-pill { display: inline-block; padding: 1px 6px; border-radius: 999px; font-size: 10px; border: 1px solid var(--line); color: var(--muted); margin-left: 6px; }
+      .ecopedia-pill.warn { color: #ffd479; border-color: rgba(255,212,121,.35); }
+      .ecopedia-pill.ok { color: var(--mint); border-color: rgba(127,224,173,.35); }
       body.menu-open #topbar, body.menu-open #objective-strip, body.menu-open #build-panel, body.menu-open #stats-panel, body.menu-open #inventory, body.menu-open #hint { opacity: .22; pointer-events: none; filter: blur(2px); }
       #error { position: fixed; z-index: 70; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; background: var(--void); }
       @media (prefers-reduced-motion: reduce) { .bar > i { transition: none; } }
@@ -249,7 +263,9 @@
         .planet-chip { justify-content: center; padding: 5px; font-size: 10px; }
         .planet-chip.active::after { display: none; }
         .planet-chip .planet-dot { width: 16px; height: 16px; }
-        .menu-action { min-height: 48px; padding: 8px 11px; }
+        .menu-action { min-height: 44px; padding: 7px 10px; }
+        .menu-action.quiet { min-height: 40px; }
+        .menu-action.quiet .menu-action-note { display: none; }
         .menu-corner, .menu-orbit { display: none; }
         .guide-map > div { grid-template-columns: 1fr; gap: 2px; }
         .objective-mission { margin-left: 0; width: 100%; text-align: left; }
@@ -382,10 +398,16 @@
               <span class="menu-action-title">Buka Planet DNA</span>
               <span class="menu-action-note">Impor kode atau salin planet yang sedang berjalan.</span>
             </button>
-            <button id="menu-guide" class="menu-action quiet">
-              <span class="menu-action-title">Cara pakai UI</span>
-              <span class="menu-action-note">Peta layar dan 4 langkah singkat.</span>
-            </button>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+              <button id="menu-ecopedia" class="menu-action quiet">
+                <span class="menu-action-title">Kompendium</span>
+                <span class="menu-action-note">Spesies, habitat, cuaca.</span>
+              </button>
+              <button id="menu-guide" class="menu-action quiet">
+                <span class="menu-action-title">Cara pakai UI</span>
+                <span class="menu-action-note">4 langkah singkat.</span>
+              </button>
+            </div>
           </div>
           <button id="menu-close" class="menu-close">Kembali ke planet</button>
         </div>
@@ -410,6 +432,16 @@
           <button id="guide-replay">Ulangi panduan</button>
           <button id="guide-close">Mengerti</button>
         </div>
+      </div>
+    </div>
+    <div id="ecopedia-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="ecopedia-title">
+      <div class="card ecopedia-card">
+        <h2 id="ecopedia-title">Kompendium Ekologi</h2>
+        <p style="font-size:12px;color:var(--muted);margin-top:-4px">Ringkasan langsung dari state planet saat ini. Saran bersifat panduan, bukan jaminan hasil.</p>
+        <div id="ecopedia-content" class="ecopedia-grid">
+          <div class="ecopedia-section"><h3>Memuat…</h3></div>
+        </div>
+        <div class="row"><button id="ecopedia-close">Tutup</button></div>
       </div>
     </div>
     <div id="error" class="hidden"></div>

@@ -27,6 +27,7 @@ export interface MainMenuCallbacks {
   onQuality: (tier: QualityTier) => void;
   onReplayTutorial: () => void;
   onClose: () => void;
+  onEcopedia: () => void;
 }
 
 const TIERS: QualityTier[] = ['low', 'medium', 'high'];
@@ -44,6 +45,9 @@ export class MainMenu {
   private readonly guideClose = document.getElementById('guide-close') as HTMLButtonElement;
   private readonly guideReplay = document.getElementById('guide-replay') as HTMLButtonElement;
   private readonly guideButton = document.getElementById('menu-guide') as HTMLButtonElement;
+  private readonly ecopediaModal = document.getElementById('ecopedia-modal')!;
+  private readonly ecopediaClose = document.getElementById('ecopedia-close') as HTMLButtonElement;
+  private readonly ecopediaButton = document.getElementById('menu-ecopedia') as HTMLButtonElement;
   private readonly qualityButtons = Array.from(
     document.querySelectorAll<HTMLButtonElement>('[data-quality]'),
   );
@@ -62,12 +66,18 @@ export class MainMenu {
     this.guideModal.addEventListener('click', (event) => {
       if (event.target === this.guideModal) this.closeGuide();
     });
+    this.ecopediaButton.addEventListener('click', () => this.callbacks.onEcopedia());
+    this.ecopediaClose.addEventListener('click', () => this.closeEcopedia());
+    this.ecopediaModal.addEventListener('click', (event) => {
+      if (event.target === this.ecopediaModal) this.closeEcopedia();
+    });
     for (const button of this.qualityButtons) {
       button.addEventListener('click', () => this.callbacks.onQuality(button.dataset.quality as QualityTier));
     }
     document.addEventListener('keydown', (event) => {
       if (event.key !== 'Escape') return;
-      if (!this.guideModal.classList.contains('hidden')) this.closeGuide();
+      if (!this.ecopediaModal.classList.contains('hidden')) this.closeEcopedia();
+      else if (!this.guideModal.classList.contains('hidden')) this.closeGuide();
       else if (this.isOpen) this.callbacks.onClose();
     });
   }
@@ -95,6 +105,7 @@ export class MainMenu {
 
   hide(): void {
     this.closeGuide();
+    this.closeEcopedia();
     this.root.classList.add('hidden');
     this.root.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('menu-open');
@@ -151,5 +162,18 @@ export class MainMenu {
     this.guideModal.classList.add('hidden');
     this.guideModal.setAttribute('aria-hidden', 'true');
     if (this.isOpen) this.guideButton.focus();
+  }
+
+  openEcopedia(): void {
+    this.ecopediaModal.classList.remove('hidden');
+    this.ecopediaModal.setAttribute('aria-hidden', 'false');
+    this.ecopediaClose.focus();
+  }
+
+  private closeEcopedia(): void {
+    if (this.ecopediaModal.classList.contains('hidden')) return;
+    this.ecopediaModal.classList.add('hidden');
+    this.ecopediaModal.setAttribute('aria-hidden', 'true');
+    if (this.isOpen) this.ecopediaButton.focus();
   }
 }

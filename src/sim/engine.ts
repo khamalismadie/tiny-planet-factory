@@ -273,6 +273,36 @@ function chooseWeather(planet: PlanetState, random: () => number): WeatherStateL
 
 type WeatherStateLike = PlanetState['weather'];
 
+export interface WeatherTendency {
+  type: WeatherType;
+  percent: number;
+  weight: number;
+}
+
+export function weatherTendencies(planet: PlanetState): WeatherTendency[] {
+  const { environment: e, weather } = planet;
+  if (weather.type === 'storm') {
+    return [
+      { type: 'sunny', percent: 100, weight: 1 },
+      { type: 'rain', percent: 0, weight: 0 },
+      { type: 'snow', percent: 0, weight: 0 },
+      { type: 'storm', percent: 0, weight: 0 },
+    ];
+  }
+  const weights: Array<[WeatherType, number]> = [
+    ['sunny', 3 + Math.max(0, 20 - e.humidity) * 0.04],
+    ['rain', 2 + e.humidity * 0.05 + e.water * 0.02],
+    ['snow', e.temperature < 12 ? 4 : 0.5],
+    ['storm', 0.6 + (100 - e.stability) * 0.03],
+  ];
+  const total = weights.reduce((sum, entry) => sum + Math.max(0, entry[1]), 0) || 1;
+  return weights.map(([type, weight]) => ({
+    type,
+    weight: Math.max(0, weight),
+    percent: (Math.max(0, weight) / total) * 100,
+  }));
+}
+
 export interface TickEvents {
   events: string[];
   weatherChanged: boolean;

@@ -4,6 +4,7 @@ import { ensureEventState } from '../content/missions';
 import { OBJECT_DEFS, OBJECT_ORDER, UNLOCK_LEVEL } from '../content/objects';
 import { SPECIES_ORDER } from '../content/species';
 import { WEATHER_DEFS } from '../content/weather';
+import { habitatAdvice, speciesInsights, weatherInsight, describeHabitatFactor } from '../sim/insights';
 import { missionView } from '../sim/campaign';
 import { CAMPAIGN, campaignMissionForLevel, MISSION_TYPE_LABELS } from '../sim/campaignRules';
 import { scoreHabitat } from '../sim/eco/habitat';
@@ -237,6 +238,7 @@ export class Game {
       onQuality: (tier) => this.setQuality(tier),
       onReplayTutorial: () => this.replayTutorial(),
       onClose: () => this.closeMenu(),
+      onEcopedia: () => this.openEcopedia(),
     });
   }
 
@@ -283,6 +285,72 @@ export class Game {
     this.menuOpen = false;
     this.menu.hide();
     this.paused = this.menuWasPaused;
+  }
+
+  private openEcopedia(): void {
+    const esc = (value: string): string =>
+      value.replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch] ?? ch));
+    const planet = this.state;
+    const advice = habitatAdvice(planet);
+    const species = speciesInsights(planet);
+    const weather = weatherInsight(planet);
+
+    const speciesHtml = species.map((entry) => {
+      const status = entry.extinct ? '<span class="ecopedia-pill warn">punah</span>' : entry.discovered ? '<span class="ecopedia-pill ok">ditemukan</span>' : '<span class="ecopedia-pill">belum terlihat</span>';
+      const limit = entry.limitingFactor ? describeHabitatFactor(entry.limitingFactor) : 'stabil';
+      const cap = Math.max(1, entry.capacity);
+      const pct = Math.max(0, Math.min(100, (entry.estimate / cap) * 100));
+      return `<div class="ecopedia-item">
+        <div class="ecopedia-kv"><strong>${esc(entry.label)}</strong><span>${status}</span></div>
+        <div class="ecopedia-kv"><span>Agen ${entry.agents} · Pop ${Math.round(entry.estimate)}/${Math.round(entry.capacity)}</span><span>Pangan ${Math.round(entry.foodFactor * 100)}%</span></div>
+        <div class="ecopedia-bar"><i style="width:${pct.toFixed(0)}%"></i></div>
+        <div style="font-size:11px;color:#72869a">Faktor pembatas: ${esc(limit)}</div>
+        <div style="font-size:11px">${esc(entry.suggestion)}</div>
+      </div>`;
+    }).join('');
+
+    const adviceHtml = advice.length
+      ? advice.map((item) => {
+          const pill = item.severity === 'high' ? 'warn' : item.severity === 'medium' ? 'warn' : 'ok';
+          return `<div class="ecopedia-item">
+            <div class="ecopedia-kv"><strong>${esc(item.label)}</strong><span class="ecopedia-pill ${pill}">${item.severity}</span></div>
+            <div style="font-size:11px">${esc(item.suggestion)}</div>
+          </div>`;
+        }).join('')
+      : '<div class="ecopedia-item"><strong>Stabil</strong><div style="font-size:11px">Tidak ada faktor pembatas kritis yang terdeteksi. Pertahankan keseimbangan saat ini.</div></div>';
+
+    const tendencyHtml = weather.tendencies.map((entry) =>
+      `<div class="ecopedia-kv"><span>${esc(entry.label)}</span><span>${entry.percent.toFixed(0)}%</span></div>`
+    ).join('');
+
+    const content = document.getElementById('ecopedia-content');
+    if (content) {
+      content.innerHTML = `
+        <section class="ecopedia-section">
+          <h3>Kompendium Spesies</h3>
+          <div class="ecopedia-list">${speciesHtml}</div>
+        </section>
+        <section class="ecopedia-section">
+          <h3>Faktor Pembatas &amp; Saran Habitat</h3>
+          <div class="ecopedia-list">${adviceHtml}</div>
+        </section>
+        <section class="ecopedia-section">
+          <h3>Cuaca &amp; Dampak</h3>
+          <div class="ecopedia-list">
+            <div class="ecopedia-item">
+              <div class="ecopedia-kv"><strong>${esc(weather.currentLabel)}</strong><span>${weather.intensityPercent}% · ${weather.remainingTicks} tick</span></div>
+              <div style="font-size:11px">${esc(weather.effects.join(' · ') || 'Tidak ada efek khusus.')}</div>
+              ${weather.caution ? `<div style="font-size:11px;color:#ffd479">${esc(weather.caution)}</div>` : ''}
+            </div>
+            <div class="ecopedia-item">
+              <strong>Kecenderungan cuaca berikutnya</strong>
+              <div style="font-size:11px;color:#72869a;margin:4px 0">Persentase dihitung dari kondisi lingkungan saat ini, bukan jaminan RNG.</div>
+              ${tendencyHtml}
+            </div>
+          </div>
+        </section>`;
+    }
+    this.menu?.openEcopedia();
   }
 
   private setupCampaignPanel(open: boolean): void {
