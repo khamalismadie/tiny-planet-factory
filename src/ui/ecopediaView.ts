@@ -1,5 +1,6 @@
 import { habitatAdvice, speciesInsights, weatherInsight, describeHabitatFactor, restorationMilestones, environmentRisks } from '../sim/insights';
 import { localAchievements } from './achievements';
+import { planetHealthIndex } from './healthIndex';
 import type { PlanetState } from '../sim/types';
 
 type EcoSnapshot = { tick: number; stage: number; level: number; fertility: number; water: number; biodiversity: number; health: number; objects: number; species: number } | null;
@@ -67,6 +68,29 @@ export function renderEcopediaHtml(planet: PlanetState, ecoSnapshot: EcoSnapshot
     trendRow('Kesehatan ekosistem', planet.ecosystem.health, delta('health'),
       planet.ecosystem.health < 55 ? 'Fokus pada stabilitas, oksigen, dan vegetasi untuk menaikkan kesehatan.' : 'Kesehatan baik; pertahankan keseimbangan.'),
   ].join('');
+
+  const health = planetHealthIndex(planet);
+  const healthRows = health.components.map((entry) =>
+    `<div class="ecopedia-kv"><span>${esc(entry.label)} · ${entry.weight}%</span><span>${Math.round(entry.value)} → +${entry.contribution.toFixed(1)}</span></div>`
+  ).join('');
+  const healthDelta = Math.abs(health.deltaFromStart) <= 0.05
+    ? 'stabil'
+    : `${health.deltaFromStart > 0 ? '+' : ''}${health.deltaFromStart.toFixed(1)}`;
+  const healthHtml = `
+    <div class="ecopedia-item">
+      <div class="ecopedia-kv">
+        <strong>${health.score}/100 · ${esc(health.label)}</strong>
+        <span class="ecopedia-pill ${health.tone}">indeks</span>
+      </div>
+      <div class="ecopedia-bar"><i style="width:${health.score}%"></i></div>
+      <div style="font-size:11px">${esc(health.summary)}</div>
+      <div style="font-size:11px;color:#72869a;margin-top:6px">Rata-rata perubahan indikator lingkungan dari kondisi awal: ${healthDelta}.</div>
+    </div>
+    <div class="ecopedia-item">
+      <strong>Komponen penilaian</strong>
+      <div style="font-size:11px;color:#72869a;margin:4px 0">Bobot lokal, dihitung dari state yang sudah ada. Tidak memengaruhi simulasi atau gate QA.</div>
+      ${healthRows}
+    </div>`;
 
   const env = planet.environment;
   const unlocked = new Set(planet.progression.unlockedObjects);
@@ -182,6 +206,10 @@ export function renderEcopediaHtml(planet: PlanetState, ecoSnapshot: EcoSnapshot
       <h3>Status Pemulihan</h3>
       <div style="font-size:11px;color:#72869a;margin-bottom:8px">Delta dibanding sampel awal riwayat sesi ini (maks. ~2 menit).</div>
       <div class="ecopedia-list">${recoveryHtml}</div>
+    </section>
+    <section class="ecopedia-section">
+      <h3>Indeks Kesehatan Planet</h3>
+      <div class="ecopedia-list">${healthHtml}</div>
     </section>
     <section class="ecopedia-section">
       <h3>Aksi Restorasi Cepat</h3>
