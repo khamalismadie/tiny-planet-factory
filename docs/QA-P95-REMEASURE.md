@@ -6,7 +6,7 @@ Dokumen ini hanya paket pengukuran. **Target tetap p95 ≤ 33 ms** seperti issue
 
 | Item | Nilai |
 |---|---|
-| Kandidat | `v0.21.0` (`main` @ `a1cff56`) |
+| Kandidat | `v0.21.0` (`main`; commit aktif via `git rev-parse HEAD`) |
 | URL | <https://deploy-preview-41--tinyplanetfactory.netlify.app/> |
 | Bundle | `assets/index-BiS1XGVG.js` |
 | Cache SW | `tpf-shell-v0-21-0` |
