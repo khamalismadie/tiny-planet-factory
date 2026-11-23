@@ -6,12 +6,12 @@ Dokumen ini mencatat fitur-fitur kecil yang dikembangkan **lokal di `main` setel
 
 | Item | Nilai |
 |---|---|
-| Commit fitur terakhir | `a54bbcb` |
+| Commit fitur terakhir | `c7bb1e2` |
 | `package.json` | `0.21.0` |
 | Cache SW | `tpf-shell-v0-21-0` |
-| Bundle lokal pada commit ini | `index-BMuY_77Q.js` |
+| Bundle lokal pada commit ini | `index-CtauFPra.js` |
 | App chunk | 92,97 kB / gzip 30,34 kB |
-| Chunk lazy `ecopediaView` | 15,11 kB / gzip 4,73 kB |
+| Chunk lazy `ecopediaView` | 17,67 kB / gzip 5,47 kB |
 | `npm test` | 8/8 PASS |
 
 Hash bundle di atas **hanya berlaku untuk commit ini**. Setiap build berikutnya harus dibaca ulang dari `dist/index.html` dan dipakai secara konsisten pada validator evidence.
@@ -73,6 +73,15 @@ Hash bundle di atas **hanya berlaku untuk commit ini**. Setiap build berikutnya 
 - Modul `src/ui/healthIndex.ts` masuk chunk lazy `ecopediaView`.
 - Sumber katalog kini tersimpan di `docs/PLANET-CARE-FEATURE-DATABASE.md`.
 
+### Wave 8 — fitur DB `#34` + `#3` — `c7bb1e2`
+
+- Panel **Kebun Penyerbuk & Hutan** menurunkan dua advisory dari objek existing:
+  - `#34 Pollinator Garden`: jumlah bunga + biodiversitas.
+  - `#3 Forest Management`: jumlah pohon/semak + stabilitas.
+- Skor, status, dan saran dihitung ulang dari state; tidak ada resource, pemangkasan, objek, atau unlock baru.
+- Teks UI menyatakan eksplisit bahwa mekanik pemangkasan tidak diimplementasikan.
+- Modul `src/ui/habitatAdvisory.ts` masuk chunk lazy `ecopediaView`.
+
 ## Batasan yang dipertahankan
 
 - Tidak ada planet, biome, objek, unlock, misi campaign, field DNA, atau `schemaVersion` baru.
@@ -85,19 +94,19 @@ Hash bundle di atas **hanya berlaku untuk commit ini**. Setiap build berikutnya 
 
 Laporan yang sudah terarsip di `qa-evidence/` dibuat terhadap bundle preview #41 `index-BiS1XGVG.js`. Laporan itu **tidak membuktikan** build lokal pasca-wave ini.
 
-Jika QA fisik dijalankan pada build `a54bbcb`, gunakan:
+Jika QA fisik dijalankan pada build `c7bb1e2`, gunakan:
 
 ```bash
 npm run qa:evidence -- laporan.json \
   --expect-version 0.21.0 \
-  --expect-bundle index-BMuY_77Q.js
+  --expect-bundle index-CtauFPra.js
 ```
 
 Untuk `qa:evidence:batch`, pakai flag yang sama. Jangan menurunkan target atau mengabaikan `--expect-bundle` agar laporan dari build lain tidak diterima.
 
 ## Belum dilakukan
 
-- Wave 1–6 dan commit docs `3b32961` sudah di-push ke `origin/main`; commit Wave 7 `a54bbcb` belum di-push.
+- Wave 1–7 dan commit docs `052c1ca` sudah di-push ke `origin/main`; commit Wave 8 `c7bb1e2` belum di-push.
 - Belum ada deploy produksi.
 - Belum ada bukti fisik #5–#8 untuk build ini.
 - Fitur DB P2/P3 dan mekanik resource/sosial/real-world tetap tertunda.
