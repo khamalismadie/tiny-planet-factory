@@ -373,6 +373,21 @@ export class Game {
       this.hud.notify('Snapshot ekologi dihapus.');
       this.openEcopedia();
     });
+    document.getElementById('ecopedia-journal-export')?.addEventListener('click', async () => {
+      const payload = {
+        app: 'Tiny Planet Factory',
+        exportedAt: new Date().toISOString(),
+        planetId: this.state.planetId,
+        tick: this.state.tick,
+        journal: this.journal,
+      };
+      try {
+        await navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
+        this.hud.notify('Jurnal ekologi disalin.');
+      } catch {
+        this.hud.notify('Gagal menyalin jurnal.', true);
+      }
+    });
   }
 
   private async openCampaignPanel(): Promise<void> {
@@ -604,7 +619,7 @@ export class Game {
     }
     this.selected = type;
     this.syncHud();
-    this.hud.notify(`${OBJECT_DEFS[type].label} dipilih. Ketuk permukaan planet.`);
+    this.hud.notify(`${this.hud.describeObject(type)}. Ketuk planet untuk menanam.`);
   }
 
   private place(type: ObjectType, dir: [number, number, number]): void {

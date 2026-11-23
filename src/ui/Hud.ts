@@ -353,7 +353,7 @@ export class Hud {
           })
       : [];
     const effectText = [...parts, ...eco].join(' · ');
-    return effectText ? `${def.label}: ${effectText}` : def.label;
+    return effectText ? `${def.label} · efek/tick: ${effectText}` : def.label;
   }
 
   private renderEcoDetail(planet: PlanetState): void {
