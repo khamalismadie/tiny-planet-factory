@@ -94,7 +94,7 @@ FTUE otomatis berjalan untuk save baru. `?tutorial=1` memaksa ulang dari langkah
 - Visual polish v0.15.9: satu merged geometry per tipe dengan warna per-facet, AO vertikal + bayangan kontak baked, shade lereng planet, awan 10×6, ground contact dari ekstent geometri, rim light, dan topbar mobile tanpa overflow. Standar visual ada di `docs/ART-DIRECTION.md`.
 - Asset varian v0.16.0: 49 pilihan (39 prop + 10 fauna) dari 43 builder unik, dipilih deterministik dari `seed + planetId`, satu geometri aktif per tipe, bias visual 9 planet, tanpa tekstur/DNA/draw call baru. Katalog ada di `docs/ASSET-CATALOG.md`.
 - Campaign v0.17.0–v0.18.0: 100 level / 10 era, kurva XP kuadratik, 100 main mission dengan 6 tipe quest, HUD era+level+progress, panel `?campaign=1`, dan hook `window.__game.campaign()`. Semua 100 misi aktif sejak v0.18.0; DNA Points/Bio Energy tetap derived. Detail: `docs/CAMPAIGN.md`.
-- Wave fitur etis lokal pasca-preview #41: kompendium + insight habitat/cuaca, tren dan aksi restorasi, milestone/snapshot/jurnal lokal, advisory risiko-respons, ekspor jurnal, dan pratinjau dampak objek. Semua turunan dari state existing, lokal/unreleased, tanpa schema/gate baru. Detail dan status bundle: `docs/LOCAL-FEATURE-WAVES.md`.
+- Wave fitur etis lokal pasca-preview #41: kompendium + insight habitat/cuaca, tren dan aksi restorasi, milestone/snapshot/jurnal lokal, advisory risiko-respons, ekspor jurnal, pratinjau dampak objek, dan panel kesiapan offline. Semua turunan dari state existing, lokal/unreleased, tanpa schema/gate baru. Detail dan status bundle: `docs/LOCAL-FEATURE-WAVES.md`.
 
 ## Arsitektur
 

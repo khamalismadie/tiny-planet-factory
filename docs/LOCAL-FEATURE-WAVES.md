@@ -6,12 +6,12 @@ Dokumen ini mencatat fitur-fitur kecil yang dikembangkan **lokal di `main` setel
 
 | Item | Nilai |
 |---|---|
-| Commit fitur terakhir | `37b2559` |
+| Commit fitur terakhir | `6fca19c` |
 | `package.json` | `0.21.0` |
 | Cache SW | `tpf-shell-v0-21-0` |
-| Bundle lokal pada commit ini | `index-Dh6P2L_r.js` |
-| App chunk | 92,85 kB / gzip 30,32 kB |
-| Chunk lazy `ecopediaView` | 8,94 kB / gzip 2,92 kB |
+| Bundle lokal pada commit ini | `index-HHM3Xrif.js` |
+| App chunk | 92,97 kB / gzip 30,34 kB |
+| Chunk lazy `ecopediaView` | 10,58 kB / gzip 3,35 kB |
 | `npm test` | 8/8 PASS |
 
 Hash bundle di atas **hanya berlaku untuk commit ini**. Setiap build berikutnya harus dibaca ulang dari `dist/index.html` dan dipakai secara konsisten pada validator evidence.
@@ -51,6 +51,13 @@ Hash bundle di atas **hanya berlaku untuk commit ini**. Setiap build berikutnya 
 - Toast pemilihan objek kini merangkum efek per tick dari `OBJECT_DEFS`.
 - Tooltip objek menggunakan label `efek/tick` agar estimasi tidak disalahartikan sebagai hasil yang dijamin.
 
+### Wave 5 — `6fca19c`
+
+- Panel **Kesiapan Offline** di kompendium menampilkan status koneksi, service worker, dan penyimpanan save yang diambil dari kondisi browser saat modal dibuka.
+- Status save membedakan IndexedDB (`lokal`) dari fallback memori; tidak ada klaim bahwa perangkat sudah lolos QA offline.
+- Panel berada di chunk lazy `ecopediaView`, tidak menambah app chunk di atas 100 kB.
+- Ini adalah Wave 5 aman turunan state; mekanik bencana, monetisasi, achievements daring, dan perubahan schema tetap tidak masuk.
+
 ## Batasan yang dipertahankan
 
 - Tidak ada planet, biome, objek, unlock, misi campaign, field DNA, atau `schemaVersion` baru.
@@ -63,19 +70,19 @@ Hash bundle di atas **hanya berlaku untuk commit ini**. Setiap build berikutnya 
 
 Laporan yang sudah terarsip di `qa-evidence/` dibuat terhadap bundle preview #41 `index-BiS1XGVG.js`. Laporan itu **tidak membuktikan** build lokal pasca-wave ini.
 
-Jika QA fisik dijalankan pada build `37b2559`, gunakan:
+Jika QA fisik dijalankan pada build `6fca19c`, gunakan:
 
 ```bash
 npm run qa:evidence -- laporan.json \
   --expect-version 0.21.0 \
-  --expect-bundle index-Dh6P2L_r.js
+  --expect-bundle index-HHM3Xrif.js
 ```
 
 Untuk `qa:evidence:batch`, pakai flag yang sama. Jangan menurunkan target atau mengabaikan `--expect-bundle` agar laporan dari build lain tidak diterima.
 
 ## Belum dilakukan
 
-- Belum ada push/PR untuk commit `71a8809`–`37b2559`.
+- Wave 1–4 dan commit docs `abbfb0d` sudah di-push ke `origin/main`; commit Wave 5 `6fca19c` belum di-push.
 - Belum ada deploy produksi.
 - Belum ada bukti fisik #5–#8 untuk build ini.
-- Wave 5 tetap tertunda karena risiko mekanik/schema dan tidak boleh masuk hanya karena wave lokal sebelumnya lulus headless.
+- Wave 5 hanya berupa status offline turunan; mekanik/schema berisiko tetap tertunda.
