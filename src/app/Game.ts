@@ -4,7 +4,7 @@ import { ensureEventState } from '../content/missions';
 import { OBJECT_DEFS, OBJECT_ORDER, UNLOCK_LEVEL } from '../content/objects';
 import { SPECIES_ORDER } from '../content/species';
 import { WEATHER_DEFS } from '../content/weather';
-import { habitatAdvice, speciesInsights, weatherInsight, describeHabitatFactor } from '../sim/insights';
+import { habitatAdvice, speciesInsights, weatherInsight, describeHabitatFactor, restorationMilestones } from '../sim/insights';
 import { missionView } from '../sim/campaign';
 import { CAMPAIGN, campaignMissionForLevel, MISSION_TYPE_LABELS } from '../sim/campaignRules';
 import { scoreHabitat } from '../sim/eco/habitat';
@@ -50,6 +50,10 @@ export class Game {
   private drawCalls = 0;
   private lastDraws = 0;
   private envHistory: Array<{ tick: number; fertility: number; water: number; biodiversity: number; health: number }> = [];
+  private ecoSnapshot: { tick: number; stage: number; level: number; fertility: number; water: number; biodiversity: number; health: number; objects: number; species: number } | null = null;
+  private readonly journalKey = 'tpf.journal.v1';
+  private journal: Array<{ tick: number; text: string }> = [];
+  private achievedMilestones = new Set<string>();
   private frameCount = 0;
   private perfTimer = 0;
   private perfOverlay: HTMLElement | null = null;
@@ -85,6 +89,7 @@ export class Game {
   }
 
   private async bootstrap(): Promise<void> {
+    this.loadJournal();
     const saved = await this.store.load();
     const params = new URLSearchParams(location.search);
     const requestedSeed = Number(params.get('seed'));
@@ -97,6 +102,7 @@ export class Game {
     this.hadSave = !!usableSave;
     this.state = usableSave ?? createPlanet(seed, planetNameFromSeed(seed), planetId);
     this.state.events = ensureEventState(this.state.events);
+    this.achievedMilestones = new Set(restorationMilestones(this.state).filter((m) => m.achieved).map((m) => m.id));
     if (params.has('qa')) {
       const qaObjects = Number(params.get('qaObjects') ?? 0);
       if (Number.isFinite(qaObjects) && qaObjects > 0) {
@@ -132,6 +138,7 @@ export class Game {
     this.buildHud();
     this.buildMenu();
     this.setupCampaignPanel(params.has('campaign'));
+    this.setupEcopediaPanel();
     this.buildInput();
     this.instrument();
     this.bindLifecycle();
@@ -288,6 +295,30 @@ export class Game {
     this.paused = this.menuWasPaused;
   }
 
+  private loadJournal(): void {
+    try {
+      const raw = localStorage.getItem(this.journalKey);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as unknown;
+      if (!Array.isArray(parsed)) return;
+      this.journal = parsed
+        .filter((entry): entry is { tick: number; text: string } =>
+          !!entry && typeof entry === 'object' && typeof (entry as any).tick === 'number' && typeof (entry as any).text === 'string')
+        .slice(-50);
+    } catch {
+      this.journal = [];
+    }
+  }
+
+  private logJournal(text: string): void {
+    const entry = { tick: this.state.tick, text };
+    const last = this.journal[this.journal.length - 1];
+    if (last && last.text === text) return;
+    this.journal.push(entry);
+    if (this.journal.length > 50) this.journal.shift();
+    try { localStorage.setItem(this.journalKey, JSON.stringify(this.journal)); } catch { /* ignore */ }
+  }
+
   private recordEnvHistory(): void {
     const s = this.state;
     const last = this.envHistory[this.envHistory.length - 1];
@@ -381,6 +412,39 @@ export class Game {
       `<div class="ecopedia-item"><div class="ecopedia-kv"><strong>${esc(a.label)}</strong><span class="ecopedia-pill ok">aksi cepat</span></div><div style="font-size:11px">${esc(a.why)}</div></div>`
     ).join('');
 
+    const milestones = restorationMilestones(planet);
+    const achieved = milestones.filter((m) => m.achieved).length;
+    const milestoneHtml = milestones.map((m) => `
+      <div class="ecopedia-item">
+        <div class="ecopedia-kv"><strong>${esc(m.label)}</strong><span class="ecopedia-pill ${m.achieved ? 'ok' : ''}">${m.achieved ? 'tercapai' : 'belum'}</span></div>
+        <div style="font-size:11px">${esc(m.detail)}</div>
+      </div>`).join('');
+
+    const snap = this.ecoSnapshot;
+    const snapHtml = snap ? (() => {
+      const row = (label: string, before: number, after: number, suffix = ''): string => {
+        const d = after - before;
+        const sign = d > 0 ? '+' : '';
+        const color = d > 0 ? 'var(--mint)' : d < 0 ? '#ffd479' : 'var(--muted)';
+        return `<div class="ecopedia-kv"><span>${esc(label)}</span><span>${before.toFixed(0)}${suffix} → ${after.toFixed(0)}${suffix} <span style="color:${color}">(${sign}${d.toFixed(0)})</span></span></div>`;
+      };
+      return `<div class="ecopedia-item">
+        <div style="font-size:11px;color:#72869a;margin-bottom:6px">Snapshot tick ${snap.tick} · stage ${snap.stage} · Lv ${snap.level}</div>
+        ${row('Kesuburan', snap.fertility, planet.environment.fertility)}
+        ${row('Air', snap.water, planet.environment.water)}
+        ${row('Biodiversitas', snap.biodiversity, planet.environment.biodiversity)}
+        ${row('Kesehatan', snap.health, planet.ecosystem.health)}
+        ${row('Objek', snap.objects, planet.objects.length)}
+        ${row('Spesies ditemukan', snap.species, planet.fauna?.discovered.length ?? 0)}
+      </div>`;
+    })() : '<div class="ecopedia-item"><div style="font-size:11px">Belum ada snapshot. Tekan “Simpan snapshot” untuk membandingkan kondisi sebelum/sesudah aksi restorasi.</div></div>';
+
+    const journalHtml = this.journal.length
+      ? this.journal.slice(-8).reverse().map((entry) =>
+          `<div class="ecopedia-item"><div class="ecopedia-kv"><span>${esc(entry.text)}</span><span style="color:var(--muted)">tick ${entry.tick}</span></div></div>`
+        ).join('')
+      : '<div class="ecopedia-item"><div style="font-size:11px">Belum ada catatan. Jurnal akan mencatat milestone, level, tahap, dan penemuan spesies.</div></div>';
+
     const content = document.getElementById('ecopedia-content');
     if (content) {
       content.innerHTML = `
@@ -400,6 +464,20 @@ export class Game {
         <section class="ecopedia-section">
           <h3>Aksi Restorasi Cepat</h3>
           <div class="ecopedia-list">${quickHtml}</div>
+        </section>
+        <section class="ecopedia-section">
+          <h3>Milestone Restorasi</h3>
+          <div style="font-size:11px;color:#72869a;margin-bottom:8px">${achieved}/${milestones.length} tercapai. Milestone bersifat lokal dan non-punitif.</div>
+          <div class="ecopedia-list">${milestoneHtml}</div>
+        </section>
+        <section class="ecopedia-section">
+          <h3>Before / After Snapshot</h3>
+          <div class="ecopedia-list">${snapHtml}</div>
+        </section>
+        <section class="ecopedia-section">
+          <h3>Jurnal Ekologi</h3>
+          <div style="font-size:11px;color:#72869a;margin-bottom:8px">Lokal di perangkat ini. Maks. 50 catatan, menampilkan 8 terbaru.</div>
+          <div class="ecopedia-list">${journalHtml}</div>
         </section>
         <section class="ecopedia-section">
           <h3>Cuaca &amp; Dampak</h3>
@@ -427,6 +505,30 @@ export class Game {
       if (event.target === this.campaignPanel) this.campaignPanel?.classList.add('hidden');
     });
     if (open) void this.openCampaignPanel();
+  }
+
+  private setupEcopediaPanel(): void {
+    document.getElementById('ecopedia-snapshot')?.addEventListener('click', () => {
+      const s = this.state;
+      this.ecoSnapshot = {
+        tick: s.tick,
+        stage: s.stage,
+        level: s.progression.level,
+        fertility: s.environment.fertility,
+        water: s.environment.water,
+        biodiversity: s.environment.biodiversity,
+        health: s.ecosystem.health,
+        objects: s.objects.length,
+        species: s.fauna?.discovered.length ?? 0,
+      };
+      this.hud.notify('Snapshot ekologi disimpan.');
+      this.openEcopedia();
+    });
+    document.getElementById('ecopedia-clear-snapshot')?.addEventListener('click', () => {
+      this.ecoSnapshot = null;
+      this.hud.notify('Snapshot ekologi dihapus.');
+      this.openEcopedia();
+    });
   }
 
   private async openCampaignPanel(): Promise<void> {
@@ -695,13 +797,16 @@ export class Game {
     else if (result.events.length) this.hud.notify(result.events[result.events.length - 1]);
     if (missionBefore === 'active' && this.state.mission.status === 'complete') {
       this.telemetry.record('mission_complete', this.telemetryContext());
+      this.logJournal(`Misi selesai: ${this.state.mission.id}`);
     }
     if (this.state.stage !== stageBefore) {
       this.telemetry.record('stage_reached', this.telemetryContext({ from: stageBefore, to: this.state.stage }));
       this.telemetry.record('objective_shown', this.telemetryContext());
+      this.logJournal(`Tahap naik ke ${this.state.stage}.`);
     }
     if (this.state.progression.level !== levelBefore) {
       this.telemetry.record('level_reached', this.telemetryContext({ from: levelBefore, to: this.state.progression.level }));
+      this.logJournal(`Naik ke level ${this.state.progression.level}.`);
     }
     const seasonAfter = this.currentSeasonId();
     if (seasonAfter !== seasonBefore) {
@@ -710,13 +815,23 @@ export class Game {
     for (const [id, progress] of Object.entries(this.state.events ?? {})) {
       if (progress.status === 'complete' && !completedBefore.has(id)) {
         this.telemetry.record('event_complete', { id, tick: this.state.tick });
+        this.logJournal(`Event selesai: ${id}.`);
       }
     }
     for (const id of this.state.fauna?.discovered ?? []) {
-      if (!discoveredBefore.has(id)) this.telemetry.record('species_discovered', { id, tick: this.state.tick });
+      if (!discoveredBefore.has(id)) {
+        this.telemetry.record('species_discovered', { id, tick: this.state.tick });
+        this.logJournal(`Spesies ditemukan: ${id}.`);
+      }
     }
     for (const id of this.state.fauna?.extinct ?? []) {
       if (!extinctBefore.has(id)) this.telemetry.record('species_extinct', { id, tick: this.state.tick });
+    }
+    for (const milestone of restorationMilestones(this.state)) {
+      if (milestone.achieved && !this.achievedMilestones.has(milestone.id)) {
+        this.achievedMilestones.add(milestone.id);
+        this.logJournal(`Milestone: ${milestone.label}.`);
+      }
     }
     this.queueSave();
   }

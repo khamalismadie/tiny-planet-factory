@@ -220,3 +220,27 @@ export function weatherLabel(type: WeatherTendency['type']): string {
 export function describeHabitatFactor(factor: string): string {
   return FACTOR_LABELS[factor] ?? factor;
 }
+
+export interface RestorationMilestone {
+  id: string;
+  label: string;
+  achieved: boolean;
+  detail: string;
+}
+
+export function restorationMilestones(planet: PlanetState): RestorationMilestone[] {
+  const env = planet.environment;
+  const eco = planet.ecosystem;
+  const discovered = planet.fauna?.discovered.length ?? 0;
+  const objects = planet.objects.length;
+  return [
+    { id: 'first-green', label: 'Hijau Pertama', achieved: eco.vegetation >= 10, detail: 'Vegetasi mencapai 10.' },
+    { id: 'water-balance', label: 'Air Seimbang', achieved: env.water >= 40, detail: 'Ketersediaan air mencapai 40.' },
+    { id: 'fertile-soil', label: 'Tanah Pulih', achieved: env.fertility >= 55, detail: 'Kesuburan mencapai 55.' },
+    { id: 'clean-air', label: 'Udara Bersih', achieved: env.oxygen >= 55, detail: 'Oksigen mencapai 55.' },
+    { id: 'biodiverse', label: 'Biodiversitas Tumbuh', achieved: env.biodiversity >= 45, detail: 'Biodiversitas mencapai 45.' },
+    { id: 'species-5', label: 'Penemu Spesies', achieved: discovered >= 5, detail: 'Menemukan 5 spesies.' },
+    { id: 'stable', label: 'Ekosistem Stabil', achieved: env.stability >= 70 && eco.health >= 60, detail: 'Stabilitas 70 dan kesehatan 60.' },
+    { id: 'builder', label: 'Arsitek Planet', achieved: objects >= 30, detail: 'Menempatkan 30 objek.' },
+  ];
+}
