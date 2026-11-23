@@ -4,11 +4,38 @@ Folder ini menyimpan laporan hasil `window.__game.qaReport()` dari perangkat nya
 
 Jangan mengubah isi file setelah disalin. Simpan satu file per sesi.
 
-## Build Wave 9 — belum ada evidence
+## Build Wave 9 — evidence pertama REVIEW
 
-Semua laporan di bawah berasal dari preview #41 `index-BiS1XGVG.js`. Build lokal terbaru `f0193de` memakai `index-BnlhvdGl.js` dan **belum** memiliki laporan fisik. Paket pengumpulan buktinya ada di `docs/QA-HANDOFF-WAVE9.md`. Simpan laporan baru di `qa-evidence/wave9/` agar tidak tercampur dengan arsip preview #41, lalu validasi dengan `--expect-bundle index-BnlhvdGl.js`.
+Laporan pertama untuk bundle `index-BnlhvdGl.js` sudah masuk di `qa-evidence/wave9/report-p95-run1.json` dan berstatus **REVIEW / TIDAK LULUS** (p95 `33,4 ms`, tier `low`, 1 downgrade). Paket pengumpulan buktinya ada di `docs/QA-HANDOFF-WAVE9.md`. Simpan laporan berikutnya di `qa-evidence/wave9/` agar tidak tercampur dengan arsip preview #41, lalu validasi dengan `--expect-bundle index-BnlhvdGl.js`.
 
-## Isi saat ini
+### `wave9/report-p95-run1.json`
+
+- Build: v0.21.0 Wave 9 — `index-BnlhvdGl.js`, `tpf-shell-v0-21-0`.
+- Sumber: perangkat nyata via bridge OpenCode, viewport `360x678`, DPR 3, portrait.
+- Host: `http://127.0.0.1:4173/` — loopback aman di perangkat, bukan URL produksi.
+- Durasi probe: `180014` ms dengan `7159` frame.
+- p50 **16,9 ms**, p95 **33,4 ms**, FPS **59,2**, boot **2578 ms**.
+- Draw call `17`, objek `94`, tier `low`, 1 adaptive downgrade, `contextLost: false`.
+- Save persisten: tick `89`, objek `94`, level `4`.
+- SW controller aktif; `standalone: false`.
+- Layout portrait: planet center visible, tanpa overlap.
+
+```bash
+npm run qa:evidence -- qa-evidence/wave9/report-p95-run1.json \
+  --expect-version 0.21.0 --expect-bundle index-BnlhvdGl.js
+```
+
+Hasil:
+
+```text
+EVIDENCE REVIEW: p95MasihDiAtas33ms
+```
+
+Laporan ini **tidak** menutup #7 maupun #5: p95 `33,4 ms` melebihi target `≤ 33 ms`, dan kualitas adaptif turun ke `low` dengan 1 downgrade meski probe memakai `?quality=medium`.
+
+## Isi saat ini — arsip preview #41
+
+Semua laporan di bawah berasal dari preview #41 `index-BiS1XGVG.js`.
 
 ### `report-p95-v021-run1.json`
 

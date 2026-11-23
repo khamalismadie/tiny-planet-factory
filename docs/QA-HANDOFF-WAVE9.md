@@ -138,9 +138,22 @@ Hook `loseContext()` / `restoreContext()` di `?debug=1` hanya alat bantu, **buka
 4. Tutup `#5` terakhir, setelah `#6/#7/#8` dan semua bukti umbrella lengkap.
 5. Deploy produksi v0.21.0 hanya setelah keempatnya closed.
 
+## Hasil run pertama
+
+`qa-evidence/wave9/report-p95-run1.json` sudah dikumpulkan dari perangkat nyata lewat bridge OpenCode pada `http://127.0.0.1:4173/` dan divalidasi dengan bundle yang benar.
+
+- p50 `16,9 ms`, p95 **33,4 ms**, FPS `59,2`.
+- Objek `94`, draw call `17`, `contextLost: false`, save persisten.
+- Tier turun ke `low` dengan 1 downgrade meski probe memakai `?quality=medium`.
+- Validator: **EVIDENCE REVIEW: p95MasihDiAtas33ms**.
+
+Ini **belum** menutup #7. Masih dibutuhkan minimal 3 run dengan `p95 ≤ 33 ms`, tier `medium`, dan 0 downgrade. Target tidak diturunkan.
+
+Helper sementara ada di `http://127.0.0.1:4173/qa-helper.html` selama preview lokal berjalan; tombol **Salin laporan QA** menyalin `qaReport()` langsung ke clipboard perangkat.
+
 ## Status saat ini
 
 - Semua fitur Wave 1–9 sudah di-push, tetapi **belum di-deploy**.
-- Tidak ada evidence fisik untuk `index-BnlhvdGl.js`.
+- Evidence pertama untuk `index-BnlhvdGl.js` sudah ada, tetapi **REVIEW / TIDAK LULUS**.
 - Issue `#5–#8` masih OPEN.
 - Produksi tetap v0.16.0.
