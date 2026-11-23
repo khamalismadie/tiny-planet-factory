@@ -2,6 +2,7 @@ import { habitatAdvice, speciesInsights, weatherInsight, describeHabitatFactor, 
 import { localAchievements } from './achievements';
 import { planetHealthIndex } from './healthIndex';
 import { forestManagementAdvisory, pollinatorGardenAdvisory } from './habitatAdvisory';
+import { wildlifeAdvisories } from './wildlifeAdvisory';
 import type { PlanetState } from '../sim/types';
 
 type EcoSnapshot = { tick: number; stage: number; level: number; fertility: number; water: number; biodiversity: number; health: number; objects: number; species: number } | null;
@@ -95,6 +96,17 @@ export function renderEcopediaHtml(planet: PlanetState, ecoSnapshot: EcoSnapshot
 
   const habitatAdvisories = [pollinatorGardenAdvisory(planet), forestManagementAdvisory(planet)];
   const habitatHtml = habitatAdvisories.map((entry) => `
+    <div class="ecopedia-item">
+      <div class="ecopedia-kv">
+        <strong>${esc(entry.label)}</strong>
+        <span class="ecopedia-pill ${entry.tone}">${esc(entry.status)}</span>
+      </div>
+      <div class="ecopedia-bar"><i style="width:${entry.score}%"></i></div>
+      <div style="font-size:11px;color:#72869a">${esc(entry.detail)}</div>
+      <div style="font-size:11px">${esc(entry.advice)}</div>
+    </div>`).join('');
+
+  const wildlifeHtml = wildlifeAdvisories(planet).map((entry) => `
     <div class="ecopedia-item">
       <div class="ecopedia-kv">
         <strong>${esc(entry.label)}</strong>
@@ -228,6 +240,11 @@ export function renderEcopediaHtml(planet: PlanetState, ecoSnapshot: EcoSnapshot
       <h3>Kebun Penyerbuk &amp; Hutan</h3>
       <div style="font-size:11px;color:#72869a;margin-bottom:8px">Advisory dari jumlah objek existing. Tidak ada mekanik pemangkasan, resource, atau objek baru.</div>
       <div class="ecopedia-list">${habitatHtml}</div>
+    </section>
+    <section class="ecopedia-section">
+      <h3>Perlindungan Satwa &amp; Konservasi</h3>
+      <div style="font-size:11px;color:#72869a;margin-bottom:8px">Advisory dari kapasitas, pangan, dan kualitas habitat. Tidak ada zona konservasi fisik atau misi baru.</div>
+      <div class="ecopedia-list">${wildlifeHtml}</div>
     </section>
     <section class="ecopedia-section">
       <h3>Aksi Restorasi Cepat</h3>
