@@ -446,6 +446,8 @@ Catatan: angka headless bukan pengganti angka device nyata.
 
 Rilis v0.21.0 **tidak boleh di-deploy ke produksi** sebelum issue #5–#8 benar-benar closed dengan laporan QA fisik dan screenshot/video asli. Ini mengikat lebih ketat daripada catatan umum di §11 bahwa P0 OPEN masih memperbolehkan RC: untuk v0.21.0, P0 OPEN adalah blocker deploy produksi.
 
+Catatan bundle: pemeriksaan `index-BiS1XGVG.js` di bawah berlaku untuk kandidat preview #41 yang dipakai evidence terarsip. `main` lokal pasca-commit `71a8809`–`37b2559` menghasilkan `index-Dh6P2L_r.js` (lihat `docs/LOCAL-FEATURE-WAVES.md`). Jika build lokal yang baru ingin dideploy, ulangi QA fisik #5–#8 dengan `--expect-bundle` sesuai hash build tersebut; jangan memakai evidence preview #41 sebagai pengganti.
+
 Sebelum trigger Netlify produksi:
 
 - [ ] #7 closed: minimal 3 run p95 v0.21.0 ≤ 33 ms dari `docs/QA-P95-REMEASURE.md`.
