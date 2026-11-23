@@ -2,7 +2,7 @@
 
 Gunakan checklist ini sebelum publish build produksi.
 
-> **Status pembacaan v0.15.9:** angka 360 tick pada phase v0.10–v0.14 adalah spesifikasi historis. Sejak v0.15.4, semua siklus musim aktif berada pada **106–120 tick** (divalidasi `test:sim`). Bagian bertanda v0.4–v0.14 adalah catatan rilis, bukan klaim kondisi saat ini; lihat §2u–§2ab untuk status terkini. `main` adalah v0.21.0 (unreleased, `c4e60d1`); produksi masih v0.16.0.
+> **Status pembacaan v0.15.9:** angka 360 tick pada phase v0.10–v0.14 adalah spesifikasi historis. Sejak v0.15.4, semua siklus musim aktif berada pada **106–120 tick** (divalidasi `test:sim`). Bagian bertanda v0.4–v0.14 adalah catatan rilis, bukan klaim kondisi saat ini; lihat §2u–§2ab untuk status terkini. `main` adalah v0.21.0 (unreleased; commit aktif selalu `git rev-parse HEAD`); produksi masih v0.16.0.
 >
 > **Status QA v0.21.0 (2026-11-23):** 4 laporan p95 fisik terarsip di `qa-evidence/`, semuanya **REVIEW** (p95 33,4–33,5 ms). #7 belum lulus; #5, #6, dan #8 juga tetap OPEN. Deploy produksi ditahan sampai evidence asli lulus. Rincian: `docs/QA-ISSUE-PLAYBOOK.md`.
 

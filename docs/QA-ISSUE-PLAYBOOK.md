@@ -25,7 +25,7 @@ Batch: `0 OK, 4 REVIEW, 4 file dari qa-evidence` — <https://github.com/khamali
 
 **Belum ada laporan yang lulus.** Run 3–4 sudah memenuhi `objects: 94` dan `contextLost: false`, tetapi p95 tetap `33,4 ms` dan adaptive quality masih turun ke `low`. `docs/QA-P95-REMEASURE.md` mengklasifikasikan 33,40 ms sebagai kuantisasi VSync 60 Hz; target `≤ 33 ms` **tidak** diturunkan dan #7 tetap OPEN.
 
-`main` @ `c4e60d1` (v0.21.0 unreleased); produksi tetap v0.16.0.
+`main` v0.21.0 unreleased; commit aktif selalu `git rev-parse HEAD`. Produksi tetap v0.16.0.
 
 ## Issue #5 — QA device nyata (umbrella)
 
