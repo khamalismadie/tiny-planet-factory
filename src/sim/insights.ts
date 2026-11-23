@@ -244,3 +244,84 @@ export function restorationMilestones(planet: PlanetState): RestorationMilestone
     { id: 'builder', label: 'Arsitek Planet', achieved: objects >= 30, detail: 'Menempatkan 30 objek.' },
   ];
 }
+
+export interface EnvironmentRisk {
+  id: string;
+  label: string;
+  severity: 'low' | 'medium' | 'high';
+  signal: string;
+  response: string;
+}
+
+export function environmentRisks(planet: PlanetState): EnvironmentRisk[] {
+  const env = planet.environment;
+  const eco = planet.ecosystem;
+  const weather = planet.weather.type;
+  const risks: EnvironmentRisk[] = [];
+
+  if (env.water < 25) {
+    risks.push({
+      id: 'drought',
+      label: 'Kekeringan',
+      severity: env.water < 15 ? 'high' : 'medium',
+      signal: `Air ${Math.round(env.water)}.`,
+      response: 'Tambah danau/laut, tanam vegetasi penahan kelembapan, dan hindari ekspansi yang menaikkan suhu.',
+    });
+  }
+  if (env.water > 80 && (weather === 'rain' || weather === 'storm')) {
+    risks.push({
+      id: 'flood',
+      label: 'Banjir / Kelebihan Air',
+      severity: env.water > 92 ? 'high' : 'medium',
+      signal: `Air ${Math.round(env.water)} dengan cuaca ${WEATHER_DEFS[weather].label.toLowerCase()}.`,
+      response: 'Jaga stabilitas medan, hindari menambah sumber air, dan prioritaskan vegetasi/struktur penyeimbang.',
+    });
+  }
+  if (env.temperature > 35) {
+    risks.push({
+      id: 'heat',
+      label: 'Panas Ekstrem',
+      severity: env.temperature > 42 ? 'high' : 'medium',
+      signal: `Suhu ${env.temperature.toFixed(1)}°C.`,
+      response: 'Tambah badan air, tingkatkan vegetasi, dan pantau stres spesies.',
+    });
+  }
+  if (env.temperature < 5) {
+    risks.push({
+      id: 'cold',
+      label: 'Dingin Ekstrem',
+      severity: env.temperature < 0 ? 'high' : 'medium',
+      signal: `Suhu ${env.temperature.toFixed(1)}°C.`,
+      response: 'Fokus pada stabilitas dan vegetasi tahan iklim; hindari perubahan besar saat salju.',
+    });
+  }
+  if (env.fertility < 30) {
+    risks.push({
+      id: 'soil',
+      label: 'Degradasi Tanah',
+      severity: env.fertility < 18 ? 'high' : 'medium',
+      signal: `Kesuburan ${Math.round(env.fertility)}.`,
+      response: 'Tanam rumput/semak/pohon/bunga untuk memulihkan nutrisi dan tutupan tanah.',
+    });
+  }
+  if (env.stability < 35 || weather === 'storm') {
+    risks.push({
+      id: 'storm',
+      label: 'Ketidakstabilan Badai',
+      severity: env.stability < 20 || weather === 'storm' ? 'high' : 'medium',
+      signal: weather === 'storm' ? `Badai aktif, stabilitas ${Math.round(env.stability)}.` : `Stabilitas ${Math.round(env.stability)}.`,
+      response: 'Perkuat stabilitas dengan vegetasi/struktur, hindari aksi ekstrem, dan manfaatkan recovery beat setelah badai.',
+    });
+  }
+  if (eco.health < 40) {
+    risks.push({
+      id: 'ecosystem',
+      label: 'Kesehatan Ekosistem Rendah',
+      severity: eco.health < 25 ? 'high' : 'medium',
+      signal: `Kesehatan ${Math.round(eco.health)}.`,
+      response: 'Prioritaskan oksigen, vegetasi, dan stabilitas sebelum ekspansi.',
+    });
+  }
+
+  return risks.slice(0, 4);
+}
