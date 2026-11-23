@@ -4,6 +4,10 @@ Folder ini menyimpan laporan hasil `window.__game.qaReport()` dari perangkat nya
 
 Jangan mengubah isi file setelah disalin. Simpan satu file per sesi.
 
+## Build Wave 9 — belum ada evidence
+
+Semua laporan di bawah berasal dari preview #41 `index-BiS1XGVG.js`. Build lokal terbaru `f0193de` memakai `index-BnlhvdGl.js` dan **belum** memiliki laporan fisik. Paket pengumpulan buktinya ada di `docs/QA-HANDOFF-WAVE9.md`. Simpan laporan baru di `qa-evidence/wave9/` agar tidak tercampur dengan arsip preview #41, lalu validasi dengan `--expect-bundle index-BnlhvdGl.js`.
+
 ## Isi saat ini
 
 ### `report-p95-v021-run1.json`

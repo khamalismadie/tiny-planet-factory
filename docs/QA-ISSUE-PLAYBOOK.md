@@ -10,7 +10,7 @@ Dokumen ini memetakan bukti yang harus dilampirkan ke tiap issue. Ia **bukan** h
 - Paket p95 / #7: `docs/QA-P95-REMEASURE.md`.
 - Prosedur lengkap: `docs/QA-DEVICE.md`.
 
-Catatan build: angka `index-BiS1XGVG.js` di atas merujuk kandidat preview #41. `main` lokal sudah memiliki commit `71a8809`–`f0193de` dengan bundle `index-BnlhvdGl.js` dan fitur etis tambahan; evidence lama **tidak** membuktikan build itu. Lihat `docs/LOCAL-FEATURE-WAVES.md`. Jangan mencampur kedua build dalam satu laporan.
+Catatan build: angka `index-BiS1XGVG.js` di atas merujuk kandidat preview #41. `main` lokal sudah memiliki commit `71a8809`–`f0193de` dengan bundle `index-BnlhvdGl.js` dan fitur etis tambahan; evidence lama **tidak** membuktikan build itu. Lihat `docs/LOCAL-FEATURE-WAVES.md`. Untuk pengumpulan bukti #5–#8 pada bundle `index-BnlhvdGl.js`, gunakan paket `docs/QA-HANDOFF-WAVE9.md`. Jangan mencampur kedua build dalam satu laporan.
 
 Semua langkah di bawah wajib di perangkat Android nyata. Headless hanya smoke.
 

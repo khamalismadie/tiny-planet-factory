@@ -111,7 +111,7 @@ npm run qa:evidence -- laporan.json \
   --expect-bundle index-BnlhvdGl.js
 ```
 
-Untuk `qa:evidence:batch`, pakai flag yang sama. Jangan menurunkan target atau mengabaikan `--expect-bundle` agar laporan dari build lain tidak diterima.
+Untuk `qa:evidence:batch`, pakai flag yang sama. Jangan menurunkan target atau mengabaikan `--expect-bundle` agar laporan dari build lain tidak diterima. URL probe, matriks penutupan #5–#8, dan perintah validator lengkap ada di `docs/QA-HANDOFF-WAVE9.md`.
 
 ## Belum dilakukan
 

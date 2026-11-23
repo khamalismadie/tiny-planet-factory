@@ -2,6 +2,8 @@
 
 Target: **Android menengah** (30 FPS, p95 frame time ≤ 33 ms), desktop 60 FPS.
 
+> Untuk build Wave 9 (`f0193de`, `index-BnlhvdGl.js`), lihat paket serah terima `docs/QA-HANDOFF-WAVE9.md`. Dokumen itu memuat URL probe, kriteria penutupan, dan perintah validator yang mengunci bundle tersebut.
+
 ## Instrumentasi
 
 Tambahkan query string saat membuka build produksi:
