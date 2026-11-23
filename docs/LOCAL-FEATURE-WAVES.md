@@ -115,7 +115,7 @@ Untuk `qa:evidence:batch`, pakai flag yang sama. Jangan menurunkan target atau m
 
 ## Belum dilakukan
 
-- Wave 1–8 dan commit docs `9266378` sudah di-push ke `origin/main`; commit Wave 9 `f0193de` belum di-push.
+- Wave 1–9 dan commit docs `e810b3a` sudah di-push ke `origin/main`; tidak ada commit fitur yang tertinggal.
 - Belum ada deploy produksi.
 - Belum ada bukti fisik #5–#8 untuk build ini.
 - Fitur DB P2/P3 dan mekanik resource/sosial/real-world tetap tertunda.
