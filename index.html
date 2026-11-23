@@ -267,8 +267,12 @@
         .menu-action.quiet { min-height: 40px; }
         .menu-action.quiet .menu-action-note { display: none; }
         .menu-corner, .menu-orbit { display: none; }
+        #object-info { display: none !important; }
         .guide-map > div { grid-template-columns: 1fr; gap: 2px; }
         .objective-mission { margin-left: 0; width: 100%; text-align: left; }
+      }
+      @media (max-height: 500px) {
+        #object-info { display: none !important; }
       }
     </style>
   </head>
@@ -302,6 +306,7 @@
       <div id="mission"></div>
     </aside>
     <footer id="inventory" class="panel">
+      <div id="object-info" style="font-size:10px;color:var(--muted);padding:0 4px 2px;min-height:0;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
       <div id="object-list"></div>
     </footer>
     <div id="hint">Geser: putar · Scroll/pinch: zoom · Ketuk permukaan: letakkan objek · Tahan lama: info</div>

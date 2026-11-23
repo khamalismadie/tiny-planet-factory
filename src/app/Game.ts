@@ -49,6 +49,7 @@ export class Game {
   private saveHandle = 0;
   private drawCalls = 0;
   private lastDraws = 0;
+  private envHistory: Array<{ tick: number; fertility: number; water: number; biodiversity: number; health: number }> = [];
   private frameCount = 0;
   private perfTimer = 0;
   private perfOverlay: HTMLElement | null = null;
@@ -287,6 +288,20 @@ export class Game {
     this.paused = this.menuWasPaused;
   }
 
+  private recordEnvHistory(): void {
+    const s = this.state;
+    const last = this.envHistory[this.envHistory.length - 1];
+    if (last && s.tick - last.tick < 5) return;
+    this.envHistory.push({
+      tick: s.tick,
+      fertility: s.environment.fertility,
+      water: s.environment.water,
+      biodiversity: s.environment.biodiversity,
+      health: s.ecosystem.health,
+    });
+    if (this.envHistory.length > 24) this.envHistory.shift();
+  }
+
   private openEcopedia(): void {
     const esc = (value: string): string =>
       value.replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch] ?? ch));
@@ -323,6 +338,49 @@ export class Game {
       `<div class="ecopedia-kv"><span>${esc(entry.label)}</span><span>${entry.percent.toFixed(0)}%</span></div>`
     ).join('');
 
+    const history = this.envHistory;
+    const prev = history.length > 1 ? history[0] : null;
+    const curr = history.length ? history[history.length - 1] : null;
+    const delta = (key: 'fertility' | 'water' | 'biodiversity' | 'health'): number =>
+      prev && curr ? curr[key] - prev[key] : 0;
+    const trendRow = (label: string, value: number, d: number, hint: string): string => {
+      const sign = d > 0.05 ? '+' : d < -0.05 ? '' : '±';
+      const color = d > 0.05 ? 'var(--mint)' : d < -0.05 ? '#ffd479' : 'var(--muted)';
+      const dText = Math.abs(d) <= 0.05 ? 'stabil' : `${sign}${d.toFixed(1)}`;
+      return `<div class="ecopedia-item">
+        <div class="ecopedia-kv"><strong>${esc(label)}</strong><span style="color:${color}">${Math.round(value)} · ${dText}</span></div>
+        <div style="font-size:11px">${esc(hint)}</div>
+      </div>`;
+    };
+    const recoveryHtml = [
+      trendRow('Kesuburan tanah', planet.environment.fertility, delta('fertility'),
+        planet.environment.fertility < 45 ? 'Pulihkan dengan rumput, semak, pohon, atau bunga untuk menambah nutrisi.' : 'Kesuburan cukup baik; jaga vegetasi agar tidak turun.'),
+      trendRow('Ketersediaan air', planet.environment.water, delta('water'),
+        planet.environment.water < 35 ? 'Konservasi air: tambah danau/laut dan jaga vegetasi penahan kelembapan.' : 'Air cukup; pantau saat cuaca panas/badai.'),
+      trendRow('Biodiversitas', planet.environment.biodiversity, delta('biodiversity'),
+        planet.environment.biodiversity < 35 ? 'Tingkatkan dengan variasi tanaman dan habitat satwa.' : 'Biodiversitas berkembang; hindari menekan satu parameter saja.'),
+      trendRow('Kesehatan ekosistem', planet.ecosystem.health, delta('health'),
+        planet.ecosystem.health < 55 ? 'Fokus pada stabilitas, oksigen, dan vegetasi untuk menaikkan kesehatan.' : 'Kesehatan baik; pertahankan keseimbangan.'),
+    ].join('');
+
+    const quickActions: Array<{ label: string; why: string }> = [];
+    const env = planet.environment;
+    const unlocked = new Set(planet.progression.unlockedObjects);
+    const can = (type: ObjectType): boolean => unlocked.has(type);
+    if (env.water < 35 && can('lake')) quickActions.push({ label: 'Danau', why: 'Menaikkan air dan kelembapan dengan cepat.' });
+    if (env.water < 35 && can('ocean')) quickActions.push({ label: 'Laut', why: 'Cadangan air besar untuk area kering.' });
+    if (env.fertility < 45 && can('grass')) quickActions.push({ label: 'Rumput', why: 'Memulihkan kesuburan dan dasar vegetasi.' });
+    if (env.fertility < 45 && can('tree')) quickActions.push({ label: 'Pohon', why: 'Meningkatkan oksigen, kesuburan, dan stabilitas jangka panjang.' });
+    if (env.biodiversity < 35 && can('flower')) quickActions.push({ label: 'Bunga', why: 'Menaikkan biodiversitas dan mendukung penyerbuk.' });
+    if (env.oxygen < 30 && can('tree')) quickActions.push({ label: 'Pohon', why: 'Sumber oksigen paling kuat.' });
+    if (env.stability < 45 && can('hill')) quickActions.push({ label: 'Bukit', why: 'Membantu menstabilkan bentuk medan.' });
+    if (env.temperature > 35 && can('lake')) quickActions.push({ label: 'Danau', why: 'Membantu mendinginkan area panas.' });
+    if (!quickActions.length) quickActions.push({ label: 'Pertahankan', why: 'Parameter utama cukup stabil. Lanjutkan misi aktif dan pantau cuaca.' });
+    const seen = new Set<string>();
+    const quickHtml = quickActions.filter((a) => (seen.has(a.label) ? false : (seen.add(a.label), true))).slice(0, 4).map((a) =>
+      `<div class="ecopedia-item"><div class="ecopedia-kv"><strong>${esc(a.label)}</strong><span class="ecopedia-pill ok">aksi cepat</span></div><div style="font-size:11px">${esc(a.why)}</div></div>`
+    ).join('');
+
     const content = document.getElementById('ecopedia-content');
     if (content) {
       content.innerHTML = `
@@ -333,6 +391,15 @@ export class Game {
         <section class="ecopedia-section">
           <h3>Faktor Pembatas &amp; Saran Habitat</h3>
           <div class="ecopedia-list">${adviceHtml}</div>
+        </section>
+        <section class="ecopedia-section">
+          <h3>Status Pemulihan</h3>
+          <div style="font-size:11px;color:#72869a;margin-bottom:8px">Delta dibanding sampel awal riwayat sesi ini (maks. ~2 menit).</div>
+          <div class="ecopedia-list">${recoveryHtml}</div>
+        </section>
+        <section class="ecopedia-section">
+          <h3>Aksi Restorasi Cepat</h3>
+          <div class="ecopedia-list">${quickHtml}</div>
         </section>
         <section class="ecopedia-section">
           <h3>Cuaca &amp; Dampak</h3>
@@ -603,6 +670,7 @@ export class Game {
     this.scene.syncObjects(this.state.objects, this.state.environment);
     this.scene.flashPlacement(dir);
     this.syncHud();
+    this.hud.notify(this.hud.describeObject(type));
     this.telemetry.record('placement', { type, total: this.state.objects.length, tick: this.state.tick });
     this.queueSave();
   }
@@ -620,6 +688,7 @@ export class Game {
     const levelBefore = this.state.progression.level;
     const seasonBefore = this.currentSeasonId();
     const result = simulateTick(this.state);
+    this.recordEnvHistory();
     this.refreshScene();
     this.syncHud();
     if (this.state.warning) this.hud.notify(this.state.warning, true);

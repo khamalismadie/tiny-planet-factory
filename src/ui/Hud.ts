@@ -65,6 +65,7 @@ export class Hud {
   private readonly eventsRoot = document.getElementById('events')!;
   private readonly mission = document.getElementById('mission')!;
   private readonly objectiveStrip = document.getElementById('objective-strip')!;
+  private readonly objectInfo = document.getElementById('object-info');
   private readonly nameLabel = document.getElementById('planet-name')!;
   private readonly stageLabel = document.getElementById('stage-label')!;
   private readonly levelLabel = document.getElementById('level-label')!;
@@ -295,15 +296,19 @@ export class Hud {
       const type = button.dataset.type as ObjectType;
       const locked = !planet.progression.unlockedObjects.includes(type);
       button.disabled = locked;
-      button.title = locked ? `Terbuka di level ${UNLOCK_LEVEL[type]}` : OBJECT_DEFS[type].label;
+      button.title = locked ? `Terbuka di level ${UNLOCK_LEVEL[type]}` : this.describeObject(type);
       button.classList.toggle('active', !locked && selected === type);
     }
     for (const button of this.objectList.querySelectorAll<HTMLButtonElement>('[data-object]')) {
       const type = button.dataset.object as ObjectType;
       const locked = !planet.progression.unlockedObjects.includes(type);
       button.disabled = locked;
-      button.title = locked ? `Terbuka di level ${UNLOCK_LEVEL[type]}` : OBJECT_DEFS[type].label;
+      button.title = locked ? `Terbuka di level ${UNLOCK_LEVEL[type]}` : this.describeObject(type);
       button.classList.toggle('active', !locked && selected === type);
+    }
+    if (this.objectInfo) {
+      this.objectInfo.textContent = selected ? this.describeObject(selected) : '';
+      this.objectInfo.style.display = selected ? 'block' : 'none';
     }
     this.applyTutorial();
   }
@@ -327,6 +332,28 @@ export class Hud {
       target.classList.add('tutorial-focus');
       this.tutorialFocus = target;
     }
+  }
+
+  describeObject(type: ObjectType): string {
+    const def = OBJECT_DEFS[type];
+    const parts = Object.entries(def.effects)
+      .filter(([, value]) => typeof value === 'number' && Math.abs(value) > 0.0001)
+      .map(([key, value]) => {
+        const label = ENV_LABELS[key as EnvKey] ?? key;
+        const sign = (value as number) > 0 ? '+' : '';
+        return `${label} ${sign}${(value as number).toFixed(2)}`;
+      });
+    const eco = def.ecoEffects
+      ? Object.entries(def.ecoEffects)
+          .filter(([, value]) => typeof value === 'number' && Math.abs(value) > 0.0001)
+          .map(([key, value]) => {
+            const label = key === 'vegetation' ? 'Vegetasi' : key === 'wildlife' ? 'Satwa' : key === 'population' ? 'Populasi' : key;
+            const sign = (value as number) > 0 ? '+' : '';
+            return `${label} ${sign}${(value as number).toFixed(2)}`;
+          })
+      : [];
+    const effectText = [...parts, ...eco].join(' · ');
+    return effectText ? `${def.label}: ${effectText}` : def.label;
   }
 
   private renderEcoDetail(planet: PlanetState): void {
