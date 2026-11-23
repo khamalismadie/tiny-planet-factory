@@ -136,6 +136,12 @@ npm run qa:evidence -- qa-evidence/wave9/report-landscape.json \
 
 Hasil: `EVIDENCE REVIEW: planetTidakTertutup, p95MasihDiAtas33ms`. #8 tetap OPEN.
 
+### `wave9/report-offline-attempt1.json`
+
+- `device.standalone: true`, SW controller aktif, save persisten, objek `14`.
+- `network.online: true` — koneksi masih dilaporkan aktif, sehingga belum memenuhi #6 offline.
+- Disimpan sebagai bukti mentah; bukan `report-offline.json` yang lulus.
+
 ## Isi saat ini — arsip preview #41
 
 Semua laporan di bawah berasal dari preview #41 `index-BiS1XGVG.js`.
