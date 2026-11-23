@@ -4,9 +4,9 @@ Folder ini menyimpan laporan hasil `window.__game.qaReport()` dari perangkat nya
 
 Jangan mengubah isi file setelah disalin. Simpan satu file per sesi.
 
-## Build Wave 9 — 5 laporan REVIEW
+## Build Wave 9 — 6 laporan REVIEW
 
-Lima laporan untuk bundle `index-BnlhvdGl.js` sudah masuk di `qa-evidence/wave9/` dan semuanya berstatus **REVIEW / TIDAK LULUS**. Run 5 adalah satu-satunya yang valid secara Android sampai saat ini. Paket pengumpulan buktinya ada di `docs/QA-HANDOFF-WAVE9.md`. Simpan laporan berikutnya di folder yang sama agar tidak tercampur dengan arsip preview #41, lalu validasi dengan `--expect-bundle index-BnlhvdGl.js`.
+Enam laporan untuk bundle `index-BnlhvdGl.js` sudah masuk di `qa-evidence/wave9/` dan semuanya berstatus **REVIEW / TIDAK LULUS**. Run 5–6 valid secara Android; sisanya tidak valid atau gagal pada konfigurasi. Paket pengumpulan buktinya ada di `docs/QA-HANDOFF-WAVE9.md`. Simpan laporan berikutnya di folder yang sama agar tidak tercampur dengan arsip preview #41, lalu validasi dengan `--expect-bundle index-BnlhvdGl.js`.
 
 ### `wave9/report-p95-run1.json`
 
@@ -100,6 +100,14 @@ npm run qa:evidence -- qa-evidence/wave9/report-p95-run5.json \
 Hasil: `EVIDENCE REVIEW: p95MasihDiAtas33ms`.
 
 Run 5 memenuhi semua syarat konfigurasi tetapi tetap gagal pada p95 `33,4 ms` (dan draw call `20` berada di batas atas). #7 tetap OPEN.
+
+### `wave9/report-p95-run6.json`
+
+- Sama seperti run 5, tetapi origin port `4177`; UA Android, viewport `360x678`, tanpa overlap.
+- `180011` ms, `7152` frame, p50 `33,2 ms`, p95 **33,4 ms**, FPS `30,1`, boot `1450 ms`.
+- Objek `94`, draw call `20`, tier `medium / 0 downgrade`, `contextLost: false`, SW controller aktif.
+
+Hasil: `EVIDENCE REVIEW: p95MasihDiAtas33ms`. #7 tetap OPEN.
 
 ## Isi saat ini — arsip preview #41
 

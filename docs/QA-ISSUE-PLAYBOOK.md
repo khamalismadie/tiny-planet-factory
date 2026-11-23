@@ -27,6 +27,7 @@ Semua langkah di bawah wajib di perangkat Android nyata. Headless hanya smoke.
 | 7 | `wave9/report-p95-run3.json` | 66,7 ms | `false` | 94 | low / 1 downgrade | REVIEW — UA desktop, overlap |
 | 8 | `wave9/report-p95-run4.json` | 66,7 ms | `false` | 94 | low / 1 downgrade | REVIEW — UA desktop, overlap |
 | 9 | `wave9/report-p95-run5.json` | 33,4 ms | `false` | 94 | medium / 0 downgrade | REVIEW — valid, p95 saja |
+| 10 | `wave9/report-p95-run6.json` | 33,4 ms | `false` | 94 | medium / 0 downgrade | REVIEW — valid, p95 saja |
 
 Batch arsip lama: `0 OK, 4 REVIEW, 4 file dari qa-evidence`. Run 5–9 berasal dari bundle Wave 9 `index-BnlhvdGl.js` dan divalidasi terpisah di `qa-evidence/wave9/`:
 
@@ -41,10 +42,12 @@ npm run qa:evidence -- qa-evidence/wave9/report-p95-run4.json \
   --expect-version 0.21.0 --expect-bundle index-BnlhvdGl.js
 npm run qa:evidence -- qa-evidence/wave9/report-p95-run5.json \
   --expect-version 0.21.0 --expect-bundle index-BnlhvdGl.js
+npm run qa:evidence -- qa-evidence/wave9/report-p95-run6.json \
+  --expect-version 0.21.0 --expect-bundle index-BnlhvdGl.js
 # EVIDENCE REVIEW: p95MasihDiAtas33ms
 ```
 
-**Belum ada laporan yang lulus.** Run 5 memenuhi `objects: 94` tetapi turun ke `low`; run 6 mempertahankan `medium / 0 downgrade` tetapi `objects: 188`; run 7 memiliki `objects: 94` tetapi memakai UA desktop `X11; Linux x86_64`, viewport `980x1845`, p95 `66,7 ms`, dan overlap layout. Run 7–8 tidak dihitung sebagai pengukuran Android yang valid karena Chrome masih dalam mode Desktop site. **Run 9 adalah run valid pertama**: UA Android, viewport `360x678`, objek `94`, `medium / 0 downgrade`, tanpa overlap — tetapi p95 tetap `33,4 ms` dan draw call `20` di batas atas. `docs/QA-P95-REMEASURE.md` mengklasifikasikan 33,40 ms sebagai kuantisasi VSync 60 Hz; target `≤ 33 ms` **tidak** diturunkan dan #7 tetap OPEN.
+**Belum ada laporan yang lulus.** Run 5 memenuhi `objects: 94` tetapi turun ke `low`; run 6 mempertahankan `medium / 0 downgrade` tetapi `objects: 188`; run 7 memiliki `objects: 94` tetapi memakai UA desktop `X11; Linux x86_64`, viewport `980x1845`, p95 `66,7 ms`, dan overlap layout. Run 7–8 tidak dihitung sebagai pengukuran Android yang valid karena Chrome masih dalam mode Desktop site. **Run 9–10 valid**: UA Android, viewport `360x678`, objek `94`, `medium / 0 downgrade`, tanpa overlap — tetapi p95 tetap `33,4 ms` dan draw call `20` di batas atas. `docs/QA-P95-REMEASURE.md` mengklasifikasikan 33,40 ms sebagai kuantisasi VSync 60 Hz; target `≤ 33 ms` **tidak** diturunkan dan #7 tetap OPEN.
 
 `main` v0.21.0 unreleased; commit aktif selalu `git rev-parse HEAD`. Produksi tetap v0.16.0.
 
@@ -56,7 +59,7 @@ npm run qa:evidence -- qa-evidence/wave9/report-p95-run5.json \
 
 | Bukti | File / lampiran | Catatan |
 |---|---|---|
-| Frame budget 30 FPS | `report-p95-v021-run1..4.json` + `wave9/report-p95-run1..5.json` | p95 tetap ≤ 33 ms; saat ini 9/9 REVIEW |
+| Frame budget 30 FPS | `report-p95-v021-run1..4.json` + `wave9/report-p95-run1..6.json` | p95 tetap ≤ 33 ms; saat ini 10/10 REVIEW |
 | Cold start 4G dari ikon PWA | video + angka waktu | Bukan `bootMs` QaProbe; itu hanya sejak hook mulai |
 | Pinch zoom | video atau sebelum/sesudah `camera().distance` | Dua jari, tanpa rotasi liar |
 | Drag 360° | video | Kamera tidak terbalik di kutub |
