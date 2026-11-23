@@ -168,6 +168,8 @@ Kriteria #8: `orientation.type` landscape, `device.viewport` `844x390`, `layout.
 
 Status build `index-BnlhvdGl.js`: `qa-evidence/wave9/report-landscape.json` berhasil merekam `landscape-primary`, tetapi viewport `734x280`, `centerElement: "DIV"`, dan `planetCenterVisible: false`. Validator: `EVIDENCE REVIEW: planetTidakTertutup, p95MasihDiAtas33ms`. #8 **belum lulus** dan memerlukan perbaikan/ulang ukuran landscape yang sesuai.
 
+UPDATE 2026-11-23: Perangkat mengulang mengirimkan laporan landscape occluded — planet tersumbat UI (`DIV`) pada layar landscape pendek. #8 tetap open; belum ada fix bundle, sehingga semua evidence bundle #9 tetap valid.
+
 ## Urutan penutupan yang aman
 
 1. #7 — p95 v0.21.0 terukur ≤ 33 ms.
