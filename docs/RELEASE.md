@@ -6,7 +6,7 @@ Gunakan checklist ini sebelum publish build produksi.
 >
 > **Status QA v0.21.0 (2026-11-23):** 4 laporan p95 fisik terarsip di `qa-evidence/`, semuanya **REVIEW** (p95 33,4–33,5 ms). #7 belum lulus; #5, #6, dan #8 juga tetap OPEN. Deploy produksi ditahan sampai evidence asli lulus. Rincian: `docs/QA-ISSUE-PLAYBOOK.md`.
 
-> **Status fitur lokal pasca-preview #41:** commit `71a8809`–`3c10434` menambahkan wave insight/restorasi/advisory/offline/lencana etis di `main` tanpa schema, gate, planet, biome, atau misi baru. Build lokal pada `3c10434` memakai `index-CB17xFLc.js`, app chunk 92,97 kB / gzip 30,34 kB, dan `npm test` 8/8 PASS. Ini **bukan** build yang diuji di `qa-evidence/` dan **tidak** menutup #5–#8. Rincian: `docs/LOCAL-FEATURE-WAVES.md`.
+> **Status fitur lokal pasca-preview #41:** commit `71a8809`–`a54bbcb` menambahkan wave insight/restorasi/advisory/offline/lencana/indeks kesehatan etis di `main` tanpa schema, gate, planet, biome, atau misi baru. Build lokal pada `a54bbcb` memakai `index-BMuY_77Q.js`, app chunk 92,97 kB / gzip 30,34 kB, dan `npm test` 8/8 PASS. Ini **bukan** build yang diuji di `qa-evidence/` dan **tidak** menutup #5–#8. Rincian: `docs/LOCAL-FEATURE-WAVES.md`.
 
 ## 1. Prasyarat
 

@@ -6,12 +6,12 @@ Dokumen ini mencatat fitur-fitur kecil yang dikembangkan **lokal di `main` setel
 
 | Item | Nilai |
 |---|---|
-| Commit fitur terakhir | `3c10434` |
+| Commit fitur terakhir | `a54bbcb` |
 | `package.json` | `0.21.0` |
 | Cache SW | `tpf-shell-v0-21-0` |
-| Bundle lokal pada commit ini | `index-CB17xFLc.js` |
+| Bundle lokal pada commit ini | `index-BMuY_77Q.js` |
 | App chunk | 92,97 kB / gzip 30,34 kB |
-| Chunk lazy `ecopediaView` | 12,62 kB / gzip 4,01 kB |
+| Chunk lazy `ecopediaView` | 15,11 kB / gzip 4,73 kB |
 | `npm test` | 8/8 PASS |
 
 Hash bundle di atas **hanya berlaku untuk commit ini**. Setiap build berikutnya harus dibaca ulang dari `dist/index.html` dan dipakai secara konsisten pada validator evidence.
@@ -65,6 +65,14 @@ Hash bundle di atas **hanya berlaku untuk commit ini**. Setiap build berikutnya 
 - Tidak ada penyimpanan baru; status badge dihitung ulang dari state setiap kompendium dibuka.
 - Modul `src/ui/achievements.ts` masuk chunk lazy `ecopediaView`, sehingga app chunk tetap 92,97 kB.
 
+### Wave 7 — fitur DB `#70 Planet Health Index` — `a54bbcb`
+
+- Skor ringkas `0–100` dari tujuh indikator existing: kesehatan ekosistem 25%, air/oksigen/kesuburan/biodiversitas masing-masing 15%, stabilitas 10%, vegetasi 5%.
+- Label kategori: Kritis, Pemulihan, Stabil, Sejahtera; disertai saran singkat dan rata-rata perubahan dari `startingEnvironment`.
+- Bobot bersifat lokal dan transparan di UI; tidak mengubah simulasi, misi, reward, atau gate.
+- Modul `src/ui/healthIndex.ts` masuk chunk lazy `ecopediaView`.
+- Sumber katalog kini tersimpan di `docs/PLANET-CARE-FEATURE-DATABASE.md`.
+
 ## Batasan yang dipertahankan
 
 - Tidak ada planet, biome, objek, unlock, misi campaign, field DNA, atau `schemaVersion` baru.
@@ -77,19 +85,19 @@ Hash bundle di atas **hanya berlaku untuk commit ini**. Setiap build berikutnya 
 
 Laporan yang sudah terarsip di `qa-evidence/` dibuat terhadap bundle preview #41 `index-BiS1XGVG.js`. Laporan itu **tidak membuktikan** build lokal pasca-wave ini.
 
-Jika QA fisik dijalankan pada build `3c10434`, gunakan:
+Jika QA fisik dijalankan pada build `a54bbcb`, gunakan:
 
 ```bash
 npm run qa:evidence -- laporan.json \
   --expect-version 0.21.0 \
-  --expect-bundle index-CB17xFLc.js
+  --expect-bundle index-BMuY_77Q.js
 ```
 
 Untuk `qa:evidence:batch`, pakai flag yang sama. Jangan menurunkan target atau mengabaikan `--expect-bundle` agar laporan dari build lain tidak diterima.
 
 ## Belum dilakukan
 
-- Wave 1–5 dan commit docs `ff4fd66` sudah di-push ke `origin/main`; commit Wave 6 `3c10434` belum di-push.
+- Wave 1–6 dan commit docs `3b32961` sudah di-push ke `origin/main`; commit Wave 7 `a54bbcb` belum di-push.
 - Belum ada deploy produksi.
 - Belum ada bukti fisik #5–#8 untuk build ini.
-- Wave 5 hanya berupa status offline turunan; mekanik/schema berisiko tetap tertunda.
+- Fitur DB P2/P3 dan mekanik resource/sosial/real-world tetap tertunda.
