@@ -337,7 +337,11 @@ export class Game {
     const content = document.getElementById('ecopedia-content');
     if (content) {
       const { renderEcopediaHtml } = await import('../ui/ecopediaView');
-      content.innerHTML = renderEcopediaHtml(this.state, this.ecoSnapshot, this.envHistory, this.journal);
+      content.innerHTML = renderEcopediaHtml(this.state, this.ecoSnapshot, this.envHistory, this.journal, {
+        online: navigator.onLine,
+        swController: !!navigator.serviceWorker?.controller,
+        persistentSave: this.store.persistent,
+      });
     }
     this.menu?.openEcopedia();
   }

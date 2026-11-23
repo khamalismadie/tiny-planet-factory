@@ -4,12 +4,13 @@ import type { PlanetState } from '../sim/types';
 type EcoSnapshot = { tick: number; stage: number; level: number; fertility: number; water: number; biodiversity: number; health: number; objects: number; species: number } | null;
 type EnvHistory = Array<{ tick: number; fertility: number; water: number; biodiversity: number; health: number }>;
 type Journal = Array<{ tick: number; text: string }>;
+type LocalRuntime = { online: boolean; swController: boolean; persistentSave: boolean };
 
 function esc(value: string): string {
   return value.replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch] ?? ch));
 }
 
-export function renderEcopediaHtml(planet: PlanetState, ecoSnapshot: EcoSnapshot, envHistory: EnvHistory, journal: Journal): string {
+export function renderEcopediaHtml(planet: PlanetState, ecoSnapshot: EcoSnapshot, envHistory: EnvHistory, journal: Journal, runtime: LocalRuntime): string {
   const advice = habitatAdvice(planet);
   const species = speciesInsights(planet);
   const weather = weatherInsight(planet);
@@ -126,6 +127,35 @@ export function renderEcopediaHtml(planet: PlanetState, ecoSnapshot: EcoSnapshot
       ).join('')
     : '<div class="ecopedia-item"><div style="font-size:11px">Belum ada catatan. Jurnal akan mencatat milestone, level, tahap, dan penemuan spesies.</div></div>';
 
+  const offlineHtml = `
+    <div class="ecopedia-item">
+      <div class="ecopedia-kv">
+        <strong>Koneksi</strong>
+        <span class="ecopedia-pill ${runtime.online ? 'ok' : 'warn'}">${runtime.online ? 'daring' : 'luring'}</span>
+      </div>
+      <div style="font-size:11px">${runtime.online
+        ? 'Browser terhubung. App shell dan chunk tetap tersimpan untuk pemakaian luring.'
+        : 'Sedang luring. Buka planet yang sudah tersimpan; tidak ada permintaan data baru yang diperlukan untuk bermain.'}</div>
+    </div>
+    <div class="ecopedia-item">
+      <div class="ecopedia-kv">
+        <strong>Service worker</strong>
+        <span class="ecopedia-pill ${runtime.swController ? 'ok' : 'warn'}">${runtime.swController ? 'aktif' : 'belum aktif'}</span>
+      </div>
+      <div style="font-size:11px">${runtime.swController
+        ? 'App shell dikendalikan service worker dan bisa melayani reload offline.'
+        : 'Service worker belum mengendalikan halaman ini; instalasi/PWA perlu diverifikasi terpisah.'}</div>
+    </div>
+    <div class="ecopedia-item">
+      <div class="ecopedia-kv">
+        <strong>Penyimpanan save</strong>
+        <span class="ecopedia-pill ${runtime.persistentSave ? 'ok' : 'warn'}">${runtime.persistentSave ? 'lokal' : 'memori'}</span>
+      </div>
+      <div style="font-size:11px">${runtime.persistentSave
+        ? 'Save ditulis ke IndexedDB pada perangkat ini.'
+        : 'IndexedDB tidak tersedia; save hanya bertahan di memori sesi ini.'}</div>
+    </div>`;
+
   return `
     <section class="ecopedia-section">
       <h3>Kompendium Spesies</h3>
@@ -161,6 +191,11 @@ export function renderEcopediaHtml(planet: PlanetState, ecoSnapshot: EcoSnapshot
       <h3>Jurnal Ekologi</h3>
       <div style="font-size:11px;color:#72869a;margin-bottom:8px">Lokal di perangkat ini. Maks. 50 catatan, menampilkan 8 terbaru.</div>
       <div class="ecopedia-list">${journalHtml}</div>
+    </section>
+    <section class="ecopedia-section">
+      <h3>Kesiapan Offline</h3>
+      <div style="font-size:11px;color:#72869a;margin-bottom:8px">Snapshot kondisi browser saat kompendium dibuka. Bukan bukti QA perangkat nyata.</div>
+      <div class="ecopedia-list">${offlineHtml}</div>
     </section>
     <section class="ecopedia-section">
       <h3>Cuaca &amp; Dampak</h3>
