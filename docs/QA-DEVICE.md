@@ -168,5 +168,5 @@ Remote produksi v0.15.9 (`https://tinyplanetfactory.netlify.app/`, commit `ea8f9
 - Build lokal `main`: app chunk 75,00 kB (gzip 24,55 kB), cache SW `tpf-shell-v0-17-0`, tanpa circular chunk warning.
 - `npm test` lokal 8/8 PASS. `test:sim` menambah cek 100 misi unik, kurva kuadratik, batas era, migrasi level lama, reward misi pertama, progres ocean, dan penolakan misi locked.
 - `test:smoke` memakai hook `window.__game.campaign()` untuk memverifikasi 100 misi/10 era dan progres misi aktif; `test:menu` memeriksa label `Level x/100` dan panel campaign tertutup saat normal play.
-- `?debug=1&campaign=1&menu=0` menampilkan 10 era dan 100 baris misi tanpa error konsol; 40 baris bertanda locked.
+- `?debug=1&campaign=1&menu=0` menampilkan 10 era dan 100 baris misi tanpa error konsol; 40 baris bertanda locked (riwayat v0.17.0; sejak v0.18.0 tidak ada baris locked).
 - **Belum di-deploy dan belum diuji di perangkat nyata.** Semua angka di atas berasal dari Chromium headless/local build; P0 Sprint 09 tetap OPEN.
