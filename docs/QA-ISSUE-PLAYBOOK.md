@@ -1,4 +1,4 @@
-# Playbook penutupan QA #5, #6, #8
+# Playbook penutupan QA #5–#8
 
 Dokumen ini memetakan bukti yang harus dilampirkan ke tiap issue. Ia **bukan** hasil QA dan tidak menutup issue apa pun.
 
@@ -12,6 +12,21 @@ Dokumen ini memetakan bukti yang harus dilampirkan ke tiap issue. Ia **bukan** h
 
 Semua langkah di bawah wajib di perangkat Android nyata. Headless hanya smoke.
 
+## Status evidence v0.21.0 (2026-11-23)
+
+| Run | File | p95 | `contextLost` | Objek | Quality | Hasil |
+|---|---|---:|---|---:|---|---|
+| 1 | `report-p95-v021-run1.json` | 33,5 ms | `true` | 399 | medium / 0 downgrade | REVIEW |
+| 2 | `report-p95-v021-run2.json` | 33,4 ms | `false` | 493 | low / 1 downgrade | REVIEW |
+| 3 | `report-p95-v021-run3.json` | 33,4 ms | `false` | 94 | low / 1 downgrade | REVIEW |
+| 4 | `report-p95-v021-run4.json` | 33,4 ms | `false` | 94 | low / 1 downgrade | REVIEW |
+
+Batch: `0 OK, 4 REVIEW, 4 file dari qa-evidence` — <https://github.com/khamalismadie/tiny-planet-factory/tree/main/qa-evidence>.
+
+**Belum ada laporan yang lulus.** Run 3–4 sudah memenuhi `objects: 94` dan `contextLost: false`, tetapi p95 tetap `33,4 ms` dan adaptive quality masih turun ke `low`. `docs/QA-P95-REMEASURE.md` mengklasifikasikan 33,40 ms sebagai kuantisasi VSync 60 Hz; target `≤ 33 ms` **tidak** diturunkan dan #7 tetap OPEN.
+
+`main` @ `c4e60d1` (v0.21.0 unreleased); produksi tetap v0.16.0.
+
 ## Issue #5 — QA device nyata (umbrella)
 
 #5 adalah payung. Jangan tutup sebelum #6, #7, dan #8 ditutup serta bukti berikut lengkap.
@@ -20,7 +35,7 @@ Semua langkah di bawah wajib di perangkat Android nyata. Headless hanya smoke.
 
 | Bukti | File / lampiran | Catatan |
 |---|---|---|
-| Frame budget 30 FPS | `report-p95-v021-run1..3.json` dari paket #7 | p95 tetap ≤ 33 ms |
+| Frame budget 30 FPS | `report-p95-v021-run1..4.json` dari paket #7 | p95 tetap ≤ 33 ms; saat ini 4/4 REVIEW |
 | Cold start 4G dari ikon PWA | video + angka waktu | Bukan `bootMs` QaProbe; itu hanya sejak hook mulai |
 | Pinch zoom | video atau sebelum/sesudah `camera().distance` | Dua jari, tanpa rotasi liar |
 | Drag 360° | video | Kamera tidak terbalik di kutub |
