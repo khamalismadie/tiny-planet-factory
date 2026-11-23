@@ -119,7 +119,7 @@ Batch Wave 9: `0 OK, 7 REVIEW, 7 file`. Tiga run valid semua p95 `33,4 ms`; #7 t
 
 ### `wave9/report-landscape-attempt1.json`
 
-Laporan landscape pertama masih `portrait-primary` dan viewport `360x678`, sehingga **tidak memenuhi #8**. Disimpan sebagai bukti mentah, bukan hasil lulus.
+Laporan landscape pertama dan kedua masih `portrait-primary` dan viewport `360x678`, sehingga **tidak memenuhi #8**. Kemungkinan auto-rotate perangkat masih mati. Disimpan sebagai bukti mentah, bukan hasil lulus.
 
 ## Isi saat ini — arsip preview #41
 
