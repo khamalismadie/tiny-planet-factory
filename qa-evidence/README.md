@@ -16,6 +16,7 @@ Jangan mengubah isi file setelah disalin. Simpan satu file per sesi.
 - Save persisten: tick `87`, objek `399`, level `4`.
 - SW controller aktif; `standalone: false`.
 - **`scene.contextLost: true`**.
+- Rincian `contextEventLost` / `glContextLost` tidak tersimpan di format `qaReport()` saat run ini dibuat, sehingga penyebabnya tidak bisa dipastikan dari file ini saja.
 
 Status: **REVIEW / TIDAK LULUS**.
 
