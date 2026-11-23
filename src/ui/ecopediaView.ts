@@ -1,4 +1,5 @@
 import { habitatAdvice, speciesInsights, weatherInsight, describeHabitatFactor, restorationMilestones, environmentRisks } from '../sim/insights';
+import { localAchievements } from './achievements';
 import type { PlanetState } from '../sim/types';
 
 type EcoSnapshot = { tick: number; stage: number; level: number; fertility: number; water: number; biodiversity: number; health: number; objects: number; species: number } | null;
@@ -127,6 +128,18 @@ export function renderEcopediaHtml(planet: PlanetState, ecoSnapshot: EcoSnapshot
       ).join('')
     : '<div class="ecopedia-item"><div style="font-size:11px">Belum ada catatan. Jurnal akan mencatat milestone, level, tahap, dan penemuan spesies.</div></div>';
 
+  const achievements = localAchievements(planet);
+  const achievementsWon = achievements.filter((entry) => entry.achieved).length;
+  const achievementsHtml = achievements.map((entry) => {
+    const value = Math.min(entry.value, entry.target);
+    const pct = Math.max(0, Math.min(100, (value / entry.target) * 100));
+    return `<div class="ecopedia-item">
+      <div class="ecopedia-kv"><strong>${esc(entry.label)}</strong><span class="ecopedia-pill ${entry.achieved ? 'ok' : ''}">${entry.achieved ? 'diraih' : 'belum'}</span></div>
+      <div class="ecopedia-bar"><i style="width:${pct.toFixed(0)}%"></i></div>
+      <div class="ecopedia-kv"><span style="font-size:11px;color:#72869a">${esc(entry.detail)}</span><span style="font-size:11px">${Math.round(value)}/${entry.target}</span></div>
+    </div>`;
+  }).join('');
+
   const offlineHtml = `
     <div class="ecopedia-item">
       <div class="ecopedia-kv">
@@ -191,6 +204,11 @@ export function renderEcopediaHtml(planet: PlanetState, ecoSnapshot: EcoSnapshot
       <h3>Jurnal Ekologi</h3>
       <div style="font-size:11px;color:#72869a;margin-bottom:8px">Lokal di perangkat ini. Maks. 50 catatan, menampilkan 8 terbaru.</div>
       <div class="ecopedia-list">${journalHtml}</div>
+    </section>
+    <section class="ecopedia-section">
+      <h3>Lencana Ekologi</h3>
+      <div style="font-size:11px;color:#72869a;margin-bottom:8px">${achievementsWon}/${achievements.length} diraih. Lencana hanya indikator lokal; tidak memberi reward, poin, atau hukuman.</div>
+      <div class="ecopedia-list">${achievementsHtml}</div>
     </section>
     <section class="ecopedia-section">
       <h3>Kesiapan Offline</h3>
