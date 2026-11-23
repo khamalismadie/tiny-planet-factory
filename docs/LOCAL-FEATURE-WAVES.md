@@ -6,12 +6,12 @@ Dokumen ini mencatat fitur-fitur kecil yang dikembangkan **lokal di `main` setel
 
 | Item | Nilai |
 |---|---|
-| Commit fitur terakhir | `6fca19c` |
+| Commit fitur terakhir | `3c10434` |
 | `package.json` | `0.21.0` |
 | Cache SW | `tpf-shell-v0-21-0` |
-| Bundle lokal pada commit ini | `index-HHM3Xrif.js` |
+| Bundle lokal pada commit ini | `index-CB17xFLc.js` |
 | App chunk | 92,97 kB / gzip 30,34 kB |
-| Chunk lazy `ecopediaView` | 10,58 kB / gzip 3,35 kB |
+| Chunk lazy `ecopediaView` | 12,62 kB / gzip 4,01 kB |
 | `npm test` | 8/8 PASS |
 
 Hash bundle di atas **hanya berlaku untuk commit ini**. Setiap build berikutnya harus dibaca ulang dari `dist/index.html` dan dipakai secara konsisten pada validator evidence.
@@ -58,6 +58,13 @@ Hash bundle di atas **hanya berlaku untuk commit ini**. Setiap build berikutnya 
 - Panel berada di chunk lazy `ecopediaView`, tidak menambah app chunk di atas 100 kB.
 - Ini adalah Wave 5 aman turunan state; mekanik bencana, monetisasi, achievements daring, dan perubahan schema tetap tidak masuk.
 
+### Wave 6 — `3c10434`
+
+- Panel **Lencana Ekologi** menampilkan 11 badge lokal yang seluruhnya dihitung dari state existing: objek, vegetasi, air, oksigen, spesies, biodiversitas, stabilitas, tahap, misi, dan event.
+- Badge bersifat non-punitif: tidak ada reward, currency, poin, streak, leaderboard, atau throttle.
+- Tidak ada penyimpanan baru; status badge dihitung ulang dari state setiap kompendium dibuka.
+- Modul `src/ui/achievements.ts` masuk chunk lazy `ecopediaView`, sehingga app chunk tetap 92,97 kB.
+
 ## Batasan yang dipertahankan
 
 - Tidak ada planet, biome, objek, unlock, misi campaign, field DNA, atau `schemaVersion` baru.
@@ -70,19 +77,19 @@ Hash bundle di atas **hanya berlaku untuk commit ini**. Setiap build berikutnya 
 
 Laporan yang sudah terarsip di `qa-evidence/` dibuat terhadap bundle preview #41 `index-BiS1XGVG.js`. Laporan itu **tidak membuktikan** build lokal pasca-wave ini.
 
-Jika QA fisik dijalankan pada build `6fca19c`, gunakan:
+Jika QA fisik dijalankan pada build `3c10434`, gunakan:
 
 ```bash
 npm run qa:evidence -- laporan.json \
   --expect-version 0.21.0 \
-  --expect-bundle index-HHM3Xrif.js
+  --expect-bundle index-CB17xFLc.js
 ```
 
 Untuk `qa:evidence:batch`, pakai flag yang sama. Jangan menurunkan target atau mengabaikan `--expect-bundle` agar laporan dari build lain tidak diterima.
 
 ## Belum dilakukan
 
-- Wave 1–4 dan commit docs `abbfb0d` sudah di-push ke `origin/main`; commit Wave 5 `6fca19c` belum di-push.
+- Wave 1–5 dan commit docs `ff4fd66` sudah di-push ke `origin/main`; commit Wave 6 `3c10434` belum di-push.
 - Belum ada deploy produksi.
 - Belum ada bukti fisik #5–#8 untuk build ini.
 - Wave 5 hanya berupa status offline turunan; mekanik/schema berisiko tetap tertunda.
