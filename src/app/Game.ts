@@ -72,6 +72,8 @@ export class Game {
   private readonly walkKeys = new Set<string>();
   private walkAzimuth = 0;
   private walkAutoDir = [0, 0, 0];
+  private walkLook = { x: 0, y: 0 };
+  private walkPointerHandler: ((event: Event) => void) | null = null;
 
   private constructor(app: Application, bootStart: number) {
     this.app = app;
@@ -466,6 +468,15 @@ export class Game {
     if (this.walkEnabled) {
       window.addEventListener('keydown', this.walkKeydown);
       window.addEventListener('keyup', this.walkKeyup);
+      const canvas = document.querySelector('#app canvas');
+      this.walkPointerHandler = (event) => {
+        const mouse = event as MouseEvent;
+        const rect = canvas?.getBoundingClientRect();
+        if (!rect) return;
+        this.walkLook.x = (mouse.clientX - rect.left) - rect.width / 2;
+        this.walkLook.y = (mouse.clientY - rect.top) - rect.height / 2;
+      };
+      canvas?.addEventListener('pointermove', this.walkPointerHandler as unknown as EventListener);
       orbit.enablePan = false;
       orbit.enableDamping = false;
       orbit.minDistance = 1.2;
@@ -475,10 +486,14 @@ export class Game {
       const camera = this.scene.view.camera;
       camera.position.set(0, 2.5, 0);
       camera.lookAt(orbit.target);
-      this.hud.notify('Modus FPS: gerak otomatis di dalam planet, Arrow/WASD, Space/Shift, ArrowLeft/Right → putar, tekan lagi untuk berhenti.', true);
+      this.hud.notify('Modus FPS: gerak otomatis di dalam planet, Arrow/WASD, Space/Shift, ArrowLeft/Right → putar, gerakan mouse → arah kamera, tekan lagi untuk berhenti.', true);
     } else {
       window.removeEventListener('keydown', this.walkKeydown);
       window.removeEventListener('keyup', this.walkKeyup);
+      const canvas = document.querySelector('#app canvas');
+      if (this.walkPointerHandler) canvas?.removeEventListener('pointermove', this.walkPointerHandler);
+      this.walkPointerHandler = null;
+      this.walkLook = { x: 0, y: 0 };
       this.walkKeys.clear();
       orbit.minDistance = 2.2;
       orbit.maxDistance = 9;
@@ -512,6 +527,12 @@ export class Game {
       dx += this.walkAutoDir[0];
       dz += this.walkAutoDir[2];
       dy += this.walkAutoDir[1];
+    }
+    if (this.walkPointerHandler) {
+      const lookX = Math.min(1, Math.max(-1, this.walkLook.x / Math.max(window.innerWidth / 2, 1)));
+      const lookY = Math.min(1, Math.max(-1, this.walkLook.y / Math.max(window.innerHeight / 2, 1)));
+      dx += lookX * 0.42;
+      dz += lookY * 0.42;
     }
     for (const key of this.walkKeys) {
       if (key === 'KeyW') { dx += Math.sin(this.walkAzimuth); dz -= Math.cos(this.walkAzimuth); }
