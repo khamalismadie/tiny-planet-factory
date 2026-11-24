@@ -70,6 +70,7 @@ export class Game {
   private sessionEnded = false;
   private walkEnabled = false;
   private readonly walkKeys = new Set<string>();
+  private walkAzimuth = 0;
 
   private constructor(app: Application, bootStart: number) {
     this.app = app;
@@ -460,14 +461,23 @@ export class Game {
     this.walkEnabled = !this.walkEnabled;
     const button = document.getElementById('walk-mode-btn');
     button?.classList.toggle('active', this.walkEnabled);
+    const orbit = this.scene.orbit;
     if (this.walkEnabled) {
       window.addEventListener('keydown', this.walkKeydown);
       window.addEventListener('keyup', this.walkKeyup);
-      this.hud.notify('Jalan aktif: Arrow/WASD → gerak, tekan lagi untuk berhenti.', true);
+      orbit.enablePan = false;
+      orbit.enableDamping = false;
+      orbit.minDistance = 1.2;
+      orbit.maxDistance = 5;
+      this.walkAzimuth = 0;
+      this.hud.notify('Jalan: Arrow/WASD → gerak di dalam planet, ArrowLeft/Right → putar, Space/Shift → naik/turun, tekan lagi untuk berhenti.', true);
     } else {
       window.removeEventListener('keydown', this.walkKeydown);
       window.removeEventListener('keyup', this.walkKeyup);
       this.walkKeys.clear();
+      orbit.minDistance = 2.2;
+      orbit.maxDistance = 9;
+      this.walkAzimuth = 0;
       this.hud.notify('Jalan dimatikan.', true);
     }
   }
@@ -488,29 +498,38 @@ export class Game {
   private walkUpdate(deltaSeconds: number): void {
     if (!this.walkEnabled) return;
     const camera = this.scene.view.camera;
-    const azimuth = this.scene.orbit.azimuthAngle;
-    const speed = 0.25 * deltaSeconds;
+    const orbit = this.scene.orbit;
+    const speed = 0.35 * deltaSeconds;
     let dx = 0;
     let dz = 0;
     let dy = 0;
     for (const key of this.walkKeys) {
-      if (key === 'KeyW') { dx += Math.cos(azimuth); dz += Math.sin(azimuth); }
-      if (key === 'KeyS') { dx -= Math.cos(azimuth); dz -= Math.sin(azimuth); }
-      if (key === 'KeyA') { dx += Math.sin(azimuth); dz -= Math.cos(azimuth); }
-      if (key === 'KeyD') { dx -= Math.sin(azimuth); dz += Math.cos(azimuth); }
+      if (key === 'KeyW') { dx += Math.sin(this.walkAzimuth); dz -= Math.cos(this.walkAzimuth); }
+      if (key === 'KeyS') { dx -= Math.sin(this.walkAzimuth); dz += Math.cos(this.walkAzimuth); }
+      if (key === 'KeyA') { dx += Math.cos(this.walkAzimuth); dz += Math.sin(this.walkAzimuth); }
+      if (key === 'KeyD') { dx -= Math.cos(this.walkAzimuth); dz -= Math.sin(this.walkAzimuth); }
       if (key === 'Space') dy += 1;
       if (key === 'ShiftLeft') dy -= 1;
+      if (key === 'ArrowLeft') this.walkAzimuth -= 0.12 * deltaSeconds;
+      if (key === 'ArrowRight') this.walkAzimuth += 0.12 * deltaSeconds;
     }
     camera.position.x += dx * speed;
     camera.position.y += dy * speed;
     camera.position.z += dz * speed;
     const distance = Math.hypot(camera.position.x, camera.position.y, camera.position.z);
-    if (distance > 11) {
-      const scale = 11 / distance;
+    if (distance > 3.2) {
+      const scale = 3.2 / distance;
       camera.position.x *= scale;
       camera.position.y *= scale;
       camera.position.z *= scale;
     }
+    if (distance < 0.8) {
+      const scale = 0.8 / Math.max(distance, 0.01);
+      camera.position.x *= scale;
+      camera.position.y *= scale;
+      camera.position.z *= scale;
+    }
+    camera.lookAt(orbit.target);
   }
 
   private instrument(): void {
