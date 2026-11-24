@@ -14,7 +14,7 @@ Gunakan checklist ini sebelum publish build produksi.
 
 > **Fitur eksplorasi 2026-11-24:** commit `2a08277` menambahkan **Camera Walk Mode** sebagai first-person di dalam planet: ArrowLeft/Right untuk putar, WASD/Space/Shift pada `Game.camera()`, `camera.lookAt` target, pembatas radius, bundle `index-CeFNRByI.js`; `npm test` 8/8 PASS. Commit `fcdaa60` menambahkan gravitasi ke target planet pada walk mode, bundle `index-DFcba--F.js`. Commit `2f127c8` menambahkan tweak speed/gravity 0.25/0.2, bundle `index-DWCl-IE1.js`. Commit `734fc1e` menambahkan **Modus FPS otomatis** pada topbar `Jalan → Modus FPS`, gerak otomatis di dalam planet saat tidak pakai kunci, bundle `index-CPvqR30c.js`. Commit `28c7b47` menambahkan mouse look pada canvas FPS, bundle `index-DrtHYPEg.js`. Commit `fce6827` menambahkan lowpoly gunung 5 varian dengan bentuk berbeda, lebar 4x dan tinggi 2x dari yang sekarang, bundle `index-BcXM5EfF.js`; `npm test` 8/8 PASS.
 
-> **Fitur galeri 2026-11-24:** commit `7f5dee2` menambahkan **Ekosistem Gallery 3D**: tombol topbar `Galeri`, modal gallery dengan daftar species + props, bundle `index-DrvTx7Lv.js`; `npm test` 8/8 PASS.
+> **Fitur galeri 2026-11-24:** commit `7f5dee2` menambahkan **Ekosistem Gallery 3D**: tombol topbar `Galeri`, modal gallery dengan daftar species + props, bundle `index-DrvTx7Lv.js`; `npm test` 8/8 PASS. Commit `6455999` menambahkan **pratinjau low-poly 3D di dalam modal Galeri**: geometri faset asli diproyeksikan ke SVG (tanpa context WebGL kedua / draw call tambahan), item species/prop dapat dipilih, pratinjau default `Kijang`. Bundle `index-DEXFluUZ.js`, app chunk 99,96 kB / gzip 32,31 kB; modul pratinjau dimuat terpisah `GalleryPreview-BJLrBAUJ.js` (2,25 kB / gzip 1,29 kB) saat Galeri dibuka. `npm test` 8/8 PASS. Bukti fisik #5–#8 harus diukur ulang untuk bundle ini.
 
 ## 1. Prasyarat
 
@@ -31,7 +31,7 @@ npm run build
 PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 ```
 
-- [ ] `npm run build` tanpa error. Chunk vendor: `pixi-core` + `pixi-3d`, app chunk < 100 kB (v0.21.0: 80,49 kB / gzip 26,42 kB; produksi v0.16.0: 73,33 kB).
+- [ ] `npm run build` tanpa error. Chunk vendor: `pixi-core` + `pixi-3d`, app chunk < 100 kB (v0.21.0 saat ini: 99,96 kB / gzip 32,31 kB, plus chunk pratinjau galeri yang dimuat sesuai kebutuhan 2,25 kB; produksi v0.16.0: 73,33 kB).
 - [ ] `PASS: sim`
 - [ ] `PASS: art scale`
 - [ ] `PASS: terrain render`
