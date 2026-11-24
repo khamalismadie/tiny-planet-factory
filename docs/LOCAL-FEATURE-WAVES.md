@@ -1,6 +1,6 @@
 # Wave fitur etis lokal pasca-preview #41
 
-Dokumen ini mencatat fitur-fitur kecil yang dikembangkan **lokal di `main` setelah kandidat QA preview #41**. Fitur-fitur ini **belum di-deploy ke produksi** dan **belum memiliki bukti QA perangkat nyata**. Produksi tetap v0.16.0; issue #5–#8 tetap OPEN.
+Dokumen ini mencatat fitur-fitur kecil yang dikembangkan **lokal di `main` setelah kandidat QA preview #41**. Fitur-fitur ini **belum di-deploy ke produksi** dan **belum memiliki bukti QA perangkat nyata lengkap**. Produksi tetap v0.16.0; issue #5–#8 tetap OPEN. Status: **fitur freeze (Wave 9); fokus pada QA fisik.**
 
 ## Status
 

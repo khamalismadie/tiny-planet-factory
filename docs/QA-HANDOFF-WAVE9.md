@@ -8,13 +8,14 @@ Dokumen ini adalah paket serah terima untuk pengumpulan bukti **di perangkat And
 |---|---|
 | Versi aplikasi | `0.21.0` |
 | Commit fitur | `f0193de` |
-| Commit docs/status | `fd0fc3d` |
+| Commit fix #8 | `index.html` — sembunyikan `#hint` pada landscape |
 | Bundle | `index-BnlhvdGl.js` |
 | Cache SW | `tpf-shell-v0-21-0` |
+| Preview HTTPS | `https://6b045262361522f239ccf165--tinyplanetfactory.netlify.app/` (context `deploy-preview`) |
 | Produksi saat ini | v0.16.0 — jangan dipakai sebagai build uji |
 | Evidence lama | preview #41 `index-BiS1XGVG.js` — **tidak berlaku** untuk build ini |
 
-Build harus di-hosting lewat HTTPS. Bisa memakai Netlify Drop untuk `dist/`, lalu buka URL hasil deploy dari perangkat.
+Build harus di-hosting lewat HTTPS. Preferable: preview Netlify draft di atas; bisa memakai Netlify Drop untuk `dist/`, lalu buka URL hasil deploy dari perangkat.
 
 ## Verifikasi build sebelum mengukur
 
@@ -71,7 +72,7 @@ Tambahkan `qa-evidence/wave9/report-update.json` bila laporan update tersedia. J
 | Issue | File bukti | Flag validator | Syarat utama |
 |---|---|---|---|
 | #7 | `report-p95-run1/2/3.json` | `--expect-version 0.21.0 --expect-bundle index-BnlhvdGl.js` | Minimal 3 run; `p95 ≤ 33 ms`; `objects 94`; `quality.tier medium`; `downgrades 0`; `contextLost false` |
-| #8 | `report-landscape.json` | flag #7 + `--landscape` | `844×390`; `layout.planetCenterVisible === true`; tanpa overlap panel; screenshot disertakan |
+| #8 | `qa-evidence/wave9/report-landscape.json` (dipakai setelah fix landscape) | `--landscape` | `layout.planetCenterVisible === true`; tanpa overlap panel; screenshot asli landscape disertakan; laporan lama dengan `BUTTON` masih tidak lulus |
 | #6 offline | `report-offline.json` | flag #7 + `--offline --standalone` | `device.standalone === true`; `sw.controller === true`; `network.online === false`; save terbaca; bisa menanam objek |
 | #6 update | `report-update.json` + screenshot | flag #7 + `--standalone` | Prompt update muncul; save IndexedDB utuh setelah update |
 | #5 | laporan #5/#7 + video/screenshot | flag #7 | Cold start 4G `< 5 s`; pinch/drag berfungsi; context loss/restore nyata; `metrics().contextEventLost === false`; `metrics().glContextLost === false`; konsol bersih |

@@ -2,7 +2,7 @@
 
 Dokumen ini memetakan bukti yang harus dilampirkan ke tiap issue. Ia **bukan** hasil QA dan tidak menutup issue apa pun.
 
-- Build kandidat: v0.21.0 — preview <https://deploy-preview-41--tinyplanetfactory.netlify.app/> (`index-BiS1XGVG.js`, `tpf-shell-v0-21-0`).
+- Build kandidat: v0.21.0 — preview <https://6b045262361522f239ccf165--tinyplanetfactory.netlify.app/> (`index-BnlhvdGl.js`, `tpf-shell-v0-21-0`).
 - Produksi tetap v0.16.0. Jangan mencampur bukti produksi dengan bukti v0.21.0.
 - Template laporan: `docs/QA-EVIDENCE-TEMPLATE.json`.
 - Checklist umum: `docs/QA-EVIDENCE-TEMPLATE.md`.
@@ -10,7 +10,7 @@ Dokumen ini memetakan bukti yang harus dilampirkan ke tiap issue. Ia **bukan** h
 - Paket p95 / #7: `docs/QA-P95-REMEASURE.md`.
 - Prosedur lengkap: `docs/QA-DEVICE.md`.
 
-Catatan build: angka `index-BiS1XGVG.js` di atas merujuk kandidat preview #41. `main` lokal sudah memiliki commit `71a8809`–`f0193de` dengan bundle `index-BnlhvdGl.js` dan fitur etis tambahan; evidence lama **tidak** membuktikan build itu. Lihat `docs/LOCAL-FEATURE-WAVES.md`. Untuk pengumpulan bukti #5–#8 pada bundle `index-BnlhvdGl.js`, gunakan paket `docs/QA-HANDOFF-WAVE9.md`. Jangan mencampur kedua build dalam satu laporan.
+Catatan build: bundle lokal pada commit ini `index-BnlhvdGl.js`. Fix #8 pada `index.html`: `#hint` disembunyikan pada landscape. Laporan lama `index-BiS1XGVG.js` **tidak berlaku**. Jangan mencampur laporan dari bundle preview #41.
 
 Semua langkah di bawah wajib di perangkat Android nyata. Headless hanya smoke.
 
@@ -50,9 +50,9 @@ npm run qa:evidence -- qa-evidence/wave9/report-p95-run7.json \
 # EVIDENCE REVIEW: p95MasihDiAtas33ms
 ```
 
-**Belum ada laporan yang lulus.** Run 5 memenuhi `objects: 94` tetapi turun ke `low`; run 6 mempertahankan `medium / 0 downgrade` tetapi `objects: 188`; run 7 memiliki `objects: 94` tetapi memakai UA desktop `X11; Linux x86_64`, viewport `980x1845`, p95 `66,7 ms`, dan overlap layout. Run 7–8 tidak dihitung sebagai pengukuran Android yang valid karena Chrome masih dalam mode Desktop site. **Run 9–11 valid**: UA Android, viewport `360x678`, objek `94`, `medium / 0 downgrade`, tanpa overlap — tetapi ketiganya p95 `33,4 ms` dan draw call `20` di batas atas. Tiga run valid sudah terkumpul, namun #7 tetap OPEN karena target tidak tercapai. `docs/QA-P95-REMEASURE.md` mengklasifikasikan 33,40 ms sebagai kuantisasi VSync 60 Hz; target `≤ 33 ms` **tidak** diturunkan dan #7 tetap OPEN.
+**Status:** p95 valid pertama terkumpul (run 5–7): UA Android, viewport `360x678`, objek `94`, `medium / 0 downgrade`, tanpa overlap, p95 `33,4 ms`. Namun target #7 tetap `≤ 33 ms` dan **#7 tetap OPEN** — run 5–7 valid, tetapi angka tepat-tepat pada batas tersebut; re-measure sampai ada ruang margin (misal ≤ 32 ms) sebelum dikatakan lulus.
 
-`main` v0.21.0 unreleased; commit aktif selalu `git rev-parse HEAD`. Produksi tetap v0.16.0.
+`main` v0.21.0 unreleased; commit aktif selalu `git rev-parse HEAD`. Produksi tetap v0.16.0 (rollback dari sementara v0.21.0 di Netlify ke commit `e71e6c1`).
 
 ## Issue #5 — QA device nyata (umbrella)
 
@@ -117,19 +117,20 @@ Lakukan dalam urutan ini. Jangan pakai `?qa=1` untuk pengukuran offline bila ing
 
 ### A. Install + offline
 
-1. Buka preview #41 dari Chrome Android melalui HTTPS.
+1. Buka preview `https://6b045262361522f239ccf165--tinyplanetfactory.netlify.app/` dari Chrome Android melalui HTTPS.
 2. Install via menu Chrome → **Add to Home screen**.
 3. Buka dari ikon. Catat:
    - `device.standalone === true`;
    - `runtime.serviceWorker.controller === true`;
-   - `runtime.serviceWorker.scriptUrl` mengandung preview #41 `/sw.js`.
+   - `runtime.serviceWorker.scriptUrl` mengandung preview draft `/sw.js`.
 4. Catat `save.tick`, `save.objects`, dan `save.level` sebelum offline.
 5. Aktifkan airplane mode. Buka ulang dari ikon PWA.
 6. Tunggu canvas interaktif. Tanam satu objek.
 7. Salin laporan sebagai `report-offline.json`.
 8. Validasi:
    ```bash
-   npm run qa:evidence -- report-offline.json --standalone --offline
+   npm run qa:evidence -- qa-evidence/wave9/report-offline.json \
+     --expect-version 0.21.0 --expect-bundle index-BnlhvdGl.js --standalone --offline
    ```
 9. Lampirkan JSON, screenshot, dan output validator ke #6.
 
@@ -150,25 +151,24 @@ Jika belum ada build yang lebih baru, sub-langkah update **masih belum terverifi
 
 ## Issue #8 — Landscape 844×390
 
-1. Buka preview #41 di perangkat nyata dengan orientasi landscape. Pastikan viewport `844×390`.
+1. Buka preview `https://6b045262361522f239ccf165--tinyplanetfactory.netlify.app/` di perangkat nyata dengan orientasi landscape.
 2. Gunakan URL:
    ```text
-   https://deploy-preview-41--tinyplanetfactory.netlify.app/?debug=1&perf=1&quality=medium&qa=1&qaObjects=30&qaSeconds=45&seed=1
+   http://127.0.0.1:4173/?debug=1&qa=1&qaObjects=30&qaSeconds=45&seed=1
    ```
+   (sarana bantu lokal; laporan yang digunakan untuk #8 hanya memakai field `orientation` dan `layout`)
 3. Amati apakah area planet tengah tetap terlihat dan tidak tertutup panel objective/inventory/topbar/build.
-4. Salin laporan sebagai `report-landscape.json`.
+4. Salin laporan sebagai `qa-evidence/wave9/report-landscape.json`.
 5. Validasi:
    ```bash
-   npm run qa:evidence -- report-landscape.json --landscape
+   npm run qa:evidence -- qa-evidence/wave9/report-landscape.json --landscape
    ```
 6. Lampirkan screenshot landscape yang menampilkan planet di tengah.
 7. Ulangi portrait → landscape → portrait saat aplikasi berjalan; pastikan tidak ada panel yang menutup planet sepenuhnya.
 
-Kriteria #8: `orientation.type` landscape, `device.viewport` `844x390`, `layout.planetCenterVisible === true`, `objectiveOverlapsInventory === false`, `topbarOverlapsBuild === false`, dan screenshot asli ada di issue.
+Kriteria #8: `orientation.type` landscape, `layout.planetCenterVisible === true`, `objectiveOverlapsInventory === false`, `topbarOverlapsBuild === false`, dan screenshot asli ada di issue.
 
-Status build `index-BnlhvdGl.js`: `qa-evidence/wave9/report-landscape.json` berhasil merekam `landscape-primary`, tetapi viewport `734x280`, `centerElement: "DIV"`, dan `planetCenterVisible: false`. Validator: `EVIDENCE REVIEW: planetTidakTertutup, p95MasihDiAtas33ms`. #8 **belum lulus** dan memerlukan perbaikan/ulang ukuran landscape yang sesuai.
-
-UPDATE 2026-11-23: Perangkat mengulang mengirimkan laporan landscape occluded — planet tersumbat UI (`DIV`) pada layar landscape pendek. #8 tetap open; belum ada fix bundle, sehingga semua evidence bundle #9 tetap valid.
+Status build `index-BnlhvdGl.js`: laporan lama `qa-evidence/wave9/report-landscape.json` (commit `f53c1a0`) gagal (`centerElement: "DIV"`, `planetCenterVisible: false` pada viewport `734x280`). Fix dulu di `index.html`: sembunyikan `#hint` pada landscape. Setelah fix, ulangi tes dari preview HTTPS di atas; #8 **belum lulus** sampai ada laporan ulang dengan `planetCenterVisible: true`.
 
 ## Urutan penutupan yang aman
 
