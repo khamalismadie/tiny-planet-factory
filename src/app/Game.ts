@@ -2,7 +2,7 @@ import { Application, UPDATE_PRIORITY } from 'pixi.js';
 import { advancedSnapshot } from '../sim/advanced';
 import { ensureEventState } from '../content/missions';
 import { OBJECT_DEFS, OBJECT_ORDER, UNLOCK_LEVEL } from '../content/objects';
-import { SPECIES_ORDER } from '../content/species';
+import { SPECIES_DEFS, SPECIES_ORDER } from '../content/species';
 import { WEATHER_DEFS } from '../content/weather';
 import { restorationMilestones } from '../sim/insights';
 import { missionView } from '../sim/campaign';
@@ -132,6 +132,8 @@ export class Game {
       document.getElementById('qa-close')?.addEventListener('click', () => this.qaPanel?.classList.remove('show'));
     }
     document.getElementById('walk-mode-btn')?.addEventListener('click', () => this.toggleWalkMode());
+    document.getElementById('gallery-btn')?.addEventListener('click', () => this.toggleGallery());
+    document.getElementById('gallery-close')?.addEventListener('click', () => document.getElementById('gallery-modal')?.classList.add('hidden'));
     const skipMenu = params.has('debug') || params.has('qa') || params.has('campaign') || params.has('planet') || params.get('menu') === '0';
     const tutorialParam = params.get('tutorial');
     if (tutorialParam === '1') this.tutorial.reset();
@@ -435,6 +437,23 @@ export class Game {
         );
       },
     });
+  }
+
+  private toggleGallery(): void {
+    const modal = document.getElementById('gallery-modal');
+    const list = document.getElementById('gallery-list');
+    const btn = document.getElementById('gallery-btn');
+    if (modal?.classList.toggle('hidden')) {
+      btn?.classList.remove('active');
+      return;
+    }
+    btn?.classList.add('active');
+    if (list) this.renderGallery(list);
+  }
+
+  private renderGallery(list: HTMLElement): void {
+    const items = [...SPECIES_ORDER.map((id) => SPECIES_DEFS[id]), ...OBJECT_ORDER.map((type) => OBJECT_DEFS[type])];
+    list.innerHTML = items.map((def) => `<div class="gallery-item"><div class="name">${def.label}</div></div>`).join('');
   }
 
   private toggleWalkMode(): void {
