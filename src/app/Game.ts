@@ -499,7 +499,7 @@ export class Game {
     if (!this.walkEnabled) return;
     const camera = this.scene.view.camera;
     const orbit = this.scene.orbit;
-    const speed = 0.35 * deltaSeconds;
+    const speed = 0.25 * deltaSeconds;
     let dx = 0;
     let dz = 0;
     let dy = 0;
@@ -533,7 +533,7 @@ export class Game {
     const gdy = orbit.target.y - camera.position.y;
     const gdz = orbit.target.z - camera.position.z;
     const gLen = Math.max(Math.hypot(gdx, gdy, gdz), 0.01);
-    const gravitySpeed = speed * 0.35;
+    const gravitySpeed = speed * 0.2;
     camera.position.x += (gdx / gLen) * gravitySpeed;
     camera.position.y += (gdy / gLen) * gravitySpeed;
     camera.position.z += (gdz / gLen) * gravitySpeed;
