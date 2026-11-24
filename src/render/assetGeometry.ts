@@ -452,6 +452,70 @@ function buildHill(variant = 0): AssetGeometry {
   ], 0.004, { radius: 0.08, color: PALETTE.shadowCanopy });
 }
 
+const MTN_SEGS = 10;
+const MTN_TIERS = 10;
+type Point = [number, number, number];
+function mountainPoint(variant: number, tier: number, seg: number): Point {
+  const t = tier / (MTN_TIERS - 1);
+  const angle = (seg / MTN_SEGS) * Math.PI * 2 + (hash01(variant * 17 + tier, seg) - 0.5) * 0.32;
+  const taper = 0.015 + 0.225 * Math.pow(1 - t, 0.72);
+  const radius = taper * (0.74 + hash01(variant * 31 + seg, tier) * 0.52);
+  const lean = t * 0.06;
+  return [
+    (hash01(variant + 3, tier) - 0.5) * lean + Math.cos(angle) * radius,
+    0.72 * t + (hash01(variant * 13 + seg, tier + 5) - 0.5) * 0.035 * (0.25 + t),
+    (hash01(variant + 7, tier) - 0.5) * lean + Math.sin(angle) * radius,
+  ];
+}
+function mountainBand(variant: number, from: number, to: number, cap = false): Geometry3D {
+  const p: number[] = [];
+  const n: number[] = [];
+  const uv: number[] = [];
+  const idx: number[] = [];
+  const tri = (a: Point, b: Point, c: Point) => {
+    const ux = b[0] - a[0];
+    const uy = b[1] - a[1];
+    const uz = b[2] - a[2];
+    const vx = c[0] - a[0];
+    const vy = c[1] - a[1];
+    const vz = c[2] - a[2];
+    let nx = uy * vz - uz * vy;
+    let ny = uz * vx - ux * vz;
+    let nz = ux * vy - uy * vx;
+    const len = Math.hypot(nx, ny, nz) || 1;
+    nx /= len;
+    ny /= len;
+    nz /= len;
+    for (const q of [a, b, c]) {
+      p.push(q[0], q[1], q[2]);
+      n.push(nx, ny, nz);
+      uv.push(0, 0);
+      idx.push(idx.length);
+    }
+  };
+  for (let tier = from; tier < to; tier++) {
+    for (let s = 0; s < MTN_SEGS; s++) {
+      const e = (s + 1) % MTN_SEGS;
+      const a = mountainPoint(variant, tier, s);
+      const b = mountainPoint(variant, tier, e);
+      const c = mountainPoint(variant, tier + 1, e);
+      const d = mountainPoint(variant, tier + 1, s);
+      tri(a, c, b);
+      tri(a, d, c);
+    }
+  }
+  if (cap) {
+    const apex: Point = [0, 0.76, 0];
+    for (let s = 0; s < MTN_SEGS; s++) tri(mountainPoint(variant, to, s), apex, mountainPoint(variant, to, (s + 1) % MTN_SEGS));
+  }
+  return new Geometry3D({
+    positions: new Float32Array(p),
+    normals: new Float32Array(n),
+    uvs: new Float32Array(uv),
+    indices: new Uint32Array(idx),
+  });
+}
+
 function buildMountain(variant = 0): AssetGeometry {
   const colors = [
     [PALETTE.stone, PALETTE.stoneLight, PALETTE.stoneDark, PALETTE.stoneLight, PALETTE.snow, PALETTE.stoneDark],
@@ -460,23 +524,13 @@ function buildMountain(variant = 0): AssetGeometry {
     [0xe8d9b8, 0xfff0cf, 0xc9b28e, 0xfff0cf, 0xffffff, 0xa89779],
     [0x51465f, 0x6c5c7d, 0x3c3448, 0x6c5c7d, 0xff9a52, 0x2e2a36],
   ][variant] ?? [PALETTE.stone, PALETTE.stoneLight, PALETTE.stoneDark, PALETTE.stoneLight, PALETTE.snow, PALETTE.stoneDark];
-  const shapes: Array<Array<[number, number, number, number]>> = [
-    [[0.12, 0.6, 9, 0], [0.05, 0.2, 7, 0], [0.07, 0.35, 7, 0.02], [0.05, 0.25, 7, 0.015], [0.04, 0.15, 7, 0]],
-    [[0.15, 0.72, 10, 0], [0.065, 0.26, 8, 0.01], [0.085, 0.44, 8, 0.02], [0.07, 0.32, 8, 0.015], [0.05, 0.18, 8, 0.01]],
-    [[0.13, 0.66, 8, 0], [0.055, 0.24, 7, 0.02], [0.072, 0.36, 7, 0.01], [0.06, 0.26, 7, 0.015], [0.045, 0.16, 7, 0.02]],
-    [[0.14, 0.7, 9, 0], [0.06, 0.28, 7, 0.015], [0.08, 0.4, 7, 0.02], [0.07, 0.24, 7, 0.01], [0.05, 0.17, 7, 0.015]],
-    [[0.13, 0.64, 8, 0], [0.055, 0.25, 7, 0.01], [0.073, 0.34, 7, 0.015], [0.06, 0.27, 7, 0.02], [0.046, 0.15, 7, 0.01]],
-  ];
-  const [a, b, c, d, e] = shapes[variant] ?? shapes[0];
-  const w = [1, 0.94, 0.99, 0.92, 0.98][variant] ?? 1;
   return defineAsset([
-    widen(bevelCone(a[0], a[1], a[2], colors[0], [0, a[1] * 0.28, a[3]], undefined, undefined, a[3] * 0.12), w),
-    widen(bevelCone(b[0], b[1], b[2], colors[1], [0, b[1] * 0.33, b[3]], undefined, undefined, b[3] * 0.22), w),
-    widen(bevelCone(c[0], c[1], c[2], colors[2], [-0.055, c[1] * 0.18, c[3]], undefined, undefined, c[3] * 0.25), w),
-    widen(bevelCone(d[0], d[1], d[2], colors[3], [0.055, d[1] * 0.12, d[3]], undefined, undefined, d[3] * 0.18), w),
-    widen(bevelCone(e[0], e[1], e[2], colors[4], [0, e[1] * 0.43, e[3]], undefined, undefined, e[3] * 0.15), w),
-    widen(rock(0.052, colors[5], [-0.05, 0.02, 0.02], [0.55, 0.28, 0.55], 1), w),
-  ], 0.004, { radius: 0.09, color: PALETTE.shadowStone });
+    { geometry: mountainBand(variant, 0, 4), color: colors[0] },
+    { geometry: mountainBand(variant, 4, 7), color: colors[1] },
+    { geometry: mountainBand(variant, 7, MTN_TIERS - 1, true), color: colors[4] },
+    rock(0.032, colors[2], [-0.085, 0.012, 0.04], [0.8, 0.55, 0.8]),
+    rock(0.028, colors[5], [0.08, 0.01, -0.05], [0.9, 0.45, 0.9]),
+  ], 0.004, { radius: 0.081, color: PALETTE.shadowStone });
 }
 
 function buildOcean(variant = 0): AssetGeometry {

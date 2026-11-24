@@ -24,7 +24,9 @@ Gunakan checklist ini sebelum publish build produksi.
 
 > **Perbaikan modus FPS 2026-11-24:** planet tetap diam—input `OrbitCamera` dinonaktifkan (`orbit.enabled = false`) selama FPS dan `walkUpdate()` dipanggil setelah `updateCamera()`. Karena itu kamera yang mengitari planet, bukan planet yang berputar. Kontrol sekarang murni orbit spherical: mouse/`ArrowLeft`/`Right`/`A`/`D` mengubah yaw, mouse/`ArrowUp`/`Down`/`Space`/`Shift` mengubah pitch (naik-turun), `W`/`S` mengubah jarak `1,15`–`6` (zoom dekat ke hewan/tumbuhan atau menjauh melihat seluruh planet), dan kamera selalu menghadap pusat planet. `window.__game.camera()` ikut mengembalikan `walk`, `yaw`, `pitch`, `dist` untuk verifikasi (debug, bukan telemetry). Bundle `index-JRtwPflp.js`, app chunk 99,29 kB / gzip 32,24 kB; `npm test` 8/8 PASS. Verifikasi headless: yaw `-0,48` rad per 120 px mouse, pitch naik dengan `ArrowUp`, `W` mengecilkan jarak `4,75 → 3,91`, `S` membesarkan `3,91 → 5,39`, keluar FPS mengembalikan orbit, 0 error konsol. Bukti fisik #5–#8 harus diukur ulang untuk bundle ini.
 
-> **Preview draft darurat 2026-11-24:** tidak ada token/CLI Netlify di environment, sehingga build `index-JRtwPflp.js` di-deploy lewat Netlify Drop: <https://admirable-taiyaki-c6332c.netlify.app/> (password `My-Drop-Site`). Situs ini **unclaimed**, dilindungi password, dan kedaluwarsa sekitar 1 jam setelah deploy; **bukan produksi**. Setelah password dimasukkan, verifikasi menunjukkan bundle `index-JRtwPflp.js`, `/sw.js` 200, dan `/manifest.webmanifest` 200. URL Drop sebelumnya `neon-biscotti-456ded.netlify.app`, `sparkling-cheesecake-8582e4.netlify.app`, serta draft lama `6b045262361522f239ccf165--tinyplanetfactory.netlify.app` sudah stale. Untuk QA lanjutan, klaim situs Drop atau deploy ulang ke draft Netlify yang sudah ada.
+> **Pembentukan ulang gunung low-poly 2026-11-24:** gunung tidak lagi berupa tumpukan kerucut, melainkan massif segitiga tak beraturan dari ring tersampel deterministik per varian: 10 sisi × 10 tingkat, tiga pita warna (batu dasar, lereng, puncak salju/lava/kristal), plus dua serpihan batu. Tanpa tekstur, tanpa draw call baru. Bundle `index-DJTYXXt9.js`, app chunk 99,51 kB / gzip 32,39 kB; `npm test` 8/8 PASS. Gate art scale: tinggi `0,174` (target `0,165` ± `0,04`), `240` triangle, `201` facet unik. Pratinjau galeri Gunung 224 polygon dengan 164 facet ber-ink, 0 error konsol.
+
+> **Preview draft darurat 2026-11-24:** tidak ada token/CLI Netlify di environment, sehingga build `index-JRtwPflp.js` sempat di-deploy lewat Netlify Drop: <https://admirable-taiyaki-c6332c.netlify.app/> (password `My-Drop-Site`). Situs itu **unclaimed**, password-protected, kedaluwarsa ±1 jam, dan sekarang **stale** untuk bundle gunung `index-DJTYXXt9.js`. Percobaan deploy ulang ditolak Netlify Drop karena **limit harian tercapai**, jadi bundle terbaru belum punya preview hosted. URL Drop sebelumnya `neon-biscotti-456ded.netlify.app`, `sparkling-cheesecake-8582e4.netlify.app`, serta draft lama `6b045262361522f239ccf165--tinyplanetfactory.netlify.app` juga stale. Untuk QA bundle ini, pakai `dist/` lokal/deploy permanen setelah limit tersedia; produksi tetap v0.16.0.
 
 ## 1. Prasyarat
 
@@ -41,7 +43,7 @@ npm run build
 PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 ```
 
-- [ ] `npm run build` tanpa error. Chunk vendor: `pixi-core` + `pixi-3d`, app chunk < 100 kB (v0.21.0 saat ini: 99,29 kB / gzip 32,24 kB, plus chunk pratinjau galeri yang dimuat sesuai kebutuhan 2,31 kB; produksi v0.16.0: 73,33 kB).
+- [ ] `npm run build` tanpa error. Chunk vendor: `pixi-core` + `pixi-3d`, app chunk < 100 kB (v0.21.0 saat ini: 99,51 kB / gzip 32,39 kB, plus chunk pratinjau galeri yang dimuat sesuai kebutuhan 2,31 kB; produksi v0.16.0: 73,33 kB).
 - [ ] `PASS: sim`
 - [ ] `PASS: art scale`
 - [ ] `PASS: terrain render`
