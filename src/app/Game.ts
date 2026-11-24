@@ -537,10 +537,11 @@ export class Game {
         this.walkLook.pitch = Math.max(-1.2, Math.min(1.2, this.walkLook.pitch - dy * 0.004));
       };
       canvas?.addEventListener('pointermove', this.walkPointerHandler as unknown as EventListener);
+      orbit.enabled = false;
       orbit.enableDamping = false;
       orbit.minDistance = 0.8;
       orbit.maxDistance = 3.2;
-      this.hud.notify('Modus FPS: mouse/Arrow Atas-Bawah lihat atas-bawah, Arrow Kiri-Kanan putar, WASD jalan, Space/Shift naik-turun. Klik lagi untuk keluar.', true);
+      this.hud.notify('FPS: planet diam, kamera mengitari. Mouse lihat, WASD jalan, Space/Shift naik-turun. Klik lagi keluar.', true);
     } else {
       window.removeEventListener('keydown', this.walkKeydown);
       window.removeEventListener('keyup', this.walkKeyup);
@@ -549,6 +550,7 @@ export class Game {
       this.walkPointerHandler = null;
       this.walkLook = { yaw: 0, pitch: -0.08, x: 0, y: 0 };
       this.walkKeys.clear();
+      orbit.enabled = true;
       orbit.enableDamping = true;
       orbit.minDistance = 2.2;
       orbit.maxDistance = 9;

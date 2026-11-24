@@ -4,7 +4,7 @@ Folder ini menyimpan laporan hasil `window.__game.qaReport()` dari perangkat nya
 
 Jangan mengubah isi file setelah disalin. Simpan satu file per sesi.
 
-> **Bundle kandidat terbaru (2026-11-24):** `index-CdugdwDq.js` (UI colorful + aset low-poly colorful + perbaikan kamera FPS, app chunk 99,87 kB / gzip 32,37 kB). Preview sementara: <https://sparkling-cheesecake-8582e4.netlify.app/> (password `My-Drop-Site`, **unclaimed**, kedaluwarsa ±1 jam, bukan produksi); SW/manifest terverifikasi 200. Seluruh laporan yang tercatat di bawah masih tertaut ke bundle lama (`index-BnlhvdGl.js`, `index-BiS1XGVG.js`, `index-wiHAa9uT.js`, `index-DUYnopCk.js`) dan **tidak berlaku** untuk kandidat ini. Jangan menimpa arsip; simpan laporan baru di `qa-evidence/wave10/` (atau folder baru lain) dan validasi dengan `--expect-version 0.21.0 --expect-bundle index-CdugdwDq.js` beserta flag yang sesuai (`--standalone`, `--offline`, `--landscape`).
+> **Bundle kandidat terbaru (2026-11-24):** `index-BMy85-KX.js` (UI colorful + aset low-poly colorful + kamera FPS dengan planet diam, app chunk 99,87 kB / gzip 32,36 kB). Preview sementara: <https://neon-biscotti-456ded.netlify.app/> (password `My-Drop-Site`, **unclaimed**, kedaluwarsa ±1 jam, bukan produksi); SW/manifest terverifikasi 200. Seluruh laporan yang tercatat di bawah masih tertaut ke bundle lama (`index-BnlhvdGl.js`, `index-BiS1XGVG.js`, `index-wiHAa9uT.js`, `index-DUYnopCk.js`, `index-CdugdwDq.js`) dan **tidak berlaku** untuk kandidat ini. Jangan menimpa arsip; simpan laporan baru di `qa-evidence/wave10/` (atau folder baru lain) dan validasi dengan `--expect-version 0.21.0 --expect-bundle index-BMy85-KX.js` beserta flag yang sesuai (`--standalone`, `--offline`, `--landscape`).
 
 ## Build Wave 9 — 7 laporan REVIEW
 

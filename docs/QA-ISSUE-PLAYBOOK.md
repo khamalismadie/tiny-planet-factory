@@ -2,7 +2,7 @@
 
 Dokumen ini memetakan bukti yang harus dilampirkan ke tiap issue. Ia **bukan** hasil QA dan tidak menutup issue apa pun.
 
-- Build kandidat lokal: v0.21.0 — bundle `index-CdugdwDq.js`, SW `tpf-shell-v0-21-0`. Preview sementara <https://sparkling-cheesecake-8582e4.netlify.app/> (password `My-Drop-Site`, **unclaimed**, kedaluwarsa ±1 jam) menyajikan bundle ini; URL draft lama `6b045262361522f239ccf165--tinyplanetfactory.netlify.app` masih stale. Produksi tidak berubah.
+- Build kandidat lokal: v0.21.0 — bundle `index-BMy85-KX.js`, SW `tpf-shell-v0-21-0`. Preview sementara <https://neon-biscotti-456ded.netlify.app/> (password `My-Drop-Site`, **unclaimed**, kedaluwarsa ±1 jam) menyajikan bundle ini; URL Drop sebelumnya `sparkling-cheesecake-8582e4.netlify.app` dan draft lama `6b045262361522f239ccf165--tinyplanetfactory.netlify.app` sudah stale. Produksi tidak berubah.
 - Produksi tetap v0.16.0. Jangan mencampur bukti produksi dengan bukti v0.21.0.
 - Template laporan: `docs/QA-EVIDENCE-TEMPLATE.json`.
 - Checklist umum: `docs/QA-EVIDENCE-TEMPLATE.md`.
@@ -12,7 +12,7 @@ Dokumen ini memetakan bukti yang harus dilampirkan ke tiap issue. Ia **bukan** h
 
 Catatan build: bundle lokal pada commit ini `index-wiHAa9uT.js`. Fix #8 pada `index.html`: `#hint` disembunyikan pada landscape. Laporan lama `index-BiS1XGVG.js` **tidak berlaku**. Jangan mencampur laporan dari bundle preview #41.
 
-> **Bundle kandidat terbaru (2026-11-24):** `index-CdugdwDq.js` (app chunk 99,87 kB / gzip 32,37 kB). Fase aset low-poly colorful mengubah ramp warna prop/terrain/cuaca dan menambah glint mata; perbaikan FPS memindahkan kamera ke permukaan planet dengan look yaw/pitch mandiri. Tidak ada draw call, gate, atau target baru. Semua laporan dan contoh perintah di bawah masih tertaut ke bundle lama (`index-wiHAa9uT.js`, `index-DUYnopCk.js`, `index-BiS1XGVG.js`, `index-BnlhvdGl.js`) dan **tidak berlaku** untuk kandidat ini. Saat mengumpulkan ulang #5–#8, ganti `--expect-bundle` menjadi `index-CdugdwDq.js` dan simpan laporan baru di folder terpisah; jangan menimpa arsip.
+> **Bundle kandidat terbaru (2026-11-24):** `index-BMy85-KX.js` (app chunk 99,87 kB / gzip 32,36 kB). Fase aset low-poly colorful mengubah ramp warna prop/terrain/cuaca dan menambah glint mata; perbaikan FPS memindahkan kamera ke permukaan planet dengan look yaw/pitch mandiri dan menonaktifkan input orbit agar planet diam. Tidak ada draw call, gate, atau target baru. Semua laporan dan contoh perintah di bawah masih tertaut ke bundle lama (`index-wiHAa9uT.js`, `index-CdugdwDq.js`, `index-DUYnopCk.js`, `index-BiS1XGVG.js`, `index-BnlhvdGl.js`) dan **tidak berlaku** untuk kandidat ini. Saat mengumpulkan ulang #5–#8, ganti `--expect-bundle` menjadi `index-BMy85-KX.js` dan simpan laporan baru di folder terpisah; jangan menimpa arsip.
 
 Semua langkah di bawah wajib di perangkat Android nyata. Headless hanya smoke.
 
