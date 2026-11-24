@@ -140,6 +140,15 @@
       .campaign-row.current { background: rgba(89, 226, 173, .09); border-radius: 6px; }
       .gallery-card, #guide-modal .card { position: absolute; bottom: 12px; width: min(360px, 100%); }
       #gallery-modal .card { max-height: min(75vh, 480px); }
+      #guide-modal .card { max-height: min(88vh, 720px); overflow-y: auto; }
+      .guide-section { border-top: 1px solid rgba(255,255,255,.08); padding: 8px 0; }
+      .guide-section summary { cursor: pointer; font-size: 12px; font-weight: 700; color: var(--mint); list-style: none; }
+      .guide-section summary::-webkit-details-marker { display: none; }
+      .guide-section summary::before { content: "▸ "; }
+      .guide-section[open] summary::before { content: "▾ "; }
+      .guide-section p, .guide-section li { font-size: 11px; line-height: 1.6; color: var(--muted); }
+      .guide-section ul { margin: 6px 0 0; padding-left: 16px; }
+      .guide-section b { color: var(--text); }
       #gallery-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; max-height: min(34vh, 220px); overflow-y: auto; }
       .gallery-item { width: min(260px, 45%); padding: 8px; border: 1px solid rgba(255,255,255,.07); border-radius: 10px; display: flex; flex-direction: column; gap: 5px; background: rgba(10,18,24,.6); text-align: left; min-height: 48px; }
       .gallery-item .name { font-size: 12px; font-weight: 700; }
@@ -346,20 +355,6 @@
         <div class="row"><button id="campaign-close">Tutup</button></div>
       </div>
     </div>
-    <div id="guide-quick-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Panduan Game">
-      <div class="card gallery-card">
-        <h2>Panduan Dasar Game</h2>
-        <div id="guide-list" style="font-size:12px;color:var(--text);line-height:1.7">
-          <div class="guide-row"><strong>Start:</strong> tap arah kiri/kanan pada canvas untuk melihat planet, klik untuk menempatkan objek.</div>
-          <div class="guide-row"><strong>Jalan/Modus FPS:</strong> tekan Jalan di topbar; kamera menjadi FPS di dalam planet, Arrow/WASD gerak, ArrowLeft/Right putar, Space/Shift naik/turun.</div>
-          <div class="guide-row"><strong>Galeri:</strong> buka Galeri di topbar untuk melihat resep habitat species + object.</div>
-          <div class="guide-row"><strong>Ekologi:</strong> buka Menu, pilih Ekologi untuk melihat spesies, himpunan, weather, dan population detail.</div>
-          <div class="guide-row"><strong>Misi:</strong> follow objective strip; progress selalu ada di Objective/Topbar.</div>
-          <div class="guide-row"><strong>Aside tips:</strong> telemetry & Baru utk seed acak, Planet DNA utk simpan/baca DNA.</div>
-        </div>
-        <div class="row"><button id="guide-quick-close">Tutup</button></div>
-      </div>
-    </div>
     <div id="gallery-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Galeri Ekosistem">
       <div class="card gallery-card">
         <h2>Galeri Ekosistem</h2>
@@ -462,18 +457,54 @@
     </div>
     <div id="guide-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="guide-title">
       <div class="card guide-card">
-        <h2 id="guide-title">Cara pakai Tiny Planet Factory</h2>
+        <h2 id="guide-title">Panduan Tiny Planet Factory</h2>
+        <p style="font-size:12px;color:var(--muted);line-height:1.6;margin:0 0 8px">Angka di game berasal dari model simulasi deterministik, bukan pengukuran planet nyata. Buka bagian mana pun yang kamu butuhkan.</p>
         <ol class="guide-steps">
-          <li><strong>Pilih dunia.</strong> Gunakan deretan planet di menu. Setiap planet punya iklim, musim, dan spesies berbeda.</li>
-          <li><strong>Letakkan objek.</strong> Pilih alat di panel kiri atau bawah, lalu ketuk permukaan planet. Geser untuk memutar, pinch untuk zoom, tahan lama untuk info.</li>
-          <li><strong>Jaga ekosistem.</strong> Panel kanan menampilkan air, oksigen, suhu, dan stabilitas. Strip di bawah layar memberi tahap dan sasaran berikutnya.</li>
-          <li><strong>Eksperimen.</strong> “Baru” mengacak seed di planet yang sama. Planet DNA menyimpan dan memuat hasilnya; telemetri opsional tetap di perangkat.</li>
+          <li><strong>Pilih dunia.</strong> Gunakan deretan planet di menu. Setiap planet memakai iklim, musim, dan komunitas spesies yang berbeda.</li>
+          <li><strong>Letakkan objek.</strong> Pilih alat di panel bawah, lalu ketuk permukaan planet. Geser untuk memutar, pinch untuk zoom, tahan lama untuk info.</li>
+          <li><strong>Jaga ekosistem.</strong> Panel kanan menampilkan air, oksigen, suhu, kesuburan, keanekaragaman, energi, dan stabilitas; strip bawah memberi sasaran misi.</li>
+          <li><strong>Jelajah &amp; simpan.</strong> Tombol <b>Jalan</b> masuk ke kamera FPS di dalam planet, <b>Galeri</b> memutar pratinjau low-poly, <b>Ekologi</b> merinci fauna, dan <b>Planet DNA</b> menyimpan hasil eksperimen. Telemetri opsional tetap di perangkat.</li>
         </ol>
         <div class="guide-map" aria-label="Peta antarmuka">
           <div><span>Kiri / atas</span><p>Kategori objek dan tombol menu, jeda, DNA, serta kualitas.</p></div>
           <div><span>Kanan</span><p>Nilai ekosistem, cuaca, event, dan misi saat ini.</p></div>
           <div><span>Bawah</span><p>Alat yang dipilih, sasaran misi, dan petunjuk gestur.</p></div>
         </div>
+        <details class="guide-section">
+          <summary>Edukasi planet</summary>
+          <p><b>Apa itu planet?</b> Menurut definisi IAU 2006, benda langit mengorbit bintang, cukup masif sehingga gravitasinya membentuknya bulat, dan telah membersihkan lingkungan orbitnya. Pluto adalah planet katai karena syarat ketiga tidak terpenuhi.</p>
+          <p><b>Waktu.</b> Tata Surya berusia sekitar 4,6 miliar tahun; Bumi terbentuk sekitar 4,54 miliar tahun lalu. Skala waktu geologi jauh lebih panjang daripada satu sesi permainan.</p>
+          <p><b>Iklim vs cuaca.</b> Cuaca adalah kondisi jam–hari; iklim adalah pola statistik dalam jangka panjang (BMG/WMO memakai rata-rata 30 tahun). Suhu dipengaruhi jarak dari bintang, <b>albedo</b> (daya pantul permukaan), dan atmosfer.</p>
+          <p><b>Efek rumah kaca.</b> Uap air, CO₂, dan metana menyerap radiasi inframerah yang dipancarkan permukaan. Efek alami membuat Bumi layak huni; peningkatan konsentrasi gas ini mengubah keseimbangan energi.</p>
+          <p><b>Di game:</b> Terra, Dune, Glaciere, Inferna, Aquaria, Mycelia, Sakura, Aurelia, dan Cosmos adalah <b>analog fiksi</b> untuk bereksperimen, bukan katalog astronomi nyata.</p>
+        </details>
+        <details class="guide-section">
+          <summary>Sejarah sains &amp; ekologi</summary>
+          <ul>
+            <li><b>1543</b> Copernicus mempublikasikan model heliosentris; <b>1609–1610</b> Galileo mengamati bulan Jupiter dengan teleskop; <b>1609–1619</b> Kepler merumuskan orbit elips; <b>1687</b> Newton menjelaskan gravitasi.</li>
+            <li><b>1859</b> Darwin mempublikasikan seleksi alam; <b>1866</b> Haeckel memperkenalkan istilah ekologi; <b>1935</b> Tansley memperkenalkan istilah <i>ecosystem</i>; <b>1942</b> Lindeman mengkaji dinamika trofik.</li>
+            <li><b>1957</b> Sputnik, <b>1969</b> Apollo 11, <b>1977</b> Voyager, <b>1990</b> Hubble, <b>2012</b> Curiosity, <b>2021</b> James Webb diluncurkan dan <b>2022</b> citra pertamanya dirilis.</li>
+            <li>Riwayat pembaruan game ini dicatat di <b>docs/RELEASE.md</b>; tanggal di atas adalah sejarah sains nyata, bukan sejarah game.</li>
+          </ul>
+        </details>
+        <details class="guide-section">
+          <summary>Detail ekosistem</summary>
+          <p><b>Dua komponen.</b> Abiotik: cahaya, suhu, air, oksigen, mineral, pH. Biotik: produsen (tumbuhan/alga), konsumen (herbivora dan predator), serta pengurai (jamur dan bakteri).</p>
+          <p><b>Fotosintesis:</b> 6CO₂ + 6H₂O + energi cahaya → C₆H₁₂O₆ + 6O₂. Respirasi melakukan sebaliknya, mengembalikan CO₂ dan air sambil melepaskan energi.</p>
+          <p><b>Jaring makanan.</b> Energi masuk dari cahaya, lalu berpindah lewat tingkat trofik. Sebagian besar energi hilang sebagai panas pada setiap perpindahan; aturan kasar "~10% per tingkat" adalah heuristik, bukan konstanta fisika.</p>
+          <p><b>Siklus materi.</b> Karbon, nitrogen, dan air terus didaur ulang. Pengurai mengembalikan unsur hara ke tanah sehingga produsen bisa tumbuh lagi.</p>
+          <p><b>Biodiversitas.</b> Keanekaragaman gen, spesies, dan ekosistem umumnya membantu ketahanan menghadapi gangguan, tetapi besarnya bergantung pada konteks. Di game, amati lewat panel <b>Ekologi</b> dan <b>Kompendium</b>.</p>
+        </details>
+        <details class="guide-section">
+          <summary>Pengetahuan sains</summary>
+          <ul>
+            <li><b>Tingkat organisasi:</b> atom → sel → organisme → populasi → komunitas → ekosistem → bioma → biosfer.</li>
+            <li><b>Konservasi energi:</b> energi tidak hilang, hanya berubah bentuk; pada sistem tertutup, entropi cenderung meningkat.</li>
+            <li><b>Cara berpikir:</b> amati → hipotesis → prediksi → uji → evaluasi bukti. Korelasi tidak otomatis berarti kausalitas.</li>
+            <li><b>Model adalah penyederhanaan.</b> Seed deterministik membuat eksperimen bisa diulang. Untuk memeriksa performa, salin laporan dengan <b>JSON.stringify(window.__game.qaReport(), null, 2)</b>.</li>
+            <li>Skala visual di game tidak mengikuti "1 unit = 1 meter"; itu pilihan artistik agar seluruh planet terlihat dalam satu layar.</li>
+          </ul>
+        </details>
         <div class="row">
           <button id="guide-replay">Ulangi panduan</button>
           <button id="guide-close">Mengerti</button>

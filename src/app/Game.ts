@@ -141,6 +141,7 @@ export class Game {
     document.getElementById('walk-mode-btn')?.addEventListener('click', () => this.toggleWalkMode());
     document.getElementById('gallery-btn')?.addEventListener('click', () => this.toggleGallery());
     document.getElementById('gallery-close')?.addEventListener('click', () => document.getElementById('gallery-modal')?.classList.add('hidden'));
+    document.getElementById('guide-btn')?.addEventListener('click', () => document.getElementById('menu-guide')?.click());
     const skipMenu = params.has('debug') || params.has('qa') || params.has('campaign') || params.has('planet') || params.get('menu') === '0';
     const tutorialParam = params.get('tutorial');
     if (tutorialParam === '1') this.tutorial.reset();
@@ -467,13 +468,13 @@ export class Game {
       .map((item) => `<button type="button" class="gallery-item" data-gallery-item="${item.key}">${item.label}</button>`)
       .join('');
     list.querySelectorAll<HTMLButtonElement>('[data-gallery-item]').forEach((button) => {
-      button.addEventListener('click', () => this.selectGalleryItem(button.dataset.galleryItem ?? ''));
+      button.addEventListener('click', () => this.selectGalleryItem(button.dataset.galleryItem ?? '', list));
     });
     const initial = items.some((item) => item.key === this.gallerySelection) ? this.gallerySelection! : items[0].key;
     this.selectGalleryItem(initial, list);
   }
 
-  private async selectGalleryItem(key: string, list?: HTMLElement): Promise<void> {
+  private async selectGalleryItem(key: string, list: HTMLElement): Promise<void> {
     const [kind, id] = key.split(':');
     let asset;
     let label = '';
@@ -492,8 +493,7 @@ export class Game {
     if (!asset) return;
 
     this.gallerySelection = key;
-    const container = list ?? document.getElementById('gallery-list');
-    container?.querySelectorAll<HTMLButtonElement>('[data-gallery-item]').forEach((button) => {
+    list.querySelectorAll<HTMLButtonElement>('[data-gallery-item]').forEach((button) => {
       button.classList.toggle('active', button.dataset.galleryItem === key);
     });
     const stage = document.getElementById('gallery-preview-image');
@@ -504,10 +504,7 @@ export class Game {
     const token = ++this.galleryPreviewToken;
     const { galleryPreviewSvg } = await import('../render/GalleryPreview');
     if (token !== this.galleryPreviewToken) return;
-    if (stage) {
-      stage.innerHTML = galleryPreviewSvg(asset);
-      stage.setAttribute('aria-label', `Pratinjau low-poly: ${label}`);
-    }
+    if (stage) stage.innerHTML = galleryPreviewSvg(asset);
   }
 
   private toggleWalkMode(): void {

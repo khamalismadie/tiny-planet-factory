@@ -16,6 +16,8 @@ Gunakan checklist ini sebelum publish build produksi.
 
 > **Fitur galeri 2026-11-24:** commit `7f5dee2` menambahkan **Ekosistem Gallery 3D**: tombol topbar `Galeri`, modal gallery dengan daftar species + props, bundle `index-DrvTx7Lv.js`; `npm test` 8/8 PASS. Commit `6455999` menambahkan **pratinjau low-poly 3D di dalam modal Galeri**: geometri faset asli diproyeksikan ke SVG (tanpa context WebGL kedua / draw call tambahan), item species/prop dapat dipilih, pratinjau default `Kijang`. Bundle `index-DEXFluUZ.js`, app chunk 99,96 kB / gzip 32,31 kB; modul pratinjau dimuat terpisah `GalleryPreview-BJLrBAUJ.js` (2,25 kB / gzip 1,29 kB) saat Galeri dibuka. `npm test` 8/8 PASS. Bukti fisik #5–#8 harus diukur ulang untuk bundle ini.
 
+> **Panduan lengkap 2026-11-24:** tombol topbar `Panduan` kini membuka modal panduan yang sama dengan menu `Cara pakai UI` (tombol `guide-btn` memicu `menu-guide`; modal dangkal `guide-quick-modal` dihapus). Isinya: tutorial 4 langkah, peta antarmuka, serta bagian **Edukasi planet** (definisi IAU, usia Tata Surya/Bumi, iklim vs cuaca, albedo, efek rumah kaca, 9 planet fiksi sebagai analog), **Sejarah sains & ekologi** (Copernicus–James Webb, Haeckel–Lindeman), **Detail ekosistem** (abiotik/biotik, fotosintesis, jaring trofik, siklus karbon/nitrogen/air, biodiversitas), dan **Pengetahuan sains** (tingkat organisasi, konservasi energi, metode ilmiah, model deterministik, laporan QA). Semua konten memakai `<details>` native tanpa gate baru. Bundle `index-tH2aV59H.js`, app chunk 99,97 kB / gzip 32,29 kB; `npm test` 8/8 PASS.
+
 ## 1. Prasyarat
 
 - [ ] Node 20+ dan dependency terpasang (`npm install`).
@@ -31,7 +33,7 @@ npm run build
 PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 ```
 
-- [ ] `npm run build` tanpa error. Chunk vendor: `pixi-core` + `pixi-3d`, app chunk < 100 kB (v0.21.0 saat ini: 99,96 kB / gzip 32,31 kB, plus chunk pratinjau galeri yang dimuat sesuai kebutuhan 2,25 kB; produksi v0.16.0: 73,33 kB).
+- [ ] `npm run build` tanpa error. Chunk vendor: `pixi-core` + `pixi-3d`, app chunk < 100 kB (v0.21.0 saat ini: 99,97 kB / gzip 32,29 kB, plus chunk pratinjau galeri yang dimuat sesuai kebutuhan 2,25 kB; produksi v0.16.0: 73,33 kB).
 - [ ] `PASS: sim`
 - [ ] `PASS: art scale`
 - [ ] `PASS: terrain render`
