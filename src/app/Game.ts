@@ -68,6 +68,8 @@ export class Game {
   private campaignPanel: HTMLElement | null = null;
   private previewBackup: PlanetState | null = null;
   private sessionEnded = false;
+  private walkEnabled = false;
+  private readonly walkKeys = new Set<string>();
 
   private constructor(app: Application, bootStart: number) {
     this.app = app;
@@ -129,6 +131,7 @@ export class Game {
       });
       document.getElementById('qa-close')?.addEventListener('click', () => this.qaPanel?.classList.remove('show'));
     }
+    document.getElementById('walk-mode-btn')?.addEventListener('click', () => this.toggleWalkMode());
     const skipMenu = params.has('debug') || params.has('qa') || params.has('campaign') || params.has('planet') || params.get('menu') === '0';
     const tutorialParam = params.get('tutorial');
     if (tutorialParam === '1') this.tutorial.reset();
@@ -434,6 +437,63 @@ export class Game {
     });
   }
 
+  private toggleWalkMode(): void {
+    this.walkEnabled = !this.walkEnabled;
+    const button = document.getElementById('walk-mode-btn');
+    button?.classList.toggle('active', this.walkEnabled);
+    if (this.walkEnabled) {
+      window.addEventListener('keydown', this.walkKeydown);
+      window.addEventListener('keyup', this.walkKeyup);
+      this.hud.notify('Jalan aktif: Arrow/WASD → gerak, tekan lagi untuk berhenti.', true);
+    } else {
+      window.removeEventListener('keydown', this.walkKeydown);
+      window.removeEventListener('keyup', this.walkKeyup);
+      this.walkKeys.clear();
+      this.hud.notify('Jalan dimatikan.', true);
+    }
+  }
+
+  private walkKeydown = (event: KeyboardEvent): void => {
+    if (!this.walkEnabled) return;
+    const key = event.code;
+    this.walkKeys.add(key);
+    event.preventDefault();
+  };
+
+  private walkKeyup = (event: KeyboardEvent): void => {
+    if (!this.walkEnabled) return;
+    this.walkKeys.delete(event.code);
+    event.preventDefault();
+  };
+
+  private walkUpdate(deltaSeconds: number): void {
+    if (!this.walkEnabled) return;
+    const camera = this.scene.view.camera;
+    const azimuth = this.scene.orbit.azimuthAngle;
+    const speed = 0.25 * deltaSeconds;
+    let dx = 0;
+    let dz = 0;
+    let dy = 0;
+    for (const key of this.walkKeys) {
+      if (key === 'KeyW') { dx += Math.cos(azimuth); dz += Math.sin(azimuth); }
+      if (key === 'KeyS') { dx -= Math.cos(azimuth); dz -= Math.sin(azimuth); }
+      if (key === 'KeyA') { dx += Math.sin(azimuth); dz -= Math.cos(azimuth); }
+      if (key === 'KeyD') { dx -= Math.sin(azimuth); dz += Math.cos(azimuth); }
+      if (key === 'Space') dy += 1;
+      if (key === 'ShiftLeft') dy -= 1;
+    }
+    camera.position.x += dx * speed;
+    camera.position.y += dy * speed;
+    camera.position.z += dz * speed;
+    const distance = Math.hypot(camera.position.x, camera.position.y, camera.position.z);
+    if (distance > 11) {
+      const scale = 11 / distance;
+      camera.position.x *= scale;
+      camera.position.y *= scale;
+      camera.position.z *= scale;
+    }
+  }
+
   private instrument(): void {
     this.gl = (this.app.renderer as unknown as { gl?: WebGL2RenderingContext }).gl ?? null;
     const gl = this.gl;
@@ -448,6 +508,7 @@ export class Game {
       }
     }
     this.app.ticker.add((ticker) => {
+      this.walkUpdate(ticker.deltaMS / 1000);
       this.scene.updateCamera();
       this.scene.update(ticker.deltaMS / 1000);
       if (!this.paused && !this.menuOpen) {
