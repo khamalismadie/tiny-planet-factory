@@ -14,7 +14,8 @@ import { placeObject, createPlanet, planetNameFromSeed, simulateTick, STAGE_NAME
 import { decodePlanetDna, encodePlanetDna, type PlanetDnaCodes } from '../sim/dna';
 import { migratePlanet } from '../sim/migrate';
 import { ERAS, eraForLevel, MAX_LEVEL } from '../sim/progression';
-import type { ObjectType, PlanetState } from '../sim/types';
+import type { ObjectType, PlanetState, SpeciesId } from '../sim/types';
+import { ASSET_GEOMETRY, PROP_VARIANT_LABELS, SPECIES_GEOMETRY, SPECIES_VARIANT_LABELS } from '../render/assetGeometry';
 import { detectQuality, QUALITY, type QualitySettings, type QualityTier } from './quality';
 import { PerfMonitor } from './PerfMonitor';
 import { QaProbe, type QaReport } from './QaProbe';
@@ -74,6 +75,8 @@ export class Game {
   private walkAutoDir = [0, 0, 0];
   private walkLook = { x: 0, y: 0 };
   private walkPointerHandler: ((event: Event) => void) | null = null;
+  private gallerySelection: string | null = null;
+  private galleryPreviewToken = 0;
 
   private constructor(app: Application, bootStart: number) {
     this.app = app;
@@ -456,8 +459,55 @@ export class Game {
   }
 
   private renderGallery(list: HTMLElement): void {
-    const items = [...SPECIES_ORDER.map((id) => SPECIES_DEFS[id]), ...OBJECT_ORDER.map((type) => OBJECT_DEFS[type])];
-    list.innerHTML = items.map((def) => `<div class="gallery-item"><div class="name">${def.label}</div></div>`).join('');
+    const items = [
+      ...SPECIES_ORDER.map((id) => ({ key: `species:${id}`, label: SPECIES_DEFS[id].label })),
+      ...OBJECT_ORDER.map((type) => ({ key: `object:${type}`, label: OBJECT_DEFS[type].label })),
+    ];
+    list.innerHTML = items
+      .map((item) => `<button type="button" class="gallery-item" data-gallery-item="${item.key}">${item.label}</button>`)
+      .join('');
+    list.querySelectorAll<HTMLButtonElement>('[data-gallery-item]').forEach((button) => {
+      button.addEventListener('click', () => this.selectGalleryItem(button.dataset.galleryItem ?? ''));
+    });
+    const initial = items.some((item) => item.key === this.gallerySelection) ? this.gallerySelection! : items[0].key;
+    this.selectGalleryItem(initial, list);
+  }
+
+  private async selectGalleryItem(key: string, list?: HTMLElement): Promise<void> {
+    const [kind, id] = key.split(':');
+    let asset;
+    let label = '';
+    let variant = '';
+    if (kind === 'species' && SPECIES_ORDER.includes(id as SpeciesId)) {
+      const species = id as SpeciesId;
+      asset = SPECIES_GEOMETRY[species];
+      label = SPECIES_DEFS[species].label;
+      variant = SPECIES_VARIANT_LABELS[species][0];
+    } else if (kind === 'object' && OBJECT_ORDER.includes(id as ObjectType)) {
+      const type = id as ObjectType;
+      asset = ASSET_GEOMETRY[type];
+      label = OBJECT_DEFS[type].label;
+      variant = PROP_VARIANT_LABELS[type][0];
+    }
+    if (!asset) return;
+
+    this.gallerySelection = key;
+    const container = list ?? document.getElementById('gallery-list');
+    container?.querySelectorAll<HTMLButtonElement>('[data-gallery-item]').forEach((button) => {
+      button.classList.toggle('active', button.dataset.galleryItem === key);
+    });
+    const stage = document.getElementById('gallery-preview-image');
+    const name = document.getElementById('gallery-preview-name');
+    if (name) name.textContent = label;
+    const tag = document.getElementById('gallery-preview-variant');
+    if (tag) tag.textContent = variant;
+    const token = ++this.galleryPreviewToken;
+    const { galleryPreviewSvg } = await import('../render/GalleryPreview');
+    if (token !== this.galleryPreviewToken) return;
+    if (stage) {
+      stage.innerHTML = galleryPreviewSvg(asset);
+      stage.setAttribute('aria-label', `Pratinjau low-poly: ${label}`);
+    }
   }
 
   private toggleWalkMode(): void {
