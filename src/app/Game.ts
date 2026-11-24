@@ -71,7 +71,7 @@ export class Game {
   private sessionEnded = false;
   private walkEnabled = false;
   private readonly walkKeys = new Set<string>();
-  private walkLook = { yaw: 0, pitch: -0.08, x: 0, y: 0 };
+  private walkLook = { yaw: 0, pitch: 0.2, dist: 4, x: 0, y: 0 };
   private walkPointerHandler: ((event: Event) => void) | null = null;
   private gallerySelection: string | null = null;
   private galleryPreviewToken = 0;
@@ -516,14 +516,14 @@ export class Game {
       const canvas = document.querySelector('#app canvas') as HTMLElement | null;
       const rect = canvas?.getBoundingClientRect();
       const camera = this.scene.view.camera;
-      const len = Math.max(Math.hypot(camera.position.x, camera.position.y, camera.position.z), 0.01);
-      const ny = camera.position.y / len;
-      const nx = camera.position.x / len;
-      const nz = camera.position.z / len;
-      camera.position.set(nx * 1.06, ny * 1.06, nz * 1.06);
+      const ox = camera.position.x - orbit.target.x;
+      const oy = camera.position.y - orbit.target.y;
+      const oz = camera.position.z - orbit.target.z;
+      const len = Math.max(Math.hypot(ox, oy, oz), 0.01);
       this.walkLook = {
-        yaw: Math.atan2(nz, -nx),
-        pitch: -0.08,
+        yaw: Math.atan2(ox, -oz),
+        pitch: Math.max(-1.2, Math.min(1.2, Math.asin(oy / len))),
+        dist: Math.max(1.15, Math.min(6, len)),
         x: rect ? rect.left + rect.width / 2 : 0,
         y: rect ? rect.top + rect.height / 2 : 0,
       };
@@ -539,16 +539,16 @@ export class Game {
       canvas?.addEventListener('pointermove', this.walkPointerHandler as unknown as EventListener);
       orbit.enabled = false;
       orbit.enableDamping = false;
-      orbit.minDistance = 0.8;
-      orbit.maxDistance = 3.2;
-      this.hud.notify('FPS: planet diam, kamera mengitari. Mouse lihat, WASD jalan, Space/Shift naik-turun. Klik lagi keluar.', true);
+      orbit.minDistance = 1.15;
+      orbit.maxDistance = 6;
+      this.hud.notify('FPS: planet diam, kamera mengitari. Mouse/Arrow putar, W/S zoom, Space/Shift naik-turun. Klik lagi keluar.', true);
     } else {
       window.removeEventListener('keydown', this.walkKeydown);
       window.removeEventListener('keyup', this.walkKeyup);
       const canvas = document.querySelector('#app canvas');
       if (this.walkPointerHandler) canvas?.removeEventListener('pointermove', this.walkPointerHandler);
       this.walkPointerHandler = null;
-      this.walkLook = { yaw: 0, pitch: -0.08, x: 0, y: 0 };
+      this.walkLook = { yaw: 0, pitch: 0.2, dist: 4, x: 0, y: 0 };
       this.walkKeys.clear();
       orbit.enabled = true;
       orbit.enableDamping = true;
@@ -574,50 +574,26 @@ export class Game {
   private walkUpdate(deltaSeconds: number): void {
     if (!this.walkEnabled) return;
     const camera = this.scene.view.camera;
-    const orbit = this.scene.orbit;
-    const speed = 0.25 * deltaSeconds;
-    const yaw = this.walkLook.yaw;
-    const pitch = this.walkLook.pitch;
-    let dx = 0;
-    let dz = 0;
-    let dy = 0;
-    if (this.walkKeys.size === 0) {
-      dx += Math.sin(yaw) * 0.28;
-      dz -= Math.cos(yaw) * 0.28;
-    }
+    const target = this.scene.orbit.target;
+    const look = this.walkLook;
+    const turn = 1.1 * deltaSeconds;
+    const rise = 0.9 * deltaSeconds;
+    const zoom = 2.4 * deltaSeconds;
     for (const key of this.walkKeys) {
-      if (key === 'KeyW') { dx += Math.sin(yaw); dz -= Math.cos(yaw); }
-      if (key === 'KeyS') { dx -= Math.sin(yaw); dz += Math.cos(yaw); }
-      if (key === 'KeyD') { dx += Math.cos(yaw); dz += Math.sin(yaw); }
-      if (key === 'KeyA') { dx -= Math.cos(yaw); dz -= Math.sin(yaw); }
-      if (key === 'Space') dy += 1;
-      if (key === 'ShiftLeft') dy -= 1;
-      if (key === 'ArrowLeft') this.walkLook.yaw -= 1.1 * deltaSeconds;
-      if (key === 'ArrowRight') this.walkLook.yaw += 1.1 * deltaSeconds;
-      if (key === 'ArrowUp') this.walkLook.pitch = Math.min(1.2, pitch + 0.9 * deltaSeconds);
-      if (key === 'ArrowDown') this.walkLook.pitch = Math.max(-1.2, pitch - 0.9 * deltaSeconds);
+      if (key === 'ArrowLeft' || key === 'KeyA') look.yaw -= turn;
+      if (key === 'ArrowRight' || key === 'KeyD') look.yaw += turn;
+      if (key === 'ArrowUp' || key === 'Space') look.pitch = Math.min(1.2, look.pitch + rise);
+      if (key === 'ArrowDown' || key === 'ShiftLeft') look.pitch = Math.max(-1.2, look.pitch - rise);
+      if (key === 'KeyW') look.dist = Math.max(1.15, look.dist - zoom);
+      if (key === 'KeyS') look.dist = Math.min(6, look.dist + zoom);
     }
-    camera.position.x += dx * speed;
-    camera.position.y += dy * speed;
-    camera.position.z += dz * speed;
-    const gx = orbit.target.x - camera.position.x;
-    const gy = orbit.target.y - camera.position.y;
-    const gz = orbit.target.z - camera.position.z;
-    const gLen = Math.max(Math.hypot(gx, gy, gz), 0.01);
-    camera.position.x += (gx / gLen) * speed * 0.2;
-    camera.position.y += (gy / gLen) * speed * 0.2;
-    camera.position.z += (gz / gLen) * speed * 0.2;
-    const len = Math.max(Math.hypot(camera.position.x, camera.position.y, camera.position.z), 0.01);
-    const scale = Math.max(0.8, Math.min(3.2, len)) / len;
-    camera.position.x *= scale;
-    camera.position.y *= scale;
-    camera.position.z *= scale;
-    const cp = Math.cos(this.walkLook.pitch);
-    camera.lookAt({
-      x: camera.position.x + Math.sin(this.walkLook.yaw) * cp,
-      y: camera.position.y + Math.sin(this.walkLook.pitch),
-      z: camera.position.z - Math.cos(this.walkLook.yaw) * cp,
-    });
+    const cp = Math.cos(look.pitch);
+    camera.position.set(
+      target.x + Math.sin(look.yaw) * cp * look.dist,
+      target.y + Math.sin(look.pitch) * look.dist,
+      target.z - Math.cos(look.yaw) * cp * look.dist,
+    );
+    camera.lookAt(target);
   }
 
   private instrument(): void {
@@ -732,6 +708,7 @@ export class Game {
           walk: this.walkEnabled,
           yaw: this.walkLook.yaw,
           pitch: this.walkLook.pitch,
+          dist: this.walkLook.dist,
         }),
         orbitDebug: () => {
           const orbit = this.scene.orbit as unknown as { _gesture?: string; _pointers?: unknown[] };
