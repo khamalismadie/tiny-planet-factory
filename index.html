@@ -290,6 +290,7 @@
       <span id="stage-label"></span>
       <div class="actions">
         <button id="menu-btn">Menu</button>
+        <button id="guide-btn">Panduan</button>
         <button id="walk-mode-btn">Modus FPS</button>
         <button id="gallery-btn">Galeri</button>
         <button id="level-label" disabled>Level 1</button>
@@ -335,6 +336,20 @@
         <p style="font-size:13px;color:var(--muted)">10 era · 100 misi. Semua misi aktif dan dapat diselesaikan; era 7–10 memakai skor sistem lanjutan yang diturunkan dari state simulasi.</p>
         <div id="campaign-list">Memuat katalog misi…</div>
         <div class="row"><button id="campaign-close">Tutup</button></div>
+      </div>
+    </div>
+    <div id="guide-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Panduan Game">
+      <div class="card gallery-card">
+        <h2>Panduan Dasar Game</h2>
+        <div id="guide-list" style="font-size:12px;color:var(--text);line-height:1.7">
+          <div class="guide-row"><strong>Start:</strong> tap arah kiri/kanan pada canvas untuk melihat planet, klik untuk menempatkan objek.</div>
+          <div class="guide-row"><strong>Jalan/Modus FPS:</strong> tekan Jalan di topbar; kamera menjadi FPS di dalam planet, Arrow/WASD gerak, ArrowLeft/Right putar, Space/Shift naik/turun.</div>
+          <div class="guide-row"><strong>Galeri:</strong> buka Galeri di topbar untuk melihat resep habitat species + object.</div>
+          <div class="guide-row"><strong>Ekologi:</strong> buka Menu, pilih Ekologi untuk melihat spesies, himpunan, weather, dan population detail.</div>
+          <div class="guide-row"><strong>Misi:</strong> follow objective strip; progress selalu ada di Objective/Topbar.</div>
+          <div class="guide-row"><strong>Aside tips:</strong> telemetry & Baru utk seed acak, Planet DNA utk simpan/baca DNA.</div>
+        </div>
+        <div class="row"><button id="guide-close">Tutup</button></div>
       </div>
     </div>
     <div id="gallery-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Galeri Ekosistem">
