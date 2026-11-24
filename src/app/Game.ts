@@ -472,6 +472,9 @@ export class Game {
       orbit.maxDistance = 5;
       this.walkAzimuth = 0;
       this.walkAutoDir = [0.28, 0, 0.18];
+      const camera = this.scene.view.camera;
+      camera.position.set(0, 2.5, 0);
+      camera.lookAt(orbit.target);
       this.hud.notify('Modus FPS: gerak otomatis di dalam planet, Arrow/WASD, Space/Shift, ArrowLeft/Right → putar, tekan lagi untuk berhenti.', true);
     } else {
       window.removeEventListener('keydown', this.walkKeydown);
