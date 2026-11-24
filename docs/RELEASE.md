@@ -22,6 +22,8 @@ Gunakan checklist ini sebelum publish build produksi.
 
 > **Pembaruan aset low-poly 2026-11-24:** palet prop dan terrain digeser ke ramp cerah (kayu hangat, daun segar, air biru jenuh, salju hangat) tanpa mengubah target tinggi, footprint, atau budget facet. Varian gunung 3/4 kini punya identitas mineral dan label sendiri (`Limestone`, `Basalt`) alih-alih menyalin palet varian 0/1. Mata rubah/burung/serangga memakai dasar gelap + glint kecil; bayangan kontak dicerahkan dan radiusnya dikurangi 10%. Awan/hujan memakai warna cartoon lebih cerah (tint per planet **ditunda** karena batas app chunk). Pratinjau galeri memakai ramp sama dan stroke tipis pada facet besar. Bundle `index-DUYnopCk.js`, app chunk 99,86 kB / gzip 32,32 kB, chunk pratinjau 2,31 kB / gzip 1,33 kB; `npm test` 8/8 PASS, galeri 526 polygon tanpa error konsol. Tidak ada draw call atau gate baru; #5–#8 tetap harus diukur ulang.
 
+> **Perbaikan modus FPS 2026-11-24:** `orbit.update()` tidak lagi menimpa kamera FPS—`walkUpdate()` dipanggil setelah `updateCamera()` pada ticker. Kamera kini masuk ke permukaan planet (radius ≈1,06) dengan yaw mengikuti arah tangensial; mouse/Arrow Kiri-Kanan mengubah yaw, Arrow Atas-Bawah mengubah pitch, WASD/Space/Shift menggerakkan kamera, dan gravitasi tetap menuju pusat planet. `window.__game.camera()` kini ikut mengembalikan `walk`, `yaw`, `pitch` untuk verifikasi (hanya debug, bukan telemetry). Bundle `index-CdugdwDq.js`, app chunk 99,87 kB / gzip 32,37 kB; `npm test` 8/8 PASS. Verifikasi headless: jarak saat masuk `1,05`, yaw berubah `-0,40` rad per 100 px gerakan mouse, `ArrowUp` menaikkan pitch, `KeyW` mengubah azimuth, 0 error konsol. Bukti fisik #5–#8 harus diukur ulang untuk bundle ini.
+
 ## 1. Prasyarat
 
 - [ ] Node 20+ dan dependency terpasang (`npm install`).
@@ -37,7 +39,7 @@ npm run build
 PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 ```
 
-- [ ] `npm run build` tanpa error. Chunk vendor: `pixi-core` + `pixi-3d`, app chunk < 100 kB (v0.21.0 saat ini: 99,86 kB / gzip 32,32 kB, plus chunk pratinjau galeri yang dimuat sesuai kebutuhan 2,31 kB; produksi v0.16.0: 73,33 kB).
+- [ ] `npm run build` tanpa error. Chunk vendor: `pixi-core` + `pixi-3d`, app chunk < 100 kB (v0.21.0 saat ini: 99,87 kB / gzip 32,37 kB, plus chunk pratinjau galeri yang dimuat sesuai kebutuhan 2,31 kB; produksi v0.16.0: 73,33 kB).
 - [ ] `PASS: sim`
 - [ ] `PASS: art scale`
 - [ ] `PASS: terrain render`

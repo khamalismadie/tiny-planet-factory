@@ -71,9 +71,7 @@ export class Game {
   private sessionEnded = false;
   private walkEnabled = false;
   private readonly walkKeys = new Set<string>();
-  private walkAzimuth = 0;
-  private walkAutoDir = [0, 0, 0];
-  private walkLook = { x: 0, y: 0 };
+  private walkLook = { yaw: 0, pitch: -0.08, x: 0, y: 0 };
   private walkPointerHandler: ((event: Event) => void) | null = null;
   private gallerySelection: string | null = null;
   private galleryPreviewToken = 0;
@@ -515,36 +513,45 @@ export class Game {
     if (this.walkEnabled) {
       window.addEventListener('keydown', this.walkKeydown);
       window.addEventListener('keyup', this.walkKeyup);
-      const canvas = document.querySelector('#app canvas');
+      const canvas = document.querySelector('#app canvas') as HTMLElement | null;
+      const rect = canvas?.getBoundingClientRect();
+      const camera = this.scene.view.camera;
+      const len = Math.max(Math.hypot(camera.position.x, camera.position.y, camera.position.z), 0.01);
+      const ny = camera.position.y / len;
+      const nx = camera.position.x / len;
+      const nz = camera.position.z / len;
+      camera.position.set(nx * 1.06, ny * 1.06, nz * 1.06);
+      this.walkLook = {
+        yaw: Math.atan2(nz, -nx),
+        pitch: -0.08,
+        x: rect ? rect.left + rect.width / 2 : 0,
+        y: rect ? rect.top + rect.height / 2 : 0,
+      };
       this.walkPointerHandler = (event) => {
-        const mouse = event as MouseEvent;
-        const rect = canvas?.getBoundingClientRect();
-        if (!rect) return;
-        this.walkLook.x = (mouse.clientX - rect.left) - rect.width / 2;
-        this.walkLook.y = (mouse.clientY - rect.top) - rect.height / 2;
+        const mouse = event as PointerEvent;
+        const dx = mouse.clientX - this.walkLook.x;
+        const dy = mouse.clientY - this.walkLook.y;
+        this.walkLook.x = mouse.clientX;
+        this.walkLook.y = mouse.clientY;
+        this.walkLook.yaw -= dx * 0.004;
+        this.walkLook.pitch = Math.max(-1.2, Math.min(1.2, this.walkLook.pitch - dy * 0.004));
       };
       canvas?.addEventListener('pointermove', this.walkPointerHandler as unknown as EventListener);
-      orbit.enablePan = false;
       orbit.enableDamping = false;
-      orbit.minDistance = 1.2;
-      orbit.maxDistance = 5;
-      this.walkAzimuth = 0;
-      this.walkAutoDir = [0.28, 0, 0.18];
-      const camera = this.scene.view.camera;
-      camera.position.set(0, 2.5, 0);
-      camera.lookAt(orbit.target);
-      this.hud.notify('Modus FPS: gerak otomatis di dalam planet, Arrow/WASD, Space/Shift, ArrowLeft/Right → putar, gerakan mouse → arah kamera, tekan lagi untuk berhenti.', true);
+      orbit.minDistance = 0.8;
+      orbit.maxDistance = 3.2;
+      this.hud.notify('Modus FPS: mouse/Arrow Atas-Bawah lihat atas-bawah, Arrow Kiri-Kanan putar, WASD jalan, Space/Shift naik-turun. Klik lagi untuk keluar.', true);
     } else {
       window.removeEventListener('keydown', this.walkKeydown);
       window.removeEventListener('keyup', this.walkKeyup);
       const canvas = document.querySelector('#app canvas');
       if (this.walkPointerHandler) canvas?.removeEventListener('pointermove', this.walkPointerHandler);
       this.walkPointerHandler = null;
-      this.walkLook = { x: 0, y: 0 };
+      this.walkLook = { yaw: 0, pitch: -0.08, x: 0, y: 0 };
       this.walkKeys.clear();
+      orbit.enableDamping = true;
       orbit.minDistance = 2.2;
       orbit.maxDistance = 9;
-      this.walkAzimuth = 0;
       this.hud.notify('Jalan dimatikan.', true);
     }
   }
@@ -567,68 +574,48 @@ export class Game {
     const camera = this.scene.view.camera;
     const orbit = this.scene.orbit;
     const speed = 0.25 * deltaSeconds;
+    const yaw = this.walkLook.yaw;
+    const pitch = this.walkLook.pitch;
     let dx = 0;
     let dz = 0;
     let dy = 0;
     if (this.walkKeys.size === 0) {
-      dx += this.walkAutoDir[0];
-      dz += this.walkAutoDir[2];
-      dy += this.walkAutoDir[1];
-    }
-    if (this.walkPointerHandler) {
-      const lookX = Math.min(1, Math.max(-1, this.walkLook.x / Math.max(window.innerWidth / 2, 1)));
-      const lookY = Math.min(1, Math.max(-1, this.walkLook.y / Math.max(window.innerHeight / 2, 1)));
-      dx += lookX * 0.42;
-      dz += lookY * 0.42;
+      dx += Math.sin(yaw) * 0.28;
+      dz -= Math.cos(yaw) * 0.28;
     }
     for (const key of this.walkKeys) {
-      if (key === 'KeyW') { dx += Math.sin(this.walkAzimuth); dz -= Math.cos(this.walkAzimuth); }
-      if (key === 'KeyS') { dx -= Math.sin(this.walkAzimuth); dz += Math.cos(this.walkAzimuth); }
-      if (key === 'KeyA') { dx += Math.cos(this.walkAzimuth); dz += Math.sin(this.walkAzimuth); }
-      if (key === 'KeyD') { dx -= Math.cos(this.walkAzimuth); dz -= Math.sin(this.walkAzimuth); }
+      if (key === 'KeyW') { dx += Math.sin(yaw); dz -= Math.cos(yaw); }
+      if (key === 'KeyS') { dx -= Math.sin(yaw); dz += Math.cos(yaw); }
+      if (key === 'KeyD') { dx += Math.cos(yaw); dz += Math.sin(yaw); }
+      if (key === 'KeyA') { dx -= Math.cos(yaw); dz -= Math.sin(yaw); }
       if (key === 'Space') dy += 1;
       if (key === 'ShiftLeft') dy -= 1;
-      if (key === 'ArrowLeft') this.walkAzimuth -= 0.12 * deltaSeconds;
-      if (key === 'ArrowRight') this.walkAzimuth += 0.12 * deltaSeconds;
+      if (key === 'ArrowLeft') this.walkLook.yaw -= 1.1 * deltaSeconds;
+      if (key === 'ArrowRight') this.walkLook.yaw += 1.1 * deltaSeconds;
+      if (key === 'ArrowUp') this.walkLook.pitch = Math.min(1.2, pitch + 0.9 * deltaSeconds);
+      if (key === 'ArrowDown') this.walkLook.pitch = Math.max(-1.2, pitch - 0.9 * deltaSeconds);
     }
     camera.position.x += dx * speed;
     camera.position.y += dy * speed;
     camera.position.z += dz * speed;
-    const distance = Math.hypot(camera.position.x, camera.position.y, camera.position.z);
-    if (distance > 3.2) {
-      const scale = 3.2 / distance;
-      camera.position.x *= scale;
-      camera.position.y *= scale;
-      camera.position.z *= scale;
-    }
-    if (distance < 0.8) {
-      const scale = 0.8 / Math.max(distance, 0.01);
-      camera.position.x *= scale;
-      camera.position.y *= scale;
-      camera.position.z *= scale;
-    }
-    const gdx = orbit.target.x - camera.position.x;
-    const gdy = orbit.target.y - camera.position.y;
-    const gdz = orbit.target.z - camera.position.z;
-    const gLen = Math.max(Math.hypot(gdx, gdy, gdz), 0.01);
-    const gravitySpeed = speed * 0.2;
-    camera.position.x += (gdx / gLen) * gravitySpeed;
-    camera.position.y += (gdy / gLen) * gravitySpeed;
-    camera.position.z += (gdz / gLen) * gravitySpeed;
-    const distanceAfterGravity = Math.hypot(camera.position.x, camera.position.y, camera.position.z);
-    if (distanceAfterGravity > 3.2) {
-      const scale = 3.2 / distanceAfterGravity;
-      camera.position.x *= scale;
-      camera.position.y *= scale;
-      camera.position.z *= scale;
-    }
-    if (distanceAfterGravity < 0.8) {
-      const scale = 0.8 / Math.max(distanceAfterGravity, 0.01);
-      camera.position.x *= scale;
-      camera.position.y *= scale;
-      camera.position.z *= scale;
-    }
-    camera.lookAt(orbit.target);
+    const gx = orbit.target.x - camera.position.x;
+    const gy = orbit.target.y - camera.position.y;
+    const gz = orbit.target.z - camera.position.z;
+    const gLen = Math.max(Math.hypot(gx, gy, gz), 0.01);
+    camera.position.x += (gx / gLen) * speed * 0.2;
+    camera.position.y += (gy / gLen) * speed * 0.2;
+    camera.position.z += (gz / gLen) * speed * 0.2;
+    const len = Math.max(Math.hypot(camera.position.x, camera.position.y, camera.position.z), 0.01);
+    const scale = Math.max(0.8, Math.min(3.2, len)) / len;
+    camera.position.x *= scale;
+    camera.position.y *= scale;
+    camera.position.z *= scale;
+    const cp = Math.cos(this.walkLook.pitch);
+    camera.lookAt({
+      x: camera.position.x + Math.sin(this.walkLook.yaw) * cp,
+      y: camera.position.y + Math.sin(this.walkLook.pitch),
+      z: camera.position.z - Math.cos(this.walkLook.yaw) * cp,
+    });
   }
 
   private instrument(): void {
@@ -645,8 +632,8 @@ export class Game {
       }
     }
     this.app.ticker.add((ticker) => {
-      this.walkUpdate(ticker.deltaMS / 1000);
       this.scene.updateCamera();
+      this.walkUpdate(ticker.deltaMS / 1000);
       this.scene.update(ticker.deltaMS / 1000);
       if (!this.paused && !this.menuOpen) {
         this.accumulator += ticker.deltaMS;
@@ -740,6 +727,9 @@ export class Game {
           azimuth: this.scene.orbit.azimuthAngle,
           polar: this.scene.orbit.polarAngle,
           distance: this.scene.orbit.distance,
+          walk: this.walkEnabled,
+          yaw: this.walkLook.yaw,
+          pitch: this.walkLook.pitch,
         }),
         orbitDebug: () => {
           const orbit = this.scene.orbit as unknown as { _gesture?: string; _pointers?: unknown[] };
