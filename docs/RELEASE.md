@@ -12,7 +12,9 @@ Gunakan checklist ini sebelum publish build produksi.
 
 > **Pembaruan lowpoly 2026-11-24:** commit `0f72a8f` menambah detail pada low-poly spesies (`deer`, `fox`, `bird`, `fish`, `insect`), bundle `index-wiHAa9uT.js`, app chunk 93,91 kB / gzip 30,61 kB; `npm test` 8/8 PASS. Physical evidence #5–#8 dari bundle lama perlu diukur ulang kalau ditujukan ke bundle ini.
 
-> **Fitur eksplorasi 2026-11-24:** commit `d7c62ff` menambahkan **Camera Walk Mode** di `index.html` + `src/app/Game.ts`: tombol topbar `Jalan`, gerak Arrow/WASD/Space pada `Game.camera()`, pembatas radius 11, bundle `index-CPLCBIaY.js`; `npm test` 8/8 PASS.
+> **Fitur eksplorasi 2026-11-24:** commit `2a08277` menambahkan **Camera Walk Mode** sebagai first-person di dalam planet: ArrowLeft/Right untuk putar, WASD/Space/Shift pada `Game.camera()`, `camera.lookAt` target, pembatas radius, bundle `index-CeFNRByI.js`; `npm test` 8/8 PASS.
+
+> **Fitur galeri 2026-11-24:** commit `7f5dee2` menambahkan **Ekosistem Gallery 3D**: tombol topbar `Galeri`, modal gallery dengan daftar species + props, bundle `index-DrvTx7Lv.js`; `npm test` 8/8 PASS.
 
 ## 1. Prasyarat
 
