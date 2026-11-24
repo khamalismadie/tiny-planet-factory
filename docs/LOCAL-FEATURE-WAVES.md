@@ -9,7 +9,7 @@ Dokumen ini mencatat fitur-fitur kecil yang dikembangkan **lokal di `main` setel
 | Commit fitur terakhir | `f0193de` |
 | `package.json` | `0.21.0` |
 | Cache SW | `tpf-shell-v0-21-0` |
-| Bundle lokal pada commit ini | `index-BnlhvdGl.js` |
+| Bundle lokal pada commit ini | `index-wiHAa9uT.js` |
 | App chunk | 92,97 kB / gzip 30,34 kB |
 | Chunk lazy `ecopediaView` | 20,10 kB / gzip 6,11 kB |
 | `npm test` | 8/8 PASS |
@@ -108,7 +108,7 @@ Jika QA fisik dijalankan pada build `f0193de`, gunakan:
 ```bash
 npm run qa:evidence -- laporan.json \
   --expect-version 0.21.0 \
-  --expect-bundle index-BnlhvdGl.js
+  --expect-bundle index-wiHAa9uT.js
 ```
 
 Untuk `qa:evidence:batch`, pakai flag yang sama. Jangan menurunkan target atau mengabaikan `--expect-bundle` agar laporan dari build lain tidak diterima. URL probe, matriks penutupan #5–#8, dan perintah validator lengkap ada di `docs/QA-HANDOFF-WAVE9.md`.

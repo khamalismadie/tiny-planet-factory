@@ -10,6 +10,8 @@ Gunakan checklist ini sebelum publish build produksi.
 
 > **Status fitur lokal pasca-preview #41:** commit `71a8809`–`f0193de` menambahkan wave insight/restorasi/advisory/offline/lencana/indeks kesehatan/advisory habitat dan satwa etis di `main` tanpa schema, gate, planet, biome, atau misi baru. Build lokal pada `f0193de` memakai `index-BnlhvdGl.js`, app chunk 92,97 kB / gzip 30,34 kB, dan `npm test` 8/8 PASS. Tujuh laporan Wave 9 sudah ada di `qa-evidence/wave9/`, tetapi semuanya **REVIEW** dan **tidak** menutup #5–#8. Rincian: `docs/LOCAL-FEATURE-WAVES.md`. Paket pengumpulan bukti fisik untuk build ini: `docs/QA-HANDOFF-WAVE9.md`.
 
+> **Pembaruan lowpoly 2026-11-24:** commit `0f72a8f` menambah detail pada low-poly spesies (`deer`, `fox`, `bird`, `fish`, `insect`), bundle `index-wiHAa9uT.js`, app chunk 93,91 kB / gzip 30,61 kB; `npm test` 8/8 PASS. Physical evidence #5–#8 dari bundle lama perlu diukur ulang kalau ditujukan ke bundle ini.
+
 ## 1. Prasyarat
 
 - [ ] Node 20+ dan dependency terpasang (`npm install`).

@@ -2,7 +2,7 @@
 
 Dokumen ini memetakan bukti yang harus dilampirkan ke tiap issue. Ia **bukan** hasil QA dan tidak menutup issue apa pun.
 
-- Build kandidat: v0.21.0 — preview <https://6b045262361522f239ccf165--tinyplanetfactory.netlify.app/> (`index-BnlhvdGl.js`, `tpf-shell-v0-21-0`).
+- Build kandidat: v0.21.0 — preview <https://6b045262361522f239ccf165--tinyplanetfactory.netlify.app/> (`index-wiHAa9uT.js`, `tpf-shell-v0-21-0`).
 - Produksi tetap v0.16.0. Jangan mencampur bukti produksi dengan bukti v0.21.0.
 - Template laporan: `docs/QA-EVIDENCE-TEMPLATE.json`.
 - Checklist umum: `docs/QA-EVIDENCE-TEMPLATE.md`.
@@ -10,7 +10,7 @@ Dokumen ini memetakan bukti yang harus dilampirkan ke tiap issue. Ia **bukan** h
 - Paket p95 / #7: `docs/QA-P95-REMEASURE.md`.
 - Prosedur lengkap: `docs/QA-DEVICE.md`.
 
-Catatan build: bundle lokal pada commit ini `index-BnlhvdGl.js`. Fix #8 pada `index.html`: `#hint` disembunyikan pada landscape. Laporan lama `index-BiS1XGVG.js` **tidak berlaku**. Jangan mencampur laporan dari bundle preview #41.
+Catatan build: bundle lokal pada commit ini `index-wiHAa9uT.js`. Fix #8 pada `index.html`: `#hint` disembunyikan pada landscape. Laporan lama `index-BiS1XGVG.js` **tidak berlaku**. Jangan mencampur laporan dari bundle preview #41.
 
 Semua langkah di bawah wajib di perangkat Android nyata. Headless hanya smoke.
 
@@ -30,23 +30,23 @@ Semua langkah di bawah wajib di perangkat Android nyata. Headless hanya smoke.
 | 10 | `wave9/report-p95-run6.json` | 33,4 ms | `false` | 94 | medium / 0 downgrade | REVIEW — valid, p95 saja |
 | 11 | `wave9/report-p95-run7.json` | 33,4 ms | `false` | 94 | medium / 0 downgrade | REVIEW — valid, p95 saja |
 
-Batch arsip lama: `0 OK, 4 REVIEW, 4 file dari qa-evidence`. Run 5–9 berasal dari bundle Wave 9 `index-BnlhvdGl.js` dan divalidasi terpisah di `qa-evidence/wave9/`:
+Batch arsip lama: `0 OK, 4 REVIEW, 4 file dari qa-evidence`. Run 5–9 berasal dari bundle Wave 9 `index-wiHAa9uT.js` dan divalidasi terpisah di `qa-evidence/wave9/`:
 
 ```bash
 npm run qa:evidence -- qa-evidence/wave9/report-p95-run1.json \
-  --expect-version 0.21.0 --expect-bundle index-BnlhvdGl.js
+  --expect-version 0.21.0 --expect-bundle index-wiHAa9uT.js
 npm run qa:evidence -- qa-evidence/wave9/report-p95-run2.json \
-  --expect-version 0.21.0 --expect-bundle index-BnlhvdGl.js
+  --expect-version 0.21.0 --expect-bundle index-wiHAa9uT.js
 npm run qa:evidence -- qa-evidence/wave9/report-p95-run3.json \
-  --expect-version 0.21.0 --expect-bundle index-BnlhvdGl.js
+  --expect-version 0.21.0 --expect-bundle index-wiHAa9uT.js
 npm run qa:evidence -- qa-evidence/wave9/report-p95-run4.json \
-  --expect-version 0.21.0 --expect-bundle index-BnlhvdGl.js
+  --expect-version 0.21.0 --expect-bundle index-wiHAa9uT.js
 npm run qa:evidence -- qa-evidence/wave9/report-p95-run5.json \
-  --expect-version 0.21.0 --expect-bundle index-BnlhvdGl.js
+  --expect-version 0.21.0 --expect-bundle index-wiHAa9uT.js
 npm run qa:evidence -- qa-evidence/wave9/report-p95-run6.json \
-  --expect-version 0.21.0 --expect-bundle index-BnlhvdGl.js
+  --expect-version 0.21.0 --expect-bundle index-wiHAa9uT.js
 npm run qa:evidence -- qa-evidence/wave9/report-p95-run7.json \
-  --expect-version 0.21.0 --expect-bundle index-BnlhvdGl.js
+  --expect-version 0.21.0 --expect-bundle index-wiHAa9uT.js
 # EVIDENCE REVIEW: p95MasihDiAtas33ms
 ```
 
@@ -130,7 +130,7 @@ Lakukan dalam urutan ini. Jangan pakai `?qa=1` untuk pengukuran offline bila ing
 8. Validasi:
    ```bash
    npm run qa:evidence -- qa-evidence/wave9/report-offline.json \
-     --expect-version 0.21.0 --expect-bundle index-BnlhvdGl.js --standalone --offline
+     --expect-version 0.21.0 --expect-bundle index-wiHAa9uT.js --standalone --offline
    ```
 9. Lampirkan JSON, screenshot, dan output validator ke #6.
 
@@ -168,7 +168,7 @@ Jika belum ada build yang lebih baru, sub-langkah update **masih belum terverifi
 
 Kriteria #8: `orientation.type` landscape, `layout.planetCenterVisible === true`, `objectiveOverlapsInventory === false`, `topbarOverlapsBuild === false`, dan screenshot asli ada di issue.
 
-Status build `index-BnlhvdGl.js`: laporan lama `qa-evidence/wave9/report-landscape.json` (commit `f53c1a0`) gagal (`centerElement: "DIV"`, `planetCenterVisible: false` pada viewport `734x280`). Fix dulu di `index.html`: sembunyikan `#hint` pada landscape. Setelah fix, ulangi tes dari preview HTTPS di atas; #8 **belum lulus** sampai ada laporan ulang dengan `planetCenterVisible: true`.
+Status build `index-wiHAa9uT.js`: laporan lama `qa-evidence/wave9/report-landscape.json` (commit `f53c1a0`) gagal (`centerElement: "DIV"`, `planetCenterVisible: false` pada viewport `734x280`). Fix dulu di `index.html`: sembunyikan `#hint` pada landscape. Setelah fix, ulangi tes dari preview HTTPS di atas; #8 **belum lulus** sampai ada laporan ulang dengan `planetCenterVisible: true`.
 
 ## Urutan penutupan yang aman
 
