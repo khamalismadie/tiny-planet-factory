@@ -2,7 +2,7 @@
 
 Dokumen ini memetakan bukti yang harus dilampirkan ke tiap issue. Ia **bukan** hasil QA dan tidak menutup issue apa pun.
 
-- Build kandidat lokal: v0.21.0 — bundle `index-CdugdwDq.js`, SW `tpf-shell-v0-21-0`. Preview draft <https://6b045262361522f239ccf165--tinyplanetfactory.netlify.app/> masih menyajikan bundle lama dan **harus di-deploy ulang** sebelum dipakai untuk #5–#8.
+- Build kandidat lokal: v0.21.0 — bundle `index-CdugdwDq.js`, SW `tpf-shell-v0-21-0`. Preview sementara <https://sparkling-cheesecake-8582e4.netlify.app/> (password `My-Drop-Site`, **unclaimed**, kedaluwarsa ±1 jam) menyajikan bundle ini; URL draft lama `6b045262361522f239ccf165--tinyplanetfactory.netlify.app` masih stale. Produksi tidak berubah.
 - Produksi tetap v0.16.0. Jangan mencampur bukti produksi dengan bukti v0.21.0.
 - Template laporan: `docs/QA-EVIDENCE-TEMPLATE.json`.
 - Checklist umum: `docs/QA-EVIDENCE-TEMPLATE.md`.

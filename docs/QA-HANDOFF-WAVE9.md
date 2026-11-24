@@ -11,7 +11,7 @@ Dokumen ini adalah paket serah terima untuk pengumpulan bukti **di perangkat And
 | Commit fix #8 | `index.html` — sembunyikan `#hint` pada landscape |
 | Bundle | `index-CdugdwDq.js` |
 | Cache SW | `tpf-shell-v0-21-0` |
-| Preview HTTPS | `https://6b045262361522f239ccf165--tinyplanetfactory.netlify.app/` (context `deploy-preview`) — masih stale, wajib di-deploy ulang dari `dist/` sebelum dipakai |
+| Preview HTTPS | `https://sparkling-cheesecake-8582e4.netlify.app/` (Netlify Drop, password `My-Drop-Site`, **unclaimed**, kedaluwarsa ±1 jam, bukan produksi) |
 | Produksi saat ini | v0.16.0 — jangan dipakai sebagai build uji |
 | Evidence lama | `index-BnlhvdGl.js`, `index-BiS1XGVG.js`, `index-wiHAa9uT.js`, dan `index-DUYnopCk.js` — **tidak berlaku** untuk build ini |
 

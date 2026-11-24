@@ -24,6 +24,8 @@ Gunakan checklist ini sebelum publish build produksi.
 
 > **Perbaikan modus FPS 2026-11-24:** `orbit.update()` tidak lagi menimpa kamera FPS—`walkUpdate()` dipanggil setelah `updateCamera()` pada ticker. Kamera kini masuk ke permukaan planet (radius ≈1,06) dengan yaw mengikuti arah tangensial; mouse/Arrow Kiri-Kanan mengubah yaw, Arrow Atas-Bawah mengubah pitch, WASD/Space/Shift menggerakkan kamera, dan gravitasi tetap menuju pusat planet. `window.__game.camera()` kini ikut mengembalikan `walk`, `yaw`, `pitch` untuk verifikasi (hanya debug, bukan telemetry). Bundle `index-CdugdwDq.js`, app chunk 99,87 kB / gzip 32,37 kB; `npm test` 8/8 PASS. Verifikasi headless: jarak saat masuk `1,05`, yaw berubah `-0,40` rad per 100 px gerakan mouse, `ArrowUp` menaikkan pitch, `KeyW` mengubah azimuth, 0 error konsol. Bukti fisik #5–#8 harus diukur ulang untuk bundle ini.
 
+> **Preview draft darurat 2026-11-24:** tidak ada token/CLI Netlify di environment, sehingga build `index-CdugdwDq.js` di-deploy lewat Netlify Drop: <https://sparkling-cheesecake-8582e4.netlify.app/> (password `My-Drop-Site`). Situs ini **unclaimed**, dilindungi password, dan kedaluwarsa sekitar 1 jam setelah deploy; **bukan produksi**. Setelah password dimasukkan, verifikasi menunjukkan bundle `index-CdugdwDq.js`, `/sw.js` 200, dan `/manifest.webmanifest` 200. URL draft lama `6b045262361522f239ccf165--tinyplanetfactory.netlify.app` tetap stale. Untuk QA lanjutan, klaim situs Drop atau deploy ulang ke draft Netlify yang sudah ada.
+
 ## 1. Prasyarat
 
 - [ ] Node 20+ dan dependency terpasang (`npm install`).
