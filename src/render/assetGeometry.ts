@@ -557,20 +557,25 @@ function buildDeer(variant = 0): AssetGeometry {
   ][variant] ?? { body: PALETTE.deer, light: PALETTE.deerLight };
   const w = [1, 0.94, 1.04][variant] ?? 1;
   const parts: Part[] = [
-    widen(sphere(0.045, 8, 6, colors.body, [0, 0.06, 0], [1.45, 0.8, 0.8]), w),
-    widen(cylinder(0.011, 0.014, 0.06, 5, colors.body, [0.05, 0.093, 0], undefined, -0.4), w),
-    widen(sphere(0.021, 7, 5, colors.light, [0.073, 0.12, 0]), w),
+    widen(sphere(0.053, 12, 8, colors.body, [0, 0.076, 0], [1.7, 0.9, 0.9]), w),
+    widen(sphere(0.032, 8, 6, colors.light, [0.045, 0.068, 0.018], [1.3, 1.1, 0.8]), w),
+    widen(sphere(0.022, 7, 5, colors.light, [0.073, 0.12, 0]), w),
+    widen(sphere(0.005, 5, 4, colors.light, [0, 0.162, 0]), w),
+    widen(cone(0.008, 0.026, 6, colors.light, [0.073, 0.138, -0.006], undefined, undefined, 1.35), w),
+    widen(cone(0.006, 0.022, 6, colors.light, [0.03, 0.16, -0.008], undefined, undefined, 0.6), w),
+    widen(cone(0.006, 0.022, 6, colors.light, [-0.03, 0.16, 0.008], undefined, undefined, -0.6), w),
   ];
   for (const side of [-1, 1]) {
-    parts.push(widen(cone(0.008, 0.02, 5, colors.light, [0.073, 0.138, side * 0.017], undefined, undefined, side * 0.5), w));
+    parts.push(widen(cone(0.009, 0.024, 6, colors.light, [0.074, 0.145, side * 0.015], undefined, undefined, side * 0.5), w));
+    parts.push(widen(cylinder(0.0045, 0.0055, 0.014, 6, colors.body, [0.07, 0.12, side * 0.008], undefined, side * 0.35), w));
   }
   for (const x of [-0.038, 0.038]) {
     for (const z of [-0.019, 0.019]) {
-      parts.push(widen(cylinder(0.005, 0.006, 0.052, 5, colors.body, [x, 0.026, z]), w));
+      parts.push(widen(cylinder(0.0055, 0.0065, 0.065, 6, colors.body, [x, 0.028, z]), w));
     }
   }
-  parts.push(widen(cone(0.011, 0.028, 5, colors.light, [-0.068, 0.073, 0], undefined, undefined, 1.35), w));
-  return defineAsset(parts, 0.004, { radius: 0.05, color: PALETTE.shadowSoil });
+  parts.push(widen(cone(0.011, 0.029, 6, colors.light, [-0.068, 0.073, 0], undefined, undefined, 1.35), w));
+  return defineAsset(parts, 0.005, { radius: 0.06, color: PALETTE.shadowSoil });
 }
 
 function buildFox(variant = 0): AssetGeometry {
@@ -581,20 +586,25 @@ function buildFox(variant = 0): AssetGeometry {
   ][variant] ?? { body: PALETTE.fox, light: PALETTE.foxLight };
   const w = [1, 0.96, 0.88][variant] ?? 1;
   const parts: Part[] = [
-    widen(sphere(0.04, 8, 6, colors.body, [0, 0.047, 0], [1.45, 0.8, 0.8]), w),
-    widen(cone(0.03, 0.053, 6, colors.body, [0.06, 0.071, 0], undefined, undefined, -Math.PI / 2), w),
+    widen(sphere(0.048, 10, 7, colors.body, [0, 0.057, 0], [1.5, 0.85, 0.85]), w),
+    widen(sphere(0.032, 6, 5, colors.light, [0.045, 0.081, 0]), w),
+    widen(sphere(0.014, 5, 4, 0xf5f2e8, [0.073, 0.108, 0.01]), w),
+    widen(cone(0.025, 0.054, 6, colors.body, [0.056, 0.061, 0], undefined, undefined, -Math.PI / 2), w),
+    widen(cone(0.034, 0.074, 6, colors.body, [0.053, 0.07, 0.006], undefined, undefined, -Math.PI / 2), w),
+    widen(sphere(0.008, 5, 4, colors.light, [0.006, 0.116, 0.018]), w),
   ];
   for (const side of [-1, 1]) {
-    parts.push(widen(cone(0.012, 0.028, 5, colors.body, [0.046, 0.095, side * 0.02], undefined, undefined, side * 0.25), w));
+    parts.push(widen(cone(0.012, 0.03, 6, colors.body, [0.052, 0.098, side * 0.018], undefined, undefined, side * 0.25), w));
+    parts.push(widen(sphere(0.008, 5, 4, 0xf5f2e8, [0.066, 0.118, side * 0.032]), w));
   }
-  parts.push(widen(bevelCone(0.024, 0.073, 6, colors.body, [-0.07, 0.065, 0], undefined, undefined, 1.2), w));
-  parts.push(widen(cone(0.017, 0.026, 6, colors.light, [-0.108, 0.095, 0], undefined, undefined, 1.2), w));
+  parts.push(widen(bevelCone(0.027, 0.08, 7, colors.body, [-0.078, 0.071, 0], undefined, undefined, 1.25), w));
+  parts.push(widen(cone(0.017, 0.028, 6, colors.light, [-0.108, 0.097, 0], undefined, undefined, 1.2), w));
   for (const x of [-0.035, 0.035]) {
     for (const z of [-0.017, 0.017]) {
-      parts.push(widen(cylinder(0.005, 0.006, 0.041, 5, colors.body, [x, 0.021, z]), w));
+      parts.push(widen(cylinder(0.0055, 0.0065, 0.045, 6, colors.body, [x, 0.023, z]), w));
     }
   }
-  return defineAsset(parts, 0.004, { radius: 0.045, color: PALETTE.shadowSoil });
+  return defineAsset(parts, 0.005, { radius: 0.05, color: PALETTE.shadowSoil });
 }
 
 function buildBird(variant = 0): AssetGeometry {
@@ -605,15 +615,18 @@ function buildBird(variant = 0): AssetGeometry {
   ][variant] ?? { body: PALETTE.bird, light: PALETTE.birdLight, beak: PALETTE.beak };
   const w = [1, 0.92, 1.05][variant] ?? 1;
   const parts: Part[] = [
-    widen(sphere(0.03, 8, 6, colors.body, [0, 0.015, 0], [1.3, 0.48, 0.8]), w),
-    widen(sphere(0.018, 7, 5, colors.light, [0.036, 0.049, 0]), w),
-    widen(cone(0.008, 0.022, 5, colors.beak, [0.056, 0.044, 0], undefined, undefined, -Math.PI / 2), w),
+    widen(sphere(0.034, 10, 7, colors.body, [0, 0.018, 0], [1.45, 0.55, 0.85]), w),
+    widen(sphere(0.014, 5, 4, colors.light, [0.031, 0.052, 0]), w),
+    widen(sphere(0.016, 5, 4, 0xf5f2e8, [0.062, 0.052, 0.006]), w),
+    widen(cone(0.008, 0.022, 5, colors.beak, [0.061, 0.038, 0], undefined, undefined, -Math.PI / 2), w),
+    widen(cone(0.022, 0.032, 6, colors.body, [-0.038, 0.018, 0], undefined, undefined, Math.PI / 2), w),
   ];
   for (const side of [-1, 1]) {
-    parts.push(widen(sphere(0.021, 6, 3, colors.light, [0, 0.036, side * 0.026], [1.1, 0.18, 0.7]), w));
+    parts.push(widen(sphere(0.022, 6, 3, colors.light, [0, 0.035, side * 0.026], [1.1, 0.18, 0.7]), w));
+    parts.push(widen(sphere(0.01, 4, 3, colors.body, [0.036, 0.074, side * 0.018]), w));
+    parts.push(widen(cylinder(0.004, 0.005, 0.035, 4, colors.body, [0.022, 0.042, side * 0.008], undefined, side * 0.8), w));
   }
-  parts.push(widen(cone(0.012, 0.03, 5, colors.body, [-0.042, 0.028, 0], undefined, undefined, Math.PI / 2), w));
-  return defineAsset(parts, 0.004, { radius: 0.025, color: PALETTE.shadowSoil });
+  return defineAsset(parts, 0.005, { radius: 0.03, color: PALETTE.shadowSoil });
 }
 
 function buildFish(variant = 0): AssetGeometry {
@@ -623,14 +636,16 @@ function buildFish(variant = 0): AssetGeometry {
   ][variant] ?? { body: PALETTE.fish, light: PALETTE.fishLight };
   const w = [1, 0.94][variant] ?? 1;
   const parts: Part[] = [
-    widen(sphere(0.034, 8, 6, colors.body, [0, 0.045, 0], [1.65, 0.85, 0.7]), w),
-    widen(cone(0.025, 0.055, 5, colors.light, [-0.068, 0.045, 0], undefined, undefined, Math.PI / 2), w),
-    widen(cone(0.017, 0.036, 5, colors.light, [0, 0.077, 0]), w),
+    widen(sphere(0.042, 9, 7, colors.body, [0, 0.05, 0], [1.8, 0.85, 0.7]), w),
+    widen(cone(0.023, 0.048, 6, colors.light, [-0.073, 0.042, 0.012], undefined, undefined, Math.PI / 2), w),
+    widen(cone(0.015, 0.032, 5, colors.light, [0, 0.074, 0]), w),
+    widen(cone(0.036, 0.012, 6, colors.light, [0.018, 0.026, 0.06], undefined, undefined, 0.35), w),
   ];
   for (const side of [-1, 1]) {
     parts.push(widen(sphere(0.014, 6, 3, colors.light, [0.005, 0.042, side * 0.026], [1, 0.2, 0.8]), w));
+    parts.push(widen(cylinder(0.002, 0.002, 0.042, 4, colors.body, [0.014, 0.028, side * 0.018], undefined, side * 0.6), w));
   }
-  return defineAsset(parts, 0.012, { radius: 0.03, color: PALETTE.shadowWater });
+  return defineAsset(parts, 0.014, { radius: 0.035, color: PALETTE.shadowWater });
 }
 
 function buildInsect(variant = 0): AssetGeometry {
@@ -640,19 +655,21 @@ function buildInsect(variant = 0): AssetGeometry {
   ][variant] ?? { body: PALETTE.insect, light: PALETTE.insectLight };
   const w = [1, 0.9][variant] ?? 1;
   const parts: Part[] = [
-    widen(sphere(0.019, 7, 5, colors.body, [0, 0.032, 0], [1.5, 0.8, 0.8]), w),
-    widen(sphere(0.012, 6, 4, colors.light, [0.031, 0.036, 0]), w),
+    widen(sphere(0.023, 8, 6, colors.body, [0, 0.033, 0], [1.6, 0.82, 0.82]), w),
+    widen(sphere(0.013, 6, 4, colors.light, [0.031, 0.036, 0]), w),
+    widen(sphere(0.012, 4, 3, 0xf5f2e8, [0, 0.044, 0.006]), w),
   ];
   for (const side of [-1, 1]) {
-    parts.push(widen(sphere(0.021, 6, 3, colors.light, [0.002, 0.055, side * 0.018], [1, 0.15, 0.6]), w));
-    parts.push(widen(cylinder(0.002, 0.002, 0.022, 3, colors.body, [0.04, 0.052, side * 0.008], undefined, side * 0.5), w));
+    parts.push(widen(sphere(0.022, 6, 3, colors.light, [0.002, 0.055, side * 0.018], [1, 0.15, 0.6]), w));
+    parts.push(widen(sphere(0.010, 4, 3, colors.body, [0.034, 0.056, side * 0.012]), w));
+    parts.push(widen(cylinder(0.002, 0.002, 0.024, 4, colors.body, [0.042, 0.052, side * 0.008], undefined, side * 0.5), w));
   }
   for (const x of [-0.012, 0.012]) {
     for (const z of [-0.014, 0.014]) {
-      parts.push(widen(cylinder(0.002, 0.002, 0.03, 3, colors.body, [x, 0.015, z], undefined, z > 0 ? 0.35 : -0.35), w));
+      parts.push(widen(cylinder(0.0021, 0.0021, 0.032, 4, colors.body, [x, 0.018, z], undefined, z > 0 ? 0.35 : -0.35), w));
     }
   }
-  return defineAsset(parts, 0.004, { radius: 0.018, color: PALETTE.shadowSoil });
+  return defineAsset(parts, 0.005, { radius: 0.02, color: PALETTE.shadowSoil });
 }
 
 export type AssetBuilder = () => AssetGeometry;

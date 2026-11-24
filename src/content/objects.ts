@@ -143,7 +143,7 @@ export const OBJECT_DEFS: Record<ObjectType, ObjectDef> = {
     label: 'Burung',
     category: 'wildlife',
     color: 0x6fc5e8,
-    scale: 0.059,
+    scale: 0.0516,
     spacingRadius: 0.004,
     effects: { biodiversity: 0.16, oxygen: 0.01 },
     ecoEffects: { wildlife: 1, population: 1.5 },

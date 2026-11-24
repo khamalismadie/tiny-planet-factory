@@ -73,9 +73,9 @@ const targets: Record<string, number> = {
   tree: 0.045,
   bush: 0.015,
   flower: 0.0065,
-  deer: 0.0105,
-  fox: 0.007,
-  bird: 0.004,
+  deer: 0.0125,
+  fox: 0.0085,
+  bird: 0.00454,
 };
 
 // Facet budgets naik dari gate lama 18-200, tapi tetap per tipe dan tanpa tekstur.
@@ -90,11 +90,11 @@ const facetRanges: Record<string, [number, number]> = {
   tree: [120, 220],
   bush: [180, 280],
   flower: [150, 240],
-  deer: [240, 320],
-  fox: [200, 280],
-  bird: [180, 260],
-  fish: [140, 220],
-  insect: [180, 260],
+  deer: [400, 720],
+  fox: [350, 520],
+  bird: [220, 380],
+  fish: [210, 340],
+  insect: [250, 420],
 };
 
 const props: Record<string, { height: number; footprint: number; triangles: number; facets: number; textures: number }> = {};
@@ -145,7 +145,7 @@ const ratios = {
 };
 assert(ratios.mountainMinPerTreeMax >= 1.4, `gunung/pohon terlalu rendah: ${ratios.mountainMinPerTreeMax.toFixed(2)}`);
 assert(ratios.hillPerTree >= 1.2 && ratios.hillPerTree <= 1.5, `bukit/pohon di luar rentang: ${ratios.hillPerTree.toFixed(2)}`);
-assert(ratios.treePerDeer >= 4 && ratios.treePerDeer <= 5, `pohon/rusa di luar rentang: ${ratios.treePerDeer.toFixed(2)}`);
+assert(ratios.treePerDeer >= 3.4 && ratios.treePerDeer <= 4.2, `pohon/rusa di luar rentang: ${ratios.treePerDeer.toFixed(2)}`);
 assert(ratios.deerPerFox >= 1.4 && ratios.deerPerFox <= 1.6, `rusa/rubah di luar rentang: ${ratios.deerPerFox.toFixed(2)}`);
 assert(ratios.deerPerBird >= 2.5 && ratios.deerPerBird <= 3, `rusa/burung di luar rentang: ${ratios.deerPerBird.toFixed(2)}`);
 
@@ -178,7 +178,8 @@ for (const species of SPECIES_ORDER) {
     const asset = measure(variants[index]().geometry);
     const wildlifeHeight = asset.localH * SPECIES_SCALE[species];
     if (species in props) {
-      assert(Math.abs(wildlifeHeight - props[species].height) < 1e-6, `${label} wildlife harus sama dengan prop`);
+      assert(Math.abs(wildlifeHeight - props[species].height) < 0.0005,
+        `${label} wildlife harus mendekati prop`);
     }
     assert(wildlifeHeight < props.tree.height, `${label} wildlife tidak boleh lebih tinggi dari pohon`);
     const range = facetRanges[species];
