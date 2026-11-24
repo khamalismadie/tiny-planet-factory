@@ -42,7 +42,7 @@
       }
       #topbar {
         top: max(10px, env(safe-area-inset-top)); left: 10px; right: 10px;
-        display: flex; align-items: center; gap: 12px; padding: 6px 12px;
+        display: flex; align-items: center; gap: 12px; padding: 6px 12px; height: 50px;
       }
       #topbar strong { font-size: 14px; letter-spacing: .01em; color: var(--mint); }
       #planet-name { color: var(--muted); margin-left: 4px; font: 11px var(--mono); }
@@ -50,7 +50,7 @@
       #topbar .actions { display: flex; gap: 6px; }
       @media (max-width: 420px) { #topbar .actions { gap: 3px; } #topbar #new-btn { display: none; } }
       #menu-btn { background: rgba(127, 224, 173, 0.14); border-color: rgba(127, 224, 173, 0.45); color: var(--mint); }
-      #build-panel, #stats-panel { top: 80px; bottom: 96px; width: 218px; padding: 13px; overflow-y: auto; }
+      #build-panel, #stats-panel { top: 96px; bottom: 96px; width: 218px; padding: 13px; overflow-y: auto; }
       #build-panel { left: 10px; }
       #stats-panel { right: 10px; }
       #build-panel h2, #stats-panel h2 { margin: 0 0 11px; font-size: 13px; color: var(--muted); font-weight: 600; }

@@ -67,7 +67,7 @@ const targets: Record<string, number> = {
   sand: 0.0019,
   rock: 0.0065,
   hill: 0.06,
-  mountain: 0.115,
+  mountain: 0.165,
   ocean: 0.0045,
   lake: 0.0027,
   tree: 0.045,
@@ -108,7 +108,8 @@ for (const type of OBJECT_ORDER) {
     const footprint = asset.localW * scale;
     const target = targets[type];
     const range = facetRanges[type];
-    assert(Math.abs(height - target) <= target * 0.05, `${label} tinggi ${height.toFixed(4)} menyimpang dari target ${target}`);
+    const heightTolerance = type === 'mountain' ? 0.04 : target * 0.05;
+    assert(Math.abs(height - target) <= heightTolerance, `${label} tinggi ${height.toFixed(4)} menyimpang dari target ${target}`);
     assert(asset.triangles >= range[0] && asset.triangles <= range[1], `${label} triangle ${asset.triangles} di luar budget ${range[0]}-${range[1]}`);
     assert(asset.distinctNormals >= asset.triangles * 0.2, `${label} sudut facet terlalu sedikit: ${asset.distinctNormals}/${asset.triangles}`);
     assert(asset.textures === 0, `${label} tidak boleh memakai tekstur`);

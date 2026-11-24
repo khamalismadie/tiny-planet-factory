@@ -62,7 +62,7 @@ export const OBJECT_DEFS: Record<ObjectType, ObjectDef> = {
     category: 'geography',
     color: 0x7c828a,
     scale: 0.228,
-    spacingRadius: 0.023,
+    spacingRadius: 0.07,
     effects: { temperature: -0.04, water: 0.05, biodiversity: 0.02 },
     strength: 1,
   },

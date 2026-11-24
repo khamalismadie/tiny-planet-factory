@@ -457,14 +457,24 @@ function buildMountain(variant = 0): AssetGeometry {
     [PALETTE.stone, PALETTE.stoneLight, PALETTE.stoneDark, PALETTE.stoneLight, PALETTE.snow, PALETTE.stoneDark],
     [PALETTE.ash, PALETTE.stone, PALETTE.stoneDark, PALETTE.ash, PALETTE.lava, PALETTE.stoneDark],
     [PALETTE.stone, PALETTE.stoneLight, PALETTE.crystal, PALETTE.crystalLight, PALETTE.crystal, PALETTE.stoneDark],
+    [PALETTE.stone, PALETTE.stoneLight, PALETTE.stoneDark, PALETTE.stoneLight, PALETTE.snow, PALETTE.stoneDark],
+    [PALETTE.ash, PALETTE.stone, PALETTE.stoneDark, PALETTE.ash, PALETTE.lava, PALETTE.stoneDark],
   ][variant] ?? [PALETTE.stone, PALETTE.stoneLight, PALETTE.stoneDark, PALETTE.stoneLight, PALETTE.snow, PALETTE.stoneDark];
-  const w = [1, 0.94, 0.99][variant] ?? 1;
+  const shapes: Array<Array<[number, number, number, number]>> = [
+    [[0.12, 0.6, 9, 0], [0.05, 0.2, 7, 0], [0.07, 0.35, 7, 0.02], [0.05, 0.25, 7, 0.015], [0.04, 0.15, 7, 0]],
+    [[0.15, 0.72, 10, 0], [0.065, 0.26, 8, 0.01], [0.085, 0.44, 8, 0.02], [0.07, 0.32, 8, 0.015], [0.05, 0.18, 8, 0.01]],
+    [[0.13, 0.66, 8, 0], [0.055, 0.24, 7, 0.02], [0.072, 0.36, 7, 0.01], [0.06, 0.26, 7, 0.015], [0.045, 0.16, 7, 0.02]],
+    [[0.14, 0.7, 9, 0], [0.06, 0.28, 7, 0.015], [0.08, 0.4, 7, 0.02], [0.07, 0.24, 7, 0.01], [0.05, 0.17, 7, 0.015]],
+    [[0.13, 0.64, 8, 0], [0.055, 0.25, 7, 0.01], [0.073, 0.34, 7, 0.015], [0.06, 0.27, 7, 0.02], [0.046, 0.15, 7, 0.01]],
+  ];
+  const [a, b, c, d, e] = shapes[variant] ?? shapes[0];
+  const w = [1, 0.94, 0.99, 0.92, 0.98][variant] ?? 1;
   return defineAsset([
-    widen(bevelCone(0.1, 0.5, 9, colors[0], [0, 0.25, 0]), w),
-    widen(bevelCone(0.055, 0.16, 7, colors[1], [0, 0.33, 0]), w),
-    widen(bevelCone(0.068, 0.34, 7, colors[2], [-0.055, 0.17, 0.02], undefined, undefined, 0.12), w),
-    widen(bevelCone(0.06, 0.3, 7, colors[3], [0.055, 0.15, -0.015], undefined, undefined, -0.1), w),
-    widen(bevelCone(0.045, 0.14, 7, colors[4], [0, 0.43, 0]), w),
+    widen(bevelCone(a[0], a[1], a[2], colors[0], [0, a[1] * 0.28, a[3]], undefined, undefined, a[3] * 0.12), w),
+    widen(bevelCone(b[0], b[1], b[2], colors[1], [0, b[1] * 0.33, b[3]], undefined, undefined, b[3] * 0.22), w),
+    widen(bevelCone(c[0], c[1], c[2], colors[2], [-0.055, c[1] * 0.18, c[3]], undefined, undefined, c[3] * 0.25), w),
+    widen(bevelCone(d[0], d[1], d[2], colors[3], [0.055, d[1] * 0.12, d[3]], undefined, undefined, d[3] * 0.18), w),
+    widen(bevelCone(e[0], e[1], e[2], colors[4], [0, e[1] * 0.43, e[3]], undefined, undefined, e[3] * 0.15), w),
     widen(rock(0.052, colors[5], [-0.05, 0.02, 0.02], [0.55, 0.28, 0.55], 1), w),
   ], 0.004, { radius: 0.09, color: PALETTE.shadowStone });
 }
@@ -705,7 +715,7 @@ export const ASSET_BUILDERS: Record<ObjectType, AssetBuilder[]> = {
   sand: [() => buildSand(0), () => buildSand(1), () => buildSand(2)],
   rock: [() => buildRock(0), () => buildRock(1), () => buildRock(2)],
   hill: [() => buildHill(0), () => buildHill(1), () => buildHill(2)],
-  mountain: [() => buildMountain(0), () => buildMountain(1), () => buildMountain(2)],
+  mountain: [() => buildMountain(0), () => buildMountain(1), () => buildMountain(2), () => buildMountain(3), () => buildMountain(4)],
   ocean: [() => buildOcean(0), () => buildOcean(1), () => buildOcean(2)],
   lake: [() => buildLake(0), () => buildLake(1), () => buildLake(2)],
   tree: [() => buildTree(0), () => buildTree(1), () => buildTree(2)],
