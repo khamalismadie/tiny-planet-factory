@@ -470,7 +470,7 @@ export class Game {
       orbit.minDistance = 1.2;
       orbit.maxDistance = 5;
       this.walkAzimuth = 0;
-      this.hud.notify('Jalan: Arrow/WASD → gerak di dalam planet, ArrowLeft/Right → putar, Space/Shift → naik/turun, tekan lagi untuk berhenti.', true);
+      this.hud.notify('Jalan: Arrow/WASD → gerak di dalam planet, ArrowLeft/Right → putar, Space/Shift → naik/turun, gravitasi ke target planet aktif, tekan lagi untuk berhenti.', true);
     } else {
       window.removeEventListener('keydown', this.walkKeydown);
       window.removeEventListener('keyup', this.walkKeyup);
@@ -525,6 +525,27 @@ export class Game {
     }
     if (distance < 0.8) {
       const scale = 0.8 / Math.max(distance, 0.01);
+      camera.position.x *= scale;
+      camera.position.y *= scale;
+      camera.position.z *= scale;
+    }
+    const gdx = orbit.target.x - camera.position.x;
+    const gdy = orbit.target.y - camera.position.y;
+    const gdz = orbit.target.z - camera.position.z;
+    const gLen = Math.max(Math.hypot(gdx, gdy, gdz), 0.01);
+    const gravitySpeed = speed * 0.35;
+    camera.position.x += (gdx / gLen) * gravitySpeed;
+    camera.position.y += (gdy / gLen) * gravitySpeed;
+    camera.position.z += (gdz / gLen) * gravitySpeed;
+    const distanceAfterGravity = Math.hypot(camera.position.x, camera.position.y, camera.position.z);
+    if (distanceAfterGravity > 3.2) {
+      const scale = 3.2 / distanceAfterGravity;
+      camera.position.x *= scale;
+      camera.position.y *= scale;
+      camera.position.z *= scale;
+    }
+    if (distanceAfterGravity < 0.8) {
+      const scale = 0.8 / Math.max(distanceAfterGravity, 0.01);
       camera.position.x *= scale;
       camera.position.y *= scale;
       camera.position.z *= scale;
