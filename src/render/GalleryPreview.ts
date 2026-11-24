@@ -160,9 +160,10 @@ export function galleryPreviewSvg(asset: AssetGeometry): string {
     const red = (a.r + b.r + c.r) / 3;
     const green = (a.g + b.g + c.g) / 3;
     const blue = (a.b + b.b + c.b) / 3;
+    const ink = area > 12 ? ' stroke="#26334d" stroke-width="0.4"' : '';
     faces.push({
       depth: (a.depth + b.depth + c.depth) / 3,
-      markup: `<polygon points="${ax.toFixed(1)},${ay.toFixed(1)} ${bx.toFixed(1)},${by.toFixed(1)} ${cx.toFixed(1)},${cy.toFixed(1)}" fill="${faceColor(red, green, blue, shade)}"/>`,
+      markup: `<polygon points="${ax.toFixed(1)},${ay.toFixed(1)} ${bx.toFixed(1)},${by.toFixed(1)} ${cx.toFixed(1)},${cy.toFixed(1)}" fill="${faceColor(red, green, blue, shade)}"${ink}/>`,
     });
   }
 

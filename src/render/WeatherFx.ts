@@ -35,9 +35,9 @@ export class WeatherFx {
     widthSegments: 10,
     heightSegments: 6,
   });
-  private readonly cloudLight = new Material3D({ baseColor: 0xf2f6ff, roughness: 1, flatShading: true });
-  private readonly cloudDark = new Material3D({ baseColor: 0x69748a, roughness: 1, flatShading: true });
-  private readonly rainMaterial = new Material3D({ baseColor: 0x8fd0ff, roughness: 0.4 });
+  private readonly cloudLight = new Material3D({ baseColor: 0xffffff, roughness: 1, flatShading: true });
+  private readonly cloudDark = new Material3D({ baseColor: 0x7a86a8, roughness: 1, flatShading: true });
+  private readonly rainMaterial = new Material3D({ baseColor: 0x7fd8ff, roughness: 0.4 });
   private readonly snowMaterial = new Material3D({ baseColor: 0xffffff, roughness: 1 });
   private readonly rainGeometry = new CylinderGeometry({
     radiusTop: WEATHER_VISUAL.rainRadius,

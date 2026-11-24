@@ -4,6 +4,8 @@ Folder ini menyimpan laporan hasil `window.__game.qaReport()` dari perangkat nya
 
 Jangan mengubah isi file setelah disalin. Simpan satu file per sesi.
 
+> **Bundle kandidat terbaru (2026-11-24):** `index-DUYnopCk.js` (UI colorful + aset low-poly colorful, app chunk 99,86 kB / gzip 32,32 kB). Seluruh laporan yang tercatat di bawah masih tertaut ke bundle lama (`index-BnlhvdGl.js`, `index-BiS1XGVG.js`, `index-wiHAa9uT.js`) dan **tidak berlaku** untuk kandidat ini. Jangan menimpa arsip; simpan laporan baru di `qa-evidence/wave10/` (atau folder baru lain) dan validasi dengan `--expect-version 0.21.0 --expect-bundle index-DUYnopCk.js` beserta flag yang sesuai (`--standalone`, `--offline`, `--landscape`).
+
 ## Build Wave 9 — 7 laporan REVIEW
 
 Tujuh laporan untuk bundle `index-BnlhvdGl.js` sudah masuk di `qa-evidence/wave9/` dan semuanya berstatus **REVIEW / TIDAK LULUS**. Run 5–7 valid secara Android; sisanya tidak valid atau gagal pada konfigurasi. Paket pengumpulan buktinya ada di `docs/QA-HANDOFF-WAVE9.md`. Simpan laporan berikutnya di folder yang sama agar tidak tercampur dengan arsip preview #41, lalu validasi dengan `--expect-bundle index-BnlhvdGl.js`.

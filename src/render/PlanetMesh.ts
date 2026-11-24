@@ -11,13 +11,13 @@ import { DEFAULT_TERRAIN_CONFIG, type Environment, type TerrainConfig } from '..
 import { terrainRadius } from './terrain';
 
 const PALETTE = {
-  barren: 0xb9a878,
-  dry: 0xd0b985,
-  ocean: 0x3f86c4,
-  grass: 0x6fa05a,
-  lush: 0x3f8f4a,
-  rock: 0x8d8a82,
-  snow: 0xe6eef5,
+  barren: 0xd2bd7e,
+  dry: 0xe8cf93,
+  ocean: 0x36a7e8,
+  grass: 0x6fc45f,
+  lush: 0x38a84e,
+  rock: 0xa8a094,
+  snow: 0xf4f9ff,
 };
 
 function linear(hex: number): [number, number, number] {
