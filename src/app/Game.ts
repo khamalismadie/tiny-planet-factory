@@ -790,6 +790,7 @@ export class Game {
   }
 
   private syncHud(): void {
+    document.body.dataset.planet = this.state.planetId;
     const tip = this.tutorial.update(this.tutorialSignals());
     this.hud.setTutorialView(this.tutorial.view);
     this.hud.update(this.state, this.selected);

@@ -28,7 +28,7 @@ export function renderEcopediaHtml(planet: PlanetState, ecoSnapshot: EcoSnapshot
       <div class="ecopedia-kv"><strong>${esc(entry.label)}</strong><span>${status}</span></div>
       <div class="ecopedia-kv"><span>Agen ${entry.agents} · Pop ${Math.round(entry.estimate)}/${Math.round(entry.capacity)}</span><span>Pangan ${Math.round(entry.foodFactor * 100)}%</span></div>
       <div class="ecopedia-bar"><i style="width:${pct.toFixed(0)}%"></i></div>
-      <div style="font-size:11px;color:#72869a">Faktor pembatas: ${esc(limit)}</div>
+      <div style="font-size:11px;color:var(--muted)">Faktor pembatas: ${esc(limit)}</div>
       <div style="font-size:11px">${esc(entry.suggestion)}</div>
     </div>`;
   }).join('');
@@ -53,7 +53,7 @@ export function renderEcopediaHtml(planet: PlanetState, ecoSnapshot: EcoSnapshot
     prev && curr ? curr[key] - prev[key] : 0;
   const trendRow = (label: string, value: number, d: number, hint: string): string => {
     const sign = d > 0.05 ? '+' : d < -0.05 ? '' : '±';
-    const color = d > 0.05 ? 'var(--mint)' : d < -0.05 ? '#ffd479' : 'var(--muted)';
+    const color = d > 0.05 ? 'var(--good)' : d < -0.05 ? 'var(--warn)' : 'var(--muted)';
     const dText = Math.abs(d) <= 0.05 ? 'stabil' : `${sign}${d.toFixed(1)}`;
     return `<div class="ecopedia-item">
       <div class="ecopedia-kv"><strong>${esc(label)}</strong><span style="color:${color}">${Math.round(value)} · ${dText}</span></div>
@@ -86,11 +86,11 @@ export function renderEcopediaHtml(planet: PlanetState, ecoSnapshot: EcoSnapshot
       </div>
       <div class="ecopedia-bar"><i style="width:${health.score}%"></i></div>
       <div style="font-size:11px">${esc(health.summary)}</div>
-      <div style="font-size:11px;color:#72869a;margin-top:6px">Rata-rata perubahan indikator lingkungan dari kondisi awal: ${healthDelta}.</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px">Rata-rata perubahan indikator lingkungan dari kondisi awal: ${healthDelta}.</div>
     </div>
     <div class="ecopedia-item">
       <strong>Komponen penilaian</strong>
-      <div style="font-size:11px;color:#72869a;margin:4px 0">Bobot lokal, dihitung dari state yang sudah ada. Tidak memengaruhi simulasi atau gate QA.</div>
+      <div style="font-size:11px;color:var(--muted);margin:4px 0">Bobot lokal, dihitung dari state yang sudah ada. Tidak memengaruhi simulasi atau gate QA.</div>
       ${healthRows}
     </div>`;
 
@@ -102,7 +102,7 @@ export function renderEcopediaHtml(planet: PlanetState, ecoSnapshot: EcoSnapshot
         <span class="ecopedia-pill ${entry.tone}">${esc(entry.status)}</span>
       </div>
       <div class="ecopedia-bar"><i style="width:${entry.score}%"></i></div>
-      <div style="font-size:11px;color:#72869a">${esc(entry.detail)}</div>
+      <div style="font-size:11px;color:var(--muted)">${esc(entry.detail)}</div>
       <div style="font-size:11px">${esc(entry.advice)}</div>
     </div>`).join('');
 
@@ -113,7 +113,7 @@ export function renderEcopediaHtml(planet: PlanetState, ecoSnapshot: EcoSnapshot
         <span class="ecopedia-pill ${entry.tone}">${esc(entry.status)}</span>
       </div>
       <div class="ecopedia-bar"><i style="width:${entry.score}%"></i></div>
-      <div style="font-size:11px;color:#72869a">${esc(entry.detail)}</div>
+      <div style="font-size:11px;color:var(--muted)">${esc(entry.detail)}</div>
       <div style="font-size:11px">${esc(entry.advice)}</div>
     </div>`).join('');
 
@@ -139,7 +139,7 @@ export function renderEcopediaHtml(planet: PlanetState, ecoSnapshot: EcoSnapshot
   const risksHtml = risks.length
     ? risks.map((risk) => `<div class="ecopedia-item">
         <div class="ecopedia-kv"><strong>${esc(risk.label)}</strong><span class="ecopedia-pill warn">${risk.severity}</span></div>
-        <div style="font-size:11px;color:#72869a">${esc(risk.signal)}</div>
+        <div style="font-size:11px;color:var(--muted)">${esc(risk.signal)}</div>
         <div style="font-size:11px">${esc(risk.response)}</div>
       </div>`).join('')
     : '<div class="ecopedia-item"><div class="ecopedia-kv"><strong>Risiko rendah</strong><span class="ecopedia-pill ok">stabil</span></div><div style="font-size:11px">Tidak ada sinyal kekeringan, banjir, panas/dingin ekstrem, atau degradasi kritis saat ini.</div></div>';
@@ -157,11 +157,11 @@ export function renderEcopediaHtml(planet: PlanetState, ecoSnapshot: EcoSnapshot
     const row = (label: string, before: number, after: number, suffix = ''): string => {
       const d = after - before;
       const sign = d > 0 ? '+' : '';
-      const color = d > 0 ? 'var(--mint)' : d < 0 ? '#ffd479' : 'var(--muted)';
+      const color = d > 0 ? 'var(--good)' : d < 0 ? 'var(--warn)' : 'var(--muted)';
       return `<div class="ecopedia-kv"><span>${esc(label)}</span><span>${before.toFixed(0)}${suffix} → ${after.toFixed(0)}${suffix} <span style="color:${color}">(${sign}${d.toFixed(0)})</span></span></div>`;
     };
     return `<div class="ecopedia-item">
-      <div style="font-size:11px;color:#72869a;margin-bottom:6px">Snapshot tick ${snap.tick} · stage ${snap.stage} · Lv ${snap.level}</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px">Snapshot tick ${snap.tick} · stage ${snap.stage} · Lv ${snap.level}</div>
       ${row('Kesuburan', snap.fertility, planet.environment.fertility)}
       ${row('Air', snap.water, planet.environment.water)}
       ${row('Biodiversitas', snap.biodiversity, planet.environment.biodiversity)}
@@ -185,7 +185,7 @@ export function renderEcopediaHtml(planet: PlanetState, ecoSnapshot: EcoSnapshot
     return `<div class="ecopedia-item">
       <div class="ecopedia-kv"><strong>${esc(entry.label)}</strong><span class="ecopedia-pill ${entry.achieved ? 'ok' : ''}">${entry.achieved ? 'diraih' : 'belum'}</span></div>
       <div class="ecopedia-bar"><i style="width:${pct.toFixed(0)}%"></i></div>
-      <div class="ecopedia-kv"><span style="font-size:11px;color:#72869a">${esc(entry.detail)}</span><span style="font-size:11px">${Math.round(value)}/${entry.target}</span></div>
+      <div class="ecopedia-kv"><span style="font-size:11px;color:var(--muted)">${esc(entry.detail)}</span><span style="font-size:11px">${Math.round(value)}/${entry.target}</span></div>
     </div>`;
   }).join('');
 
@@ -229,7 +229,7 @@ export function renderEcopediaHtml(planet: PlanetState, ecoSnapshot: EcoSnapshot
     </section>
     <section class="ecopedia-section">
       <h3>Status Pemulihan</h3>
-      <div style="font-size:11px;color:#72869a;margin-bottom:8px">Delta dibanding sampel awal riwayat sesi ini (maks. ~2 menit).</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Delta dibanding sampel awal riwayat sesi ini (maks. ~2 menit).</div>
       <div class="ecopedia-list">${recoveryHtml}</div>
     </section>
     <section class="ecopedia-section">
@@ -238,12 +238,12 @@ export function renderEcopediaHtml(planet: PlanetState, ecoSnapshot: EcoSnapshot
     </section>
     <section class="ecopedia-section">
       <h3>Kebun Penyerbuk &amp; Hutan</h3>
-      <div style="font-size:11px;color:#72869a;margin-bottom:8px">Advisory dari jumlah objek existing. Tidak ada mekanik pemangkasan, resource, atau objek baru.</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Advisory dari jumlah objek existing. Tidak ada mekanik pemangkasan, resource, atau objek baru.</div>
       <div class="ecopedia-list">${habitatHtml}</div>
     </section>
     <section class="ecopedia-section">
       <h3>Perlindungan Satwa &amp; Konservasi</h3>
-      <div style="font-size:11px;color:#72869a;margin-bottom:8px">Advisory dari kapasitas, pangan, dan kualitas habitat. Tidak ada zona konservasi fisik atau misi baru.</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Advisory dari kapasitas, pangan, dan kualitas habitat. Tidak ada zona konservasi fisik atau misi baru.</div>
       <div class="ecopedia-list">${wildlifeHtml}</div>
     </section>
     <section class="ecopedia-section">
@@ -256,7 +256,7 @@ export function renderEcopediaHtml(planet: PlanetState, ecoSnapshot: EcoSnapshot
     </section>
     <section class="ecopedia-section">
       <h3>Milestone Restorasi</h3>
-      <div style="font-size:11px;color:#72869a;margin-bottom:8px">${achieved}/${milestones.length} tercapai. Milestone bersifat lokal dan non-punitif.</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">${achieved}/${milestones.length} tercapai. Milestone bersifat lokal dan non-punitif.</div>
       <div class="ecopedia-list">${milestoneHtml}</div>
     </section>
     <section class="ecopedia-section">
@@ -265,17 +265,17 @@ export function renderEcopediaHtml(planet: PlanetState, ecoSnapshot: EcoSnapshot
     </section>
     <section class="ecopedia-section">
       <h3>Jurnal Ekologi</h3>
-      <div style="font-size:11px;color:#72869a;margin-bottom:8px">Lokal di perangkat ini. Maks. 50 catatan, menampilkan 8 terbaru.</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Lokal di perangkat ini. Maks. 50 catatan, menampilkan 8 terbaru.</div>
       <div class="ecopedia-list">${journalHtml}</div>
     </section>
     <section class="ecopedia-section">
       <h3>Lencana Ekologi</h3>
-      <div style="font-size:11px;color:#72869a;margin-bottom:8px">${achievementsWon}/${achievements.length} diraih. Lencana hanya indikator lokal; tidak memberi reward, poin, atau hukuman.</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">${achievementsWon}/${achievements.length} diraih. Lencana hanya indikator lokal; tidak memberi reward, poin, atau hukuman.</div>
       <div class="ecopedia-list">${achievementsHtml}</div>
     </section>
     <section class="ecopedia-section">
       <h3>Kesiapan Offline</h3>
-      <div style="font-size:11px;color:#72869a;margin-bottom:8px">Snapshot kondisi browser saat kompendium dibuka. Bukan bukti QA perangkat nyata.</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Snapshot kondisi browser saat kompendium dibuka. Bukan bukti QA perangkat nyata.</div>
       <div class="ecopedia-list">${offlineHtml}</div>
     </section>
     <section class="ecopedia-section">
@@ -284,11 +284,11 @@ export function renderEcopediaHtml(planet: PlanetState, ecoSnapshot: EcoSnapshot
         <div class="ecopedia-item">
           <div class="ecopedia-kv"><strong>${esc(weather.currentLabel)}</strong><span>${weather.intensityPercent}% · ${weather.remainingTicks} tick</span></div>
           <div style="font-size:11px">${esc(weather.effects.join(' · ') || 'Tidak ada efek khusus.')}</div>
-          ${weather.caution ? `<div style="font-size:11px;color:#ffd479">${esc(weather.caution)}</div>` : ''}
+          ${weather.caution ? `<div style="font-size:11px;color:var(--warn)">${esc(weather.caution)}</div>` : ''}
         </div>
         <div class="ecopedia-item">
           <strong>Kecenderungan cuaca berikutnya</strong>
-          <div style="font-size:11px;color:#72869a;margin:4px 0">Persentase dihitung dari kondisi lingkungan saat ini, bukan jaminan RNG.</div>
+          <div style="font-size:11px;color:var(--muted);margin:4px 0">Persentase dihitung dari kondisi lingkungan saat ini, bukan jaminan RNG.</div>
           ${tendencyHtml}
         </div>
       </div>

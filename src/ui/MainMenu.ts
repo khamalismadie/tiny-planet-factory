@@ -34,8 +34,6 @@ const TIERS: QualityTier[] = ['low', 'medium', 'high'];
 
 export class MainMenu {
   private readonly root = document.getElementById('main-menu')!;
-  private readonly sheet = document.querySelector<HTMLElement>('.menu-sheet')!;
-  private readonly orb = document.getElementById('menu-planet-orb')!;
   private readonly planetGrid = document.getElementById('planet-grid')!;
   private readonly planetCaption = document.getElementById('menu-planet-caption')!;
   private readonly continueButton = document.getElementById('menu-continue') as HTMLButtonElement;
@@ -144,11 +142,6 @@ export class MainMenu {
     }
     if (!active) return;
     this.planetCaption.textContent = `${active.name} · ${active.subtitle}`;
-    for (const element of [this.sheet, this.orb]) {
-      element.style.setProperty('--planet-primary', active.colors.primary);
-      element.style.setProperty('--planet-water', active.colors.water);
-      element.style.setProperty('--planet-accent', active.colors.accent);
-    }
   }
 
   private openGuide(): void {

@@ -18,6 +18,8 @@ Gunakan checklist ini sebelum publish build produksi.
 
 > **Panduan lengkap 2026-11-24:** tombol topbar `Panduan` kini membuka modal panduan yang sama dengan menu `Cara pakai UI` (tombol `guide-btn` memicu `menu-guide`; modal dangkal `guide-quick-modal` dihapus). Isinya: tutorial 4 langkah, peta antarmuka, serta bagian **Edukasi planet** (definisi IAU, usia Tata Surya/Bumi, iklim vs cuaca, albedo, efek rumah kaca, 9 planet fiksi sebagai analog), **Sejarah sains & ekologi** (Copernicus–James Webb, Haeckel–Lindeman), **Detail ekosistem** (abiotik/biotik, fotosintesis, jaring trofik, siklus karbon/nitrogen/air, biodiversitas), dan **Pengetahuan sains** (tingkat organisasi, konservasi energi, metode ilmiah, model deterministik, laporan QA). Semua konten memakai `<details>` native tanpa gate baru. Bundle `index-tH2aV59H.js`, app chunk 99,97 kB / gzip 32,29 kB; `npm test` 8/8 PASS.
 
+> **Pembaruan warna UI 2026-11-24:** tampilan bergaya low-poly cartoon colorful: panggung malam `#101a33`, panel kertas `#fff6df` dengan border tinta, dan "spine" warna yang mengikuti planet aktif. Palet per planet diambil dari warna `PlanetConfig` yang sudah ada dan dipilih lewat `body[data-planet]` (tanpa modul JS baru). Juga memperbaiki konflik specificity panduan, menghapus CSS mati, menaikkan teks kecil ke 11 px, dan mengganti bar gradient dengan isian solid. Bundle `index-BisyOBvs.js`, app chunk 99,73 kB / gzip 32,23 kB; `npm test` 8/8 PASS. Kontras terukur di atas kertas: teks utama 11,72:1, sekunder 5,04:1, aksen hijau 4,91:1, peringatan 5,03:1. Bukti fisik #5–#8 harus diukur ulang untuk bundle ini.
+
 ## 1. Prasyarat
 
 - [ ] Node 20+ dan dependency terpasang (`npm install`).
@@ -33,7 +35,7 @@ npm run build
 PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 ```
 
-- [ ] `npm run build` tanpa error. Chunk vendor: `pixi-core` + `pixi-3d`, app chunk < 100 kB (v0.21.0 saat ini: 99,97 kB / gzip 32,29 kB, plus chunk pratinjau galeri yang dimuat sesuai kebutuhan 2,25 kB; produksi v0.16.0: 73,33 kB).
+- [ ] `npm run build` tanpa error. Chunk vendor: `pixi-core` + `pixi-3d`, app chunk < 100 kB (v0.21.0 saat ini: 99,73 kB / gzip 32,23 kB, plus chunk pratinjau galeri yang dimuat sesuai kebutuhan 2,25 kB; produksi v0.16.0: 73,33 kB).
 - [ ] `PASS: sim`
 - [ ] `PASS: art scale`
 - [ ] `PASS: terrain render`
