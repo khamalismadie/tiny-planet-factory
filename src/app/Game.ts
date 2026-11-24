@@ -71,6 +71,7 @@ export class Game {
   private walkEnabled = false;
   private readonly walkKeys = new Set<string>();
   private walkAzimuth = 0;
+  private walkAutoDir = [0, 0, 0];
 
   private constructor(app: Application, bootStart: number) {
     this.app = app;
@@ -470,7 +471,8 @@ export class Game {
       orbit.minDistance = 1.2;
       orbit.maxDistance = 5;
       this.walkAzimuth = 0;
-      this.hud.notify('Jalan: Arrow/WASD → gerak di dalam planet, ArrowLeft/Right → putar, Space/Shift → naik/turun, gravitasi ke target planet aktif, tekan lagi untuk berhenti.', true);
+      this.walkAutoDir = [0.28, 0, 0.18];
+      this.hud.notify('Modus FPS: gerak otomatis di dalam planet, Arrow/WASD, Space/Shift, ArrowLeft/Right → putar, tekan lagi untuk berhenti.', true);
     } else {
       window.removeEventListener('keydown', this.walkKeydown);
       window.removeEventListener('keyup', this.walkKeyup);
@@ -503,6 +505,11 @@ export class Game {
     let dx = 0;
     let dz = 0;
     let dy = 0;
+    if (this.walkKeys.size === 0) {
+      dx += this.walkAutoDir[0];
+      dz += this.walkAutoDir[2];
+      dy += this.walkAutoDir[1];
+    }
     for (const key of this.walkKeys) {
       if (key === 'KeyW') { dx += Math.sin(this.walkAzimuth); dz -= Math.cos(this.walkAzimuth); }
       if (key === 'KeyS') { dx -= Math.sin(this.walkAzimuth); dz += Math.cos(this.walkAzimuth); }
