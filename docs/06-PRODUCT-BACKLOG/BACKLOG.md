@@ -6,7 +6,7 @@ Status per 2026-11-25. Sumber: `docs/02-PRODUCT-STRATEGY/PRODUCT-TO-PRODUCTION.m
 
 | ID | Item | Status | Catatan |
 |---|---|---|---|
-| #5 | QA Android nyata: p50/p95, cold start 4G, pinch/drag, context loss/restore | OPEN | Umbrella; ditutup terakhir setelah #6–#8. Perangkat Itel S686LN / Android 15 sudah terhubung; boot `633 ms` dan `484 ms`, `contextLost:false` sudah teramati, tetapi skenario 4G/pinch/drag/context-restore belum dikumpulkan |
+| #5 | QA Android nyata: p50/p95, cold start 4G, pinch/drag, context loss/restore | OPEN | Umbrella; ditutup terakhir setelah #6–#8. Perangkat Itel S686LN / Android 15 terhubung. `context-before.json` LULUS: `p95 16,8 ms`, 45 s, 94 objek, `contextLost:false`, `serviceWorker.controller:true`, boot `1143 ms`. Skenario 4G/pinch/drag dan background 30 s + restore masih wajib manual |
 | #6 | PWA install → offline boot/save/place → update | OPEN | `serviceWorker.controller:true` dan shell `tpf-shell-v0-21-0` terlihat di run #1, namun `standalone:false` di kedua run; offline/update belum diverifikasi |
 | #7 | p95 `33,4 ms → ≤ 33 ms` | OPEN — 1/2 valid | `report-p95-run1.json` LULUS: `16,8 ms`, 180 s, 94 objek, draw call 20, validator OK. Run #2 juga `16,8 ms` tetapi `pwaControllerAktif:false` karena origin tunnel berganti, jadi belum bisa dipakai sebagai bukti penutup |
 | #8 | Landscape 844×390, planet tidak tertutup panel | OPEN | Run portrait `360×678` bersih (`planetCenterVisible:true`, tanpa overlap), tapi belum ada laporan landscape dari perangkat |
@@ -38,6 +38,7 @@ Status per 2026-11-25. Sumber: `docs/02-PRODUCT-STRATEGY/PRODUCT-TO-PRODUCTION.m
 |---|---|
 | `qa-evidence/wave10/report-p95-run1.json` | LULUS validator: `p95 16,8 ms`, `180014 ms`, 94 objek, draw call 20, `serviceWorker.controller:true`, bundle `index-DJTYXXt9.js` |
 | `qa-evidence/wave10/attempt-p95-origin-change.json` | `p95 16,8 ms`, `180010 ms`, tetapi `serviceWorker.controller:false` karena origin tunnel berganti. Ini catatan percobaan, **bukan** bukti penutup; sengaja tidak memakai prefix `report-` agar tidak ikut batch validator |
+| `qa-evidence/wave10/context-before.json` | LULUS validator: `p95 16,8 ms`, 45 s, 94 objek, `contextLost:false`, `serviceWorker.controller:true`. Ini baseline sebelum percobaan context loss; **bukan** bukti restore |
 
 Kedua run berasal dari perangkat Itel S686LN / Android 15 lewat preview HTTPS sementara. Tidak ada production deploy; produksi tetap `v0.16.0`.
 
