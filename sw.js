@@ -7,12 +7,13 @@ const PRECACHE = [
   "icons/icon.svg",
   "icons/icon-192.png",
   "icons/icon-512.png",
-  "assets/ecopediaView-DTZb7bom.js",
-  "assets/index-BnlhvdGl.js",
+  "assets/GalleryPreview-BVmOgYZA.js",
+  "assets/ecopediaView-CWRkQtgJ.js",
+  "assets/index-DJTYXXt9.js",
   "assets/meshopt_decoder-Dz7S8YZg.js",
   "assets/pixi-3d-txJ64NjT.js",
   "assets/pixi-core-DXQFmL6O.js",
-  "assets/planet-configs-DJR3I4Wu.js",
+  "assets/planet-configs-Ck2M5Dpi.js",
 ];
 const SCOPE = new URL('.', self.registration.scope);
 const asset = (path) => new URL(path, SCOPE).href;

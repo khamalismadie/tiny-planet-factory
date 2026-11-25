@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="theme-color" content="#0d1117" />
+    <meta name="theme-color" content="#101a33" />
     <meta name="description" content="Bangun planet mini, atur ekosistem, dan jaga tetap hidup." />
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
@@ -11,76 +11,100 @@
     <style>
       :root {
         color-scheme: dark;
-        --void: #070c14;
-        --ink: #0e1824;
-        --ink-2: #152332;
-        --line: #2a3d52;
-        --text: #e7eff8;
-        --muted: #94a8bd;
-        --mint: #7fe0ad;
-        --amber: #f4bd72;
-        --violet: #a99ae8;
-        --panel: rgba(12, 20, 30, 0.92);
+        --night: #101a33;
+        --paper: #fff6df;
+        --paper-shade: #fffaf0;
+        --ink: #26334d;
+        --muted: #5b6b82;
+        --stage-text: #eef4ff;
+        --coral: #ff7a66;
+        --sun: #ffc94d;
+        --mint: #4fd1a5;
+        --sky: #55b8ee;
+        --lilac: #b18bff;
+        --good: #1d7a57;
+        --warn: #9a5b12;
+        --line: #26334d;
+        --planet-primary: #4f9d69;
+        --planet-water: #2f7fa8;
+        --planet-accent: #e8c86a;
         --display: "Trebuchet MS", "Avenir Next", "Segoe UI", sans-serif;
         --mono: ui-monospace, "SFMono-Regular", Consolas, monospace;
       }
+      body[data-planet="terra"] { --planet-primary: #4f9d69; --planet-water: #2f7fa8; --planet-accent: #e8c86a; }
+      body[data-planet="dune"] { --planet-primary: #d9a441; --planet-water: #2b8ba0; --planet-accent: #6fb7a1; }
+      body[data-planet="glaciere"] { --planet-primary: #bcd8e8; --planet-water: #3a7fa5; --planet-accent: #9ad7ef; }
+      body[data-planet="inferna"] { --planet-primary: #d8542a; --planet-water: #6c2f1a; --planet-accent: #ffa23a; }
+      body[data-planet="aquaria"] { --planet-primary: #2fa4a8; --planet-water: #1b7fb3; --planet-accent: #ff9c6e; }
+      body[data-planet="mycelia"] { --planet-primary: #8a6cd6; --planet-water: #2f6b8a; --planet-accent: #d7f27a; }
+      body[data-planet="sakura"] { --planet-primary: #f0a8c8; --planet-water: #5aa8cf; --planet-accent: #ffe6a0; }
+      body[data-planet="aurelia"] { --planet-primary: #d98a32; --planet-water: #3f7f8f; --planet-accent: #f2c85b; }
+      body[data-planet="cosmos"] { --planet-primary: #8f7ce8; --planet-water: #2b3f8a; --planet-accent: #f2e07a; }
       * { box-sizing: border-box; }
-      html, body { margin: 0; height: 100%; overflow: hidden; background: var(--void); color: var(--text); font-family: var(--display); }
+      html, body { margin: 0; height: 100%; overflow: hidden; background: var(--night); color: var(--ink); font-family: var(--display); }
       button {
-        font: inherit; font-size: 12px; color: var(--text); background: rgba(25, 38, 53, 0.94);
-        border: 1px solid var(--line); border-radius: 9px; padding: 8px 11px; cursor: pointer; min-height: 48px; min-width: 48px;
+        font: inherit; font-size: 12px; color: var(--ink); background: var(--paper);
+        border: 2px solid var(--line); border-radius: 12px; padding: 8px 11px; cursor: pointer;
+        min-height: 48px; min-width: 48px;
       }
-      button:hover { border-color: var(--mint); color: var(--mint); }
-      button:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
-      button.active { background: rgba(48, 103, 78, 0.55); border-color: var(--mint); color: var(--mint); }
-      button:disabled { opacity: .4; cursor: not-allowed; }
+      button:hover { border-color: var(--planet-primary); }
+      button:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+      button.active { background: var(--paper); border-color: var(--line); box-shadow: inset 5px 0 0 var(--planet-primary); color: var(--ink); }
+      button:disabled { opacity: .45; cursor: not-allowed; }
       #app { position: fixed; inset: 0; }
       #app canvas { display: block; }
       .panel {
-        position: fixed; z-index: 10; background: var(--panel); border: 1px solid var(--line);
-        border-radius: 14px 14px 5px 14px; backdrop-filter: blur(10px);
+        position: fixed; z-index: 10; background: var(--paper); border: 2px solid var(--line);
+        border-radius: 14px; box-shadow: 0 10px 30px rgba(8, 12, 24, .28);
+      }
+      .panel::before {
+        content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 6px;
+        border-radius: 12px 0 0 12px; background: var(--planet-primary);
       }
       #topbar {
         top: max(10px, env(safe-area-inset-top)); left: 10px; right: 10px;
-        display: flex; align-items: center; gap: 12px; padding: 6px 12px;
+        display: flex; align-items: center; gap: 12px; padding: 6px 12px; height: 50px;
       }
-      #topbar strong { font-size: 14px; letter-spacing: .01em; color: var(--mint); }
+      #topbar strong { font-size: 14px; letter-spacing: -.01em; color: var(--ink); border-bottom: 3px solid var(--planet-primary); }
       #planet-name { color: var(--muted); margin-left: 4px; font: 11px var(--mono); }
-      #stage-label { margin-left: auto; color: var(--amber); font-size: 12px; }
+      #stage-label { margin-left: auto; color: var(--warn); font-size: 12px; font-weight: 700; }
       #topbar .actions { display: flex; gap: 6px; }
-      #menu-btn { background: rgba(127, 224, 173, 0.14); border-color: rgba(127, 224, 173, 0.45); color: var(--mint); }
-      #build-panel, #stats-panel { top: 80px; bottom: 96px; width: 218px; padding: 13px; overflow-y: auto; }
+      @media (max-width: 420px) { #topbar .actions { gap: 3px; } #topbar #new-btn { display: none; } }
+      @media (max-width: 500px) { #topbar #dna-btn { display: none; } }
+      #menu-btn { box-shadow: inset 5px 0 0 var(--planet-primary); }
+      #build-panel, #stats-panel { top: 96px; bottom: 96px; width: 218px; padding: 13px 13px 13px 16px; overflow-y: auto; }
       #build-panel { left: 10px; }
       #stats-panel { right: 10px; }
-      #build-panel h2, #stats-panel h2 { margin: 0 0 11px; font-size: 13px; color: var(--muted); font-weight: 600; }
+      #stats-panel::before { background: var(--planet-water); }
+      #build-panel h2, #stats-panel h2 { margin: 0 0 11px; font-size: 13px; color: var(--ink); font-weight: 700; }
       .category { margin-bottom: 13px; }
       .category > span { display: block; font-size: 11px; color: var(--muted); margin-bottom: 6px; }
       .category .items { display: flex; flex-wrap: wrap; gap: 6px; }
       .category button { flex: 1 1 44%; font-size: 11px; padding: 6px; min-height: 48px; }
       .stat { margin-bottom: 8px; }
       .stat .row { display: flex; justify-content: space-between; font: 11px var(--mono); margin-bottom: 4px; }
-      .bar { height: 5px; border-radius: 3px; background: #1d2c3a; overflow: hidden; }
-      .bar > i { display: block; height: 100%; background: linear-gradient(90deg, var(--mint), var(--violet)); transition: width .4s ease; }
-      #mission { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 10px; font-size: 12px; line-height: 1.5; }
-      #mission strong, #weather strong, #events strong { color: var(--mint); }
-      #ecosystem { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 10px; font-size: 11px; color: var(--muted); line-height: 1.5; }
-      #eco-detail { margin-top: 10px; border-top: 1px solid var(--line); padding-top: 8px; font: 10px/1.4 var(--mono); color: var(--muted); }
-      #eco-detail .eco-title { margin-top: 8px; padding-top: 6px; border-top: 1px solid #24313f; color: #c8d7e6; }
+      .bar { height: 7px; border-radius: 4px; background: var(--paper-shade); border: 1px solid var(--line); overflow: hidden; }
+      .bar > i { display: block; height: 100%; background: var(--planet-water); box-shadow: inset -2px 0 0 rgba(38, 51, 77, .22); transition: width .4s ease; }
+      #mission { margin-top: 14px; border-top: 2px solid var(--line); padding-top: 10px; font-size: 12px; line-height: 1.5; }
+      #mission strong, #weather strong, #events strong { color: var(--good); }
+      #ecosystem { margin-top: 12px; border-top: 2px solid var(--line); padding-top: 10px; font-size: 11px; color: var(--muted); line-height: 1.5; }
+      #eco-detail { margin-top: 10px; border-top: 2px solid var(--line); padding-top: 8px; font: 11px/1.5 var(--mono); color: var(--muted); }
+      #eco-detail .eco-title { margin-top: 8px; padding-top: 6px; border-top: 1px solid var(--line); color: var(--ink); font-weight: 700; }
       #eco-detail .eco-list { margin-top: 6px; }
       #eco-detail .eco-name { display: flex; justify-content: space-between; gap: 6px; }
-      #eco-detail .eco-bar { height: 3px; border-radius: 2px; background: #1e2b38; overflow: hidden; margin: 2px 0; }
-      #eco-detail .eco-bar > i { display: block; height: 100%; background: var(--amber); }
-      #eco-detail .eco-limit { color: #72869a; font-size: 9px; margin-bottom: 4px; }
+      #eco-detail .eco-bar { height: 4px; border-radius: 2px; background: var(--paper-shade); border: 1px solid var(--line); overflow: hidden; margin: 2px 0; }
+      #eco-detail .eco-bar > i { display: block; height: 100%; background: var(--planet-accent); }
+      #eco-detail .eco-limit { color: var(--muted); font-size: 11px; margin-bottom: 4px; }
       #weather { margin-top: 10px; font-size: 11px; color: var(--muted); line-height: 1.5; }
       #events { margin-top: 10px; font-size: 11px; line-height: 1.4; }
       .event { margin-bottom: 6px; }
-      .event.done { color: var(--mint); }
+      .event.done { color: var(--good); }
       .event span { color: var(--muted); }
       #inventory {
         left: 50%; transform: translateX(-50%); bottom: max(10px, env(safe-area-inset-bottom));
         max-width: min(760px, calc(100% - 20px)); padding: 8px 10px; text-align: center;
-        border-radius: 12px 12px 12px 4px;
       }
+      #inventory::before { background: var(--planet-accent); }
       #object-list { display: flex; gap: 6px; overflow-x: auto; }
       #object-list button { white-space: nowrap; font-size: 11px; }
       #objective-strip {
@@ -88,159 +112,139 @@
         bottom: calc(max(10px, env(safe-area-inset-bottom)) + 74px);
         width: min(760px, calc(100% - 20px)); min-height: 48px;
         padding: 7px 10px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-        font-size: 11px; line-height: 1.35; border-radius: 12px 12px 4px 12px;
+        font-size: 11px; line-height: 1.35;
       }
-      .objective-stage { color: var(--amber); font-weight: 700; white-space: nowrap; }
-      .objective-goal { color: var(--text); }
-      .objective-mission { margin-left: auto; color: var(--muted); font: 10px/1.4 var(--mono); text-align: right; }
-      .objective-mission.done { color: var(--mint); }
-      .tutorial-focus {
-        outline: 2px solid var(--mint);
-        outline-offset: 2px;
-        box-shadow: 0 0 0 4px rgba(93, 214, 178, .14);
-        animation: tutorial-pulse 1.8s ease-in-out 2;
-      }
-      @keyframes tutorial-pulse {
-        50% { box-shadow: 0 0 0 9px rgba(93, 214, 178, 0); }
-      }
-      @media (prefers-reduced-motion: reduce) {
-        .tutorial-focus { animation: none; }
-      }
-      #hint { position: fixed; z-index: 5; bottom: calc(max(10px, env(safe-area-inset-bottom)) + 136px); left: 50%; transform: translateX(-50%); font-size: 11px; color: var(--muted); pointer-events: none; text-align: center; }
-      #perf { position: fixed; z-index: 20; left: 10px; bottom: 140px; display: none; padding: 8px 10px; border-radius: 8px; background: rgba(5, 10, 16, .9); border: 1px solid var(--line); color: var(--mint); font: 11px/1.5 var(--mono); white-space: pre-line; pointer-events: none; }
+      #objective-strip::before { background: var(--sun); }
+      .objective-stage { color: var(--warn); font-weight: 700; white-space: nowrap; }
+      .objective-goal { color: var(--ink); }
+      .objective-mission { margin-left: auto; color: var(--muted); font: 11px/1.4 var(--mono); text-align: right; }
+      .objective-mission.done { color: var(--good); }
+      .tutorial-focus { outline: 3px solid var(--ink); outline-offset: 2px; box-shadow: 0 0 0 5px rgba(79, 209, 165, .22); animation: tutorial-pulse 1.8s ease-in-out 2; }
+      @keyframes tutorial-pulse { 50% { box-shadow: 0 0 0 10px rgba(79, 209, 165, 0); } }
+      @media (prefers-reduced-motion: reduce) { .tutorial-focus { animation: none; } }
+      #hint { position: fixed; z-index: 5; bottom: calc(max(10px, env(safe-area-inset-bottom)) + 136px); left: 50%; transform: translateX(-50%); font-size: 11px; color: var(--stage-text); pointer-events: none; text-align: center; text-shadow: 0 2px 6px rgba(8, 12, 24, .8); }
+      #perf { position: fixed; z-index: 20; left: 10px; bottom: 140px; display: none; padding: 8px 10px; border-radius: 10px; background: rgba(8, 12, 24, .92); border: 2px solid var(--stage-text); color: var(--stage-text); font: 11px/1.5 var(--mono); white-space: pre-line; pointer-events: none; }
       #perf.show { display: block; }
-      #qa { position: fixed; z-index: 25; inset: 12px; display: none; flex-direction: column; gap: 8px; padding: 14px; border-radius: 12px; background: rgba(8, 13, 20, .97); border: 1px solid var(--line); }
+      #qa { position: fixed; z-index: 25; inset: 12px; display: none; flex-direction: column; gap: 8px; padding: 14px; border-radius: 14px; background: rgba(8, 12, 24, .97); border: 2px solid var(--stage-text); color: var(--stage-text); }
       #qa.show { display: flex; }
-      #qa h2 { margin: 0; font-size: 15px; color: var(--mint); }
-      #qa-status { font-size: 12px; color: var(--muted); }
-      #qa-output { flex: 1; overflow: auto; margin: 0; padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: #0c141d; color: var(--text); font: 11px/1.5 var(--mono); white-space: pre; resize: none; }
+      #qa h2 { margin: 0; font-size: 15px; color: var(--sun); }
+      #qa-status { font-size: 12px; color: var(--stage-text); }
+      #qa-output { flex: 1; overflow: auto; margin: 0; padding: 10px; border: 1px solid var(--stage-text); border-radius: 8px; background: rgba(255, 255, 255, .06); color: var(--stage-text); font: 11px/1.5 var(--mono); white-space: pre; resize: none; }
       #qa-actions { display: flex; gap: 8px; justify-content: flex-end; }
-      #toast { position: fixed; z-index: 60; top: 72px; left: 50%; transform: translateX(-50%); background: #213447; border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; max-width: 80%; display: none; font-size: 12px; }
+      #toast { position: fixed; z-index: 60; top: 72px; left: 50%; transform: translateX(-50%); background: rgba(8, 12, 24, .94); border: 2px solid var(--stage-text); border-radius: 12px; padding: 10px 14px; max-width: 80%; display: none; font-size: 12px; color: var(--stage-text); }
       #toast.show { display: block; }
-      #toast.warn { border-color: var(--amber); color: var(--amber); }
-      .modal { position: fixed; z-index: 45; inset: 0; display: grid; place-items: center; background: rgba(5, 8, 12, .76); padding: 16px; }
+      #toast.warn { border-color: var(--sun); color: var(--sun); }
+      .modal { position: fixed; z-index: 45; inset: 0; display: grid; place-items: center; background: rgba(8, 12, 24, .78); padding: 16px; }
       .modal.hidden, .hidden { display: none !important; }
-      .modal .card { background: linear-gradient(160deg, #121f2d, #0d1620); border: 1px solid var(--line); border-radius: 16px 16px 6px 16px; padding: 18px; width: min(480px, 100%); }
-      .modal h2 { margin-top: 0; font-size: 16px; }
-      .modal input, .modal textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--line); background: #0c141d; color: var(--text); font-family: var(--mono); box-sizing: border-box; }
+      .modal .card { position: relative; background: var(--paper); border: 2px solid var(--line); border-radius: 14px; padding: 18px; width: min(480px, 100%); box-shadow: 0 18px 50px rgba(8, 12, 24, .4); }
+      .modal .card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; border-radius: 12px 0 0 12px; background: var(--planet-primary); }
+      .modal h2 { margin: 0 0 8px; font-size: 16px; color: var(--ink); }
+      .modal input, .modal textarea { width: 100%; padding: 10px; border-radius: 10px; border: 2px solid var(--line); background: var(--paper-shade); color: var(--ink); font-family: var(--mono); box-sizing: border-box; }
       .modal textarea { resize: vertical; min-height: 64px; font-size: 11px; line-height: 1.4; word-break: break-all; }
       .modal .dna-label { display: block; margin-top: 10px; font-size: 12px; color: var(--muted); }
-      .modal .dna-status { margin-top: 10px; font-size: 12px; color: #ffd479; }
+      .modal .dna-status { margin-top: 10px; font-size: 12px; color: var(--warn); font-weight: 700; }
       .modal .row { display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end; flex-wrap: wrap; }
       .campaign-card { width: min(560px, 100%); }
       #campaign-list { max-height: min(58vh, 420px); overflow-y: auto; margin-top: 10px; padding-right: 4px; }
-      .campaign-era { margin-top: 10px; font-size: 12px; color: var(--amber); font-weight: 700; }
-      .campaign-row { display: flex; gap: 8px; padding: 5px 6px; border-bottom: 1px solid rgba(255,255,255,.06); font-size: 11px; line-height: 1.4; }
+      .campaign-era { margin-top: 10px; font-size: 12px; color: var(--warn); font-weight: 700; }
+      .campaign-row { display: flex; gap: 8px; padding: 5px 6px; border-bottom: 1px solid var(--line); font-size: 11px; line-height: 1.4; }
       .campaign-row .lv { color: var(--muted); font: 10px var(--mono); min-width: 26px; }
-      .campaign-row .title { color: var(--text); min-width: 120px; }
+      .campaign-row .title { color: var(--ink); min-width: 120px; }
       .campaign-row .goal { color: var(--muted); flex: 1; }
-      .campaign-row.locked { opacity: .55; }
-      .campaign-row.current { background: rgba(89, 226, 173, .09); border-radius: 6px; }
+      .campaign-row.locked { color: var(--muted); }
+      .campaign-row.current { background: rgba(79, 209, 165, .18); border-radius: 8px; }
+      .gallery-card, .guide-card { position: absolute; bottom: 12px; width: min(360px, 100%); }
+      #gallery-modal .card { max-height: min(75vh, 480px); overflow-y: auto; }
+      #guide-modal .card { max-height: min(88vh, 720px); overflow-y: auto; }
+      .guide-card { width: min(560px, 100%); }
+      .guide-section { border-top: 2px solid var(--line); padding: 8px 0; }
+      .guide-section summary { cursor: pointer; font-size: 12px; font-weight: 700; color: var(--good); list-style: none; }
+      .guide-section summary::-webkit-details-marker { display: none; }
+      .guide-section summary::before { content: "▸ "; }
+      .guide-section[open] summary::before { content: "▾ "; }
+      .guide-section p, .guide-section li { font-size: 11px; line-height: 1.6; color: var(--muted); }
+      .guide-section ul { margin: 6px 0 0; padding-left: 16px; }
+      .guide-section b { color: var(--ink); }
+      #gallery-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; max-height: min(34vh, 220px); overflow-y: auto; }
+      .gallery-item { width: min(260px, 45%); padding: 8px; border: 2px solid var(--line); border-radius: 10px; display: flex; flex-direction: column; gap: 5px; background: var(--paper-shade); text-align: left; min-height: 48px; box-shadow: inset 4px 0 0 var(--planet-primary); }
+      .gallery-item .name { font-size: 12px; font-weight: 700; color: var(--ink); }
+      .gallery-preview { display: flex; gap: 12px; align-items: center; margin-top: 10px; }
+      .gallery-preview-stage { width: 132px; height: 112px; flex: 0 0 132px; border: 2px solid var(--line); border-radius: 12px; background: radial-gradient(circle at 50% 35%, #dff1fb, #f8f1dd 72%); display: grid; place-items: center; overflow: hidden; }
+      .gallery-preview-stage svg { width: 100%; height: 100%; display: block; }
+      .gallery-preview-meta { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+      .gallery-preview-meta strong { font-size: 14px; color: var(--ink); }
+      .gallery-preview-meta span { font-size: 11px; color: var(--muted); }
 
-      .main-menu {
-        position: fixed; z-index: 38; inset: 0; display: grid; place-items: center; padding: 24px;
-        background: radial-gradient(circle at 72% 34%, rgba(169, 154, 232, .16), transparent 42%),
-          radial-gradient(circle at 24% 78%, rgba(127, 224, 173, .12), transparent 46%), rgba(5, 9, 15, .86);
-        backdrop-filter: blur(9px);
-      }
+      .main-menu { position: fixed; z-index: 38; inset: 0; display: grid; place-items: center; padding: 24px; background: rgba(8, 12, 24, .86); backdrop-filter: blur(9px); }
+      .main-menu::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .18; background: radial-gradient(circle at 72% 34%, var(--planet-accent), transparent 42%), radial-gradient(circle at 24% 78%, var(--planet-primary), transparent 46%); }
       .main-menu.hidden { display: none; }
-      .menu-orbit { position: absolute; border: 1px solid rgba(169, 154, 232, .18); border-radius: 50%; pointer-events: none; }
+      .menu-orbit { position: absolute; z-index: 1; border: 2px solid var(--planet-accent); border-radius: 50%; pointer-events: none; opacity: .32; }
       .menu-orbit.outer { width: min(88vmin, 760px); aspect-ratio: 1; transform: rotate(-21deg) scaleY(.42); }
-      .menu-orbit.inner { width: min(58vmin, 500px); aspect-ratio: 1; transform: rotate(32deg) scaleY(.55); border-color: rgba(127, 224, 173, .16); }
-      .menu-sheet {
-        --planet-primary: #67c997; --planet-water: #2f6d73; --planet-accent: #f4bd72;
-        position: relative; z-index: 1; width: min(660px, 100%); padding: 22px;
-        display: grid; grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr); gap: 20px;
-        background: linear-gradient(155deg, rgba(17, 29, 42, .98), rgba(9, 16, 24, .98));
-        border: 1px solid var(--line); border-radius: 18px 18px 6px 18px;
-        box-shadow: 0 30px 90px rgba(0, 0, 0, .45);
-        animation: menu-in .32s ease-out both;
-      }
+      .menu-orbit.inner { width: min(58vmin, 500px); aspect-ratio: 1; transform: rotate(32deg) scaleY(.55); border-color: var(--planet-primary); }
+      .menu-sheet { position: relative; z-index: 2; width: min(660px, 100%); padding: 22px 22px 22px 26px; display: grid; grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr); gap: 20px; background: var(--paper); border: 2px solid var(--line); border-radius: 14px; box-shadow: 0 30px 90px rgba(8, 12, 24, .45); animation: menu-in .32s ease-out both; }
+      .menu-sheet::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 8px; border-radius: 12px 0 0 12px; background: var(--planet-primary); }
       @keyframes menu-in { from { opacity: 0; transform: translateY(8px) scale(.985); } }
       .menu-hero { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-      .menu-planet {
-        position: relative; width: 112px; height: 112px; border-radius: 50%;
-        background: radial-gradient(circle at 32% 27%, var(--planet-accent) 0 6%, var(--planet-primary) 9% 43%, var(--planet-water) 44% 72%, #172d3d 73%);
-        box-shadow: 0 0 38px rgba(127, 224, 173, .2), inset -10px -12px 20px rgba(0, 0, 0, .38);
-      }
-      .menu-planet::before {
-        content: ""; position: absolute; inset: 16% 7%; border: 1px solid rgba(255, 255, 255, .2);
-        border-radius: 50%; transform: rotate(-18deg);
-      }
-      .menu-planet::after {
-        content: ""; position: absolute; inset: -9px -17px; border: 1px solid rgba(244, 189, 114, .45);
-        border-radius: 50%; transform: rotate(-24deg);
-      }
-      .menu-sheet h1 { margin: 0; font-size: clamp(29px, 5vw, 40px); line-height: 1.04; letter-spacing: -.035em; font-weight: 700; }
+      .menu-planet { position: relative; width: 112px; height: 112px; border-radius: 50%; background: radial-gradient(circle at 32% 27%, var(--planet-accent) 0 10%, var(--planet-primary) 11% 48%, var(--planet-water) 49% 76%, #1b2b44 77%); box-shadow: 0 0 38px rgba(79, 209, 165, .22), inset -10px -12px 20px rgba(8, 12, 24, .35); }
+      .menu-planet::before { content: ""; position: absolute; inset: 16% 7%; border: 2px solid rgba(255, 255, 255, .42); border-radius: 50%; transform: rotate(-18deg); }
+      .menu-planet::after { content: ""; position: absolute; inset: -9px -17px; border: 2px solid var(--planet-accent); border-radius: 50%; transform: rotate(-24deg); opacity: .7; }
+      .menu-sheet h1 { margin: 0; font-size: clamp(29px, 5vw, 40px); line-height: 1.04; letter-spacing: -.035em; font-weight: 700; color: var(--ink); }
       .menu-lede { margin: 0; max-width: 34ch; color: var(--muted); font-size: 12px; line-height: 1.5; }
-      .menu-quality { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--line); display: grid; gap: 7px; font-size: 12px; color: var(--muted); }
+      .menu-quality { margin-top: auto; padding-top: 12px; border-top: 2px solid var(--line); display: grid; gap: 7px; font-size: 12px; color: var(--muted); }
       .quality-switch { display: flex; gap: 4px; }
       .quality-switch button { flex: 1; min-height: 48px; padding: 6px 7px; font-size: 11px; }
       .menu-console { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
       .menu-section-head { display: grid; gap: 2px; }
-      .menu-section-head > span { font-size: 13px; font-weight: 600; }
+      .menu-section-head > span { font-size: 13px; font-weight: 700; color: var(--ink); }
       #menu-planet-caption { min-height: 2.7em; font-size: 11px; line-height: 1.35; color: var(--muted); }
       .planet-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
-      .planet-chip {
-        --chip-primary: #67c997; --chip-water: #2f6d73; --chip-accent: #f4bd72;
-        min-height: 48px; display: flex; align-items: center; gap: 7px; padding: 6px 8px;
-        border-radius: 10px; text-align: left; font-size: 11px;
-        background: rgba(20, 32, 45, .72);
-      }
-      .planet-chip .planet-dot {
-        width: 18px; height: 18px; flex: none; border-radius: 50%;
-        background: radial-gradient(circle at 32% 28%, var(--chip-accent) 0 12%, var(--chip-primary) 13% 60%, var(--chip-water) 61%);
-        box-shadow: inset -2px -3px 5px rgba(0, 0, 0, .35);
-      }
-      .planet-chip.active { border-color: var(--mint); background: rgba(48, 103, 78, .35); color: var(--mint); }
-      .planet-chip.active::after { content: "✓"; margin-left: auto; }
-      .menu-guide-strip {
-        padding: 8px 10px; border: 1px dashed rgba(244, 189, 114, .35); border-radius: 9px;
-        background: rgba(244, 189, 114, .06); font-size: 11px; line-height: 1.45; color: #dccbae;
-      }
+      .planet-chip { --chip-primary: #4f9d69; --chip-water: #2f7fa8; --chip-accent: #e8c86a; min-height: 48px; display: flex; align-items: center; gap: 7px; padding: 6px 8px; border-radius: 10px; text-align: left; font-size: 11px; background: var(--paper-shade); border: 2px solid var(--line); color: var(--ink); }
+      .planet-chip .planet-dot { width: 18px; height: 18px; flex: none; border-radius: 50%; background: radial-gradient(circle at 32% 28%, var(--chip-accent) 0 12%, var(--chip-primary) 13% 60%, var(--chip-water) 61%); box-shadow: inset -2px -3px 5px rgba(8, 12, 24, .32); }
+      .planet-chip.active { border-color: var(--line); background: var(--paper); box-shadow: inset 5px 0 0 var(--planet-primary); color: var(--ink); }
+      .planet-chip.active::after { content: "✓"; margin-left: auto; font-weight: 700; }
       .menu-actions { display: grid; gap: 7px; }
-      .menu-action { display: flex; flex-direction: column; align-items: flex-start; text-align: left; padding: 9px 13px; min-height: 48px; border-radius: 11px; }
-      .menu-action.primary { background: linear-gradient(100deg, rgba(127, 224, 173, .18), rgba(244, 189, 114, .07)); border-color: rgba(127, 224, 173, .55); }
-      .menu-action.quiet { background: transparent; border-color: rgba(169, 154, 232, .38); color: var(--violet); }
-      .menu-action-title { font-size: 14px; }
-      .menu-action-note { margin-top: 2px; font: 10px/1.4 var(--mono); color: var(--muted); }
-      .menu-close { width: 100%; margin-top: 0; background: transparent; border-color: transparent; color: var(--muted); }
-      .menu-corner { position: absolute; right: 18px; bottom: 16px; font: 10px var(--mono); color: var(--muted); }
+      .menu-action { display: flex; flex-direction: column; align-items: flex-start; text-align: left; padding: 9px 13px; min-height: 48px; border-radius: 11px; background: var(--paper); }
+      .menu-action.primary { box-shadow: inset 6px 0 0 var(--planet-primary); border-color: var(--line); }
+      .menu-action.quiet { background: var(--paper-shade); box-shadow: inset 6px 0 0 var(--planet-water); color: var(--ink); }
+      .menu-action-title { font-size: 14px; font-weight: 700; }
+      .menu-action-note { margin-top: 2px; font-size: 11px; line-height: 1.4; color: var(--muted); }
+      .menu-close { width: 100%; margin-top: 0; background: transparent; border-color: transparent; color: var(--muted); box-shadow: none; }
+      .menu-corner { position: absolute; right: 18px; bottom: 16px; font: 11px var(--mono); color: var(--muted); }
       .guide-card { width: min(560px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; }
       .guide-steps { margin: 12px 0 0; padding-left: 21px; font-size: 12px; line-height: 1.55; color: var(--muted); }
       .guide-steps li + li { margin-top: 8px; }
-      .guide-steps strong { color: var(--text); }
+      .guide-steps strong { color: var(--ink); }
       .guide-map { display: grid; gap: 6px; margin-top: 14px; }
-      .guide-map > div { display: grid; grid-template-columns: 92px 1fr; gap: 8px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 9px; background: rgba(12, 20, 30, .7); }
-      .guide-map span { color: var(--mint); font-size: 11px; }
+      .guide-map > div { display: grid; grid-template-columns: 92px 1fr; gap: 8px; padding: 8px 10px; border: 2px solid var(--line); border-radius: 10px; background: var(--paper-shade); }
+      .guide-map span { color: var(--good); font-size: 11px; font-weight: 700; }
       .guide-map p { margin: 0; font-size: 11px; line-height: 1.45; color: var(--muted); }
       .ecopedia-card { width: min(680px, 100%); max-height: min(82vh, 760px); overflow: auto; }
       .ecopedia-grid { display: grid; gap: 12px; }
-      .ecopedia-section { border: 1px solid var(--line); border-radius: 12px; padding: 12px; background: rgba(255,255,255,.02); }
-      .ecopedia-section h3 { margin: 0 0 8px; font-size: 13px; color: var(--mint); }
+      .ecopedia-section { border: 2px solid var(--line); border-radius: 12px; padding: 12px; background: var(--paper-shade); }
+      .ecopedia-section h3 { margin: 0 0 8px; font-size: 13px; color: var(--good); }
       .ecopedia-list { display: grid; gap: 8px; font-size: 12px; color: var(--muted); }
-      .ecopedia-item { border-top: 1px solid #24313f; padding-top: 8px; }
+      .ecopedia-item { border-top: 1px solid var(--line); padding-top: 8px; }
       .ecopedia-item:first-child { border-top: 0; padding-top: 0; }
-      .ecopedia-item strong { color: var(--text); }
+      .ecopedia-item strong { color: var(--ink); }
       .ecopedia-kv { display: flex; justify-content: space-between; gap: 8px; font-size: 11px; }
-      .ecopedia-bar { height: 4px; border-radius: 2px; background: #1e2b38; overflow: hidden; margin: 4px 0; }
-      .ecopedia-bar > i { display: block; height: 100%; background: var(--amber); }
+      .ecopedia-bar { height: 5px; border-radius: 3px; background: var(--paper); border: 1px solid var(--line); overflow: hidden; margin: 4px 0; }
+      .ecopedia-bar > i { display: block; height: 100%; background: var(--planet-primary); }
       .ecopedia-pill { display: inline-block; padding: 1px 6px; border-radius: 999px; font-size: 10px; border: 1px solid var(--line); color: var(--muted); margin-left: 6px; }
-      .ecopedia-pill.warn { color: #ffd479; border-color: rgba(255,212,121,.35); }
-      .ecopedia-pill.ok { color: var(--mint); border-color: rgba(127,224,173,.35); }
+      .ecopedia-pill.warn { color: var(--warn); border-color: var(--warn); }
+      .ecopedia-pill.ok { color: var(--good); border-color: var(--good); }
       body.menu-open #topbar, body.menu-open #objective-strip, body.menu-open #build-panel, body.menu-open #stats-panel, body.menu-open #inventory, body.menu-open #hint { opacity: .22; pointer-events: none; filter: blur(2px); }
-      #error { position: fixed; z-index: 70; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; background: var(--void); }
+      #error { position: fixed; z-index: 70; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; background: var(--night); color: var(--stage-text); }
       @media (prefers-reduced-motion: reduce) { .bar > i { transition: none; } }
       @media (max-width: 820px) {
         #topbar { gap: 3px; padding: 4px 6px; }
         #topbar strong { font-size: 12px; }
         #planet-name, #hint { display: none; }
         #stage-label { font-size: 11px; }
-        #build-panel { left: 8px; right: 8px; top: 72px; bottom: auto; width: auto; padding: 8px; max-height: 112px; }
+        #build-panel { left: 8px; right: 8px; top: 72px; bottom: auto; width: auto; padding: 8px 8px 8px 14px; max-height: 112px; }
         #build-panel .category > span { display: none; }
         #build-panel .category { margin-bottom: 6px; }
         #build-panel h2 { display: none; }
-        #stats-panel { right: 8px; top: 196px; bottom: 92px; width: 162px; padding: 8px; }
+        #stats-panel { right: 8px; top: 196px; bottom: 92px; width: 162px; padding: 8px 8px 8px 14px; }
         #stats-panel h2 { font-size: 11px; }
         .stat .row { font-size: 10px; }
         #object-list button { min-height: 48px; }
@@ -254,12 +258,11 @@
         #topbar .actions { width: 100%; justify-content: space-between; }
         #stats-panel { top: 196px; width: 144px; }
         .main-menu { padding: 12px; }
-        .menu-sheet { grid-template-columns: 1fr; gap: 14px; padding: 18px; max-height: calc(100vh - 24px); overflow-y: auto; border-radius: 15px 15px 5px 15px; }
+        .menu-sheet { grid-template-columns: 1fr; gap: 14px; padding: 18px 18px 18px 24px; max-height: calc(100vh - 24px); overflow-y: auto; border-radius: 14px; }
         .menu-planet { width: 58px; height: 58px; }
         .menu-sheet h1 { font-size: 28px; }
         .menu-lede { font-size: 11px; line-height: 1.4; }
         .menu-quality { margin-top: 0; }
-        .menu-guide-strip { display: none; }
         .planet-chip { justify-content: center; padding: 5px; font-size: 10px; }
         .planet-chip.active::after { display: none; }
         .planet-chip .planet-dot { width: 16px; height: 16px; }
@@ -271,13 +274,11 @@
         .guide-map > div { grid-template-columns: 1fr; gap: 2px; }
         .objective-mission { margin-left: 0; width: 100%; text-align: left; }
       }
-      @media (max-height: 500px) {
-        #object-info { display: none !important; }
-      }
+      @media (max-height: 500px) { #object-info { display: none !important; } }
     </style>
-    <script type="module" crossorigin src="./assets/index-BnlhvdGl.js"></script>
+    <script type="module" crossorigin src="./assets/index-DJTYXXt9.js"></script>
     <link rel="modulepreload" crossorigin href="./assets/pixi-core-DXQFmL6O.js">
-    <link rel="modulepreload" crossorigin href="./assets/planet-configs-DJR3I4Wu.js">
+    <link rel="modulepreload" crossorigin href="./assets/planet-configs-Ck2M5Dpi.js">
     <link rel="modulepreload" crossorigin href="./assets/pixi-3d-txJ64NjT.js">
   </head>
   <body>
@@ -288,6 +289,9 @@
       <span id="stage-label"></span>
       <div class="actions">
         <button id="menu-btn">Menu</button>
+        <button id="guide-btn">Panduan</button>
+        <button id="walk-mode-btn">Modus FPS</button>
+        <button id="gallery-btn">Galeri</button>
         <button id="level-label" disabled>Level 1</button>
         <button id="pause-btn">Jeda</button>
         <button id="telemetry-btn">Telemetri</button>
@@ -331,6 +335,17 @@
         <p style="font-size:13px;color:var(--muted)">10 era · 100 misi. Semua misi aktif dan dapat diselesaikan; era 7–10 memakai skor sistem lanjutan yang diturunkan dari state simulasi.</p>
         <div id="campaign-list">Memuat katalog misi…</div>
         <div class="row"><button id="campaign-close">Tutup</button></div>
+      </div>
+    </div>
+    <div id="gallery-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Galeri Ekosistem">
+      <div class="card gallery-card">
+        <h2>Galeri Ekosistem</h2>
+        <div class="gallery-preview">
+          <div id="gallery-preview-image" class="gallery-preview-stage" role="img" aria-label="Pratinjau model low-poly"></div>
+          <div class="gallery-preview-meta"><strong id="gallery-preview-name">Kijang</strong><span id="gallery-preview-variant">Kijang</span></div>
+        </div>
+        <div id="gallery-list">Memuat galeri…</div>
+        <div class="row"><button id="gallery-close">Tutup</button></div>
       </div>
     </div>
     <div id="telemetry-modal" class="modal hidden">
@@ -393,7 +408,6 @@
             <small id="menu-planet-caption">Terra · Dunia hutan hijau dan danau tenang</small>
           </div>
           <div id="planet-grid" class="planet-grid" role="group" aria-label="Pilih planet"></div>
-          <div class="menu-guide-strip">Mulai dari pilih dunia, ketuk permukaan untuk menanam, lalu jaga angka ekosistem tetap hijau.</div>
           <div class="menu-actions">
             <button id="menu-continue" class="menu-action primary">
               <span class="menu-action-title">Lanjutkan</span>
@@ -425,18 +439,54 @@
     </div>
     <div id="guide-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="guide-title">
       <div class="card guide-card">
-        <h2 id="guide-title">Cara pakai Tiny Planet Factory</h2>
+        <h2 id="guide-title">Panduan Tiny Planet Factory</h2>
+        <p style="font-size:12px;color:var(--muted);line-height:1.6;margin:0 0 8px">Angka di game berasal dari model simulasi deterministik, bukan pengukuran planet nyata. Buka bagian mana pun yang kamu butuhkan.</p>
         <ol class="guide-steps">
-          <li><strong>Pilih dunia.</strong> Gunakan deretan planet di menu. Setiap planet punya iklim, musim, dan spesies berbeda.</li>
-          <li><strong>Letakkan objek.</strong> Pilih alat di panel kiri atau bawah, lalu ketuk permukaan planet. Geser untuk memutar, pinch untuk zoom, tahan lama untuk info.</li>
-          <li><strong>Jaga ekosistem.</strong> Panel kanan menampilkan air, oksigen, suhu, dan stabilitas. Strip di bawah layar memberi tahap dan sasaran berikutnya.</li>
-          <li><strong>Eksperimen.</strong> “Baru” mengacak seed di planet yang sama. Planet DNA menyimpan dan memuat hasilnya; telemetri opsional tetap di perangkat.</li>
+          <li><strong>Pilih dunia.</strong> Gunakan deretan planet di menu. Setiap planet memakai iklim, musim, dan komunitas spesies yang berbeda.</li>
+          <li><strong>Letakkan objek.</strong> Pilih alat di panel bawah, lalu ketuk permukaan planet. Geser untuk memutar, pinch untuk zoom, tahan lama untuk info.</li>
+          <li><strong>Jaga ekosistem.</strong> Panel kanan menampilkan air, oksigen, suhu, kesuburan, keanekaragaman, energi, dan stabilitas; strip bawah memberi sasaran misi.</li>
+          <li><strong>Jelajah &amp; simpan.</strong> Tombol <b>Jalan</b> masuk ke kamera FPS di dalam planet, <b>Galeri</b> memutar pratinjau low-poly, <b>Ekologi</b> merinci fauna, dan <b>Planet DNA</b> menyimpan hasil eksperimen. Telemetri opsional tetap di perangkat.</li>
         </ol>
         <div class="guide-map" aria-label="Peta antarmuka">
           <div><span>Kiri / atas</span><p>Kategori objek dan tombol menu, jeda, DNA, serta kualitas.</p></div>
           <div><span>Kanan</span><p>Nilai ekosistem, cuaca, event, dan misi saat ini.</p></div>
           <div><span>Bawah</span><p>Alat yang dipilih, sasaran misi, dan petunjuk gestur.</p></div>
         </div>
+        <details class="guide-section">
+          <summary>Edukasi planet</summary>
+          <p><b>Apa itu planet?</b> Menurut definisi IAU 2006, benda langit mengorbit bintang, cukup masif sehingga gravitasinya membentuknya bulat, dan telah membersihkan lingkungan orbitnya. Pluto adalah planet katai karena syarat ketiga tidak terpenuhi.</p>
+          <p><b>Waktu.</b> Tata Surya berusia sekitar 4,6 miliar tahun; Bumi terbentuk sekitar 4,54 miliar tahun lalu. Skala waktu geologi jauh lebih panjang daripada satu sesi permainan.</p>
+          <p><b>Iklim vs cuaca.</b> Cuaca adalah kondisi jam–hari; iklim adalah pola statistik dalam jangka panjang (BMG/WMO memakai rata-rata 30 tahun). Suhu dipengaruhi jarak dari bintang, <b>albedo</b> (daya pantul permukaan), dan atmosfer.</p>
+          <p><b>Efek rumah kaca.</b> Uap air, CO₂, dan metana menyerap radiasi inframerah yang dipancarkan permukaan. Efek alami membuat Bumi layak huni; peningkatan konsentrasi gas ini mengubah keseimbangan energi.</p>
+          <p><b>Di game:</b> Terra, Dune, Glaciere, Inferna, Aquaria, Mycelia, Sakura, Aurelia, dan Cosmos adalah <b>analog fiksi</b> untuk bereksperimen, bukan katalog astronomi nyata.</p>
+        </details>
+        <details class="guide-section">
+          <summary>Sejarah sains &amp; ekologi</summary>
+          <ul>
+            <li><b>1543</b> Copernicus mempublikasikan model heliosentris; <b>1609–1610</b> Galileo mengamati bulan Jupiter dengan teleskop; <b>1609–1619</b> Kepler merumuskan orbit elips; <b>1687</b> Newton menjelaskan gravitasi.</li>
+            <li><b>1859</b> Darwin mempublikasikan seleksi alam; <b>1866</b> Haeckel memperkenalkan istilah ekologi; <b>1935</b> Tansley memperkenalkan istilah <i>ecosystem</i>; <b>1942</b> Lindeman mengkaji dinamika trofik.</li>
+            <li><b>1957</b> Sputnik, <b>1969</b> Apollo 11, <b>1977</b> Voyager, <b>1990</b> Hubble, <b>2012</b> Curiosity, <b>2021</b> James Webb diluncurkan dan <b>2022</b> citra pertamanya dirilis.</li>
+            <li>Riwayat pembaruan game ini dicatat di <b>docs/11-RELEASE-DEPLOYMENT/RELEASE.md</b>; tanggal di atas adalah sejarah sains nyata, bukan sejarah game.</li>
+          </ul>
+        </details>
+        <details class="guide-section">
+          <summary>Detail ekosistem</summary>
+          <p><b>Dua komponen.</b> Abiotik: cahaya, suhu, air, oksigen, mineral, pH. Biotik: produsen (tumbuhan/alga), konsumen (herbivora dan predator), serta pengurai (jamur dan bakteri).</p>
+          <p><b>Fotosintesis:</b> 6CO₂ + 6H₂O + energi cahaya → C₆H₁₂O₆ + 6O₂. Respirasi melakukan sebaliknya, mengembalikan CO₂ dan air sambil melepaskan energi.</p>
+          <p><b>Jaring makanan.</b> Energi masuk dari cahaya, lalu berpindah lewat tingkat trofik. Sebagian besar energi hilang sebagai panas pada setiap perpindahan; aturan kasar "~10% per tingkat" adalah heuristik, bukan konstanta fisika.</p>
+          <p><b>Siklus materi.</b> Karbon, nitrogen, dan air terus didaur ulang. Pengurai mengembalikan unsur hara ke tanah sehingga produsen bisa tumbuh lagi.</p>
+          <p><b>Biodiversitas.</b> Keanekaragaman gen, spesies, dan ekosistem umumnya membantu ketahanan menghadapi gangguan, tetapi besarnya bergantung pada konteks. Di game, amati lewat panel <b>Ekologi</b> dan <b>Kompendium</b>.</p>
+        </details>
+        <details class="guide-section">
+          <summary>Pengetahuan sains</summary>
+          <ul>
+            <li><b>Tingkat organisasi:</b> atom → sel → organisme → populasi → komunitas → ekosistem → bioma → biosfer.</li>
+            <li><b>Konservasi energi:</b> energi tidak hilang, hanya berubah bentuk; pada sistem tertutup, entropi cenderung meningkat.</li>
+            <li><b>Cara berpikir:</b> amati → hipotesis → prediksi → uji → evaluasi bukti. Korelasi tidak otomatis berarti kausalitas.</li>
+            <li><b>Model adalah penyederhanaan.</b> Seed deterministik membuat eksperimen bisa diulang. Untuk memeriksa performa, salin laporan dengan <b>JSON.stringify(window.__game.qaReport(), null, 2)</b>.</li>
+            <li>Skala visual di game tidak mengikuti "1 unit = 1 meter"; itu pilihan artistik agar seluruh planet terlihat dalam satu layar.</li>
+          </ul>
+        </details>
         <div class="row">
           <button id="guide-replay">Ulangi panduan</button>
           <button id="guide-close">Mengerti</button>
