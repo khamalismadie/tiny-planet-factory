@@ -1,6 +1,6 @@
 # Product Backlog
 
-Status per 2026-11-25. Sumber: `docs/02-PRODUCT-STRATEGY/PRODUCT-TO-PRODUCTION.md` §3.2, `docs/10-QA-TESTING/QA-ISSUE-PLAYBOOK.md`, dan `docs/11-RELEASE-DEPLOYMENT/RELEASE.md`.
+Status per 2026-11-25. Sumber: `docs/02-PRODUCT-STRATEGY/PRODUCT-TO-PRODUCTION.md` §3.2, `docs/10-QA-TESTING/QA-ISSUE-PLAYBOOK.md`, dan `docs/11-RELEASE-DEPLOYMENT/RELEASE.md`. Paket pengumpulan bukti untuk bundle saat ini ada di `docs/10-QA-TESTING/QA-HANDOFF-WAVE10.md`.
 
 ## P0 — terbuka
 

@@ -4,6 +4,8 @@
 
 Nomor sprint ini adalah sprint pertama yang didokumentasikan formal. Tidak ada sprint sebelumnya dalam repo; penomoran mengikuti phase rilis `v0.15.x`.
 
+> **Addendum 2026-11-25:** Dokumen ini adalah catatan historis Sprint 09 (`v0.15.x`/`v0.16.0`). Checkbox dan target di bawah sengaja tidak diubah agar sejarah tetap utuh. Status backlog aktual untuk kandidat `v0.21.0` ada di `docs/06-PRODUCT-BACKLOG/BACKLOG.md`, dan paket penutupan QA bundle `index-DJTYXXt9.js` ada di `docs/10-QA-TESTING/QA-HANDOFF-WAVE10.md`. Jangan membaca checklist lama sebagai status PASS saat ini.
+
 ---
 
 ## 1. Sprint goal
