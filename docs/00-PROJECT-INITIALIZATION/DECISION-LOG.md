@@ -7,7 +7,7 @@ Keputusan yang mengikat. Ubah hanya dengan alasan tertulis dan evaluasi ulang ga
 | ADR-001 | Sim renderer-agnostic & deterministik | QA harus reproducible; render boleh berganti tanpa mengubah aturan dunia |
 | ADR-002 | PixiJS 3D + WebGL2 baseline | Bundle lebih kecil dan cocok untuk perangkat menengah |
 | ADR-003 | Satu geometri gabungan per tipe, vertex colors, tanpa tekstur/GLB | Menjaga draw call `≤ 18`/`≤ 20` dan chunk `< 100 kB` |
-| ADR-004 | PWA offline-first dengan shell version | Into loop tetap bisa dimainkan tanpa jaringan |
+| ADR-004 | PWA offline-first dengan shell version | Inti loop tetap bisa dimainkan tanpa jaringan |
 | ADR-005 | App chunk `< 100 kB` | Anggaran muat `< 5 s` dan perangkat menengah |
 | ADR-006 | UI colorful per planet dari `PlanetConfig`, UI phase sebelum asset phase | Tidak menambah modul palet; warna tetap konsisten |
 | ADR-007 | Kamera FPS = orbit spherical, planet diam | Sesuai ekspektasi kamera ala GTA; planet tidak ikut berputar saat mouse digerakkan |
