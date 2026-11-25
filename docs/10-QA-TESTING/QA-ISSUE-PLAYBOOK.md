@@ -4,11 +4,11 @@ Dokumen ini memetakan bukti yang harus dilampirkan ke tiap issue. Ia **bukan** h
 
 - Build kandidat lokal: v0.21.0 — bundle `index-DJTYXXt9.js`, SW `tpf-shell-v0-21-0`. Preview Drop terakhir <https://admirable-taiyaki-c6332c.netlify.app/> (password `My-Drop-Site`, **unclaimed**, kedaluwarsa ±1 jam) masih menyajikan `index-JRtwPflp.js` dan **stale**; deploy ulang ditolak karena limit harian Netlify Drop. Bundle terbaru belum punya preview hosted; gunakan `dist/` lokal atau deploy permanen. Produksi tidak berubah.
 - Produksi tetap v0.16.0. Jangan mencampur bukti produksi dengan bukti v0.21.0.
-- Template laporan: `docs/QA-EVIDENCE-TEMPLATE.json`.
-- Checklist umum: `docs/QA-EVIDENCE-TEMPLATE.md`.
+- Template laporan: `docs/10-QA-TESTING/QA-EVIDENCE-TEMPLATE.json`.
+- Checklist umum: `docs/10-QA-TESTING/QA-EVIDENCE-TEMPLATE.md`.
 - Validasi banyak laporan: `npm run qa:evidence:batch -- <folder>`.
-- Paket p95 / #7: `docs/QA-P95-REMEASURE.md`.
-- Prosedur lengkap: `docs/QA-DEVICE.md`.
+- Paket p95 / #7: `docs/10-QA-TESTING/QA-P95-REMEASURE.md`.
+- Prosedur lengkap: `docs/10-QA-TESTING/QA-DEVICE.md`.
 
 Catatan build: bundle lokal pada commit ini `index-wiHAa9uT.js`. Fix #8 pada `index.html`: `#hint` disembunyikan pada landscape. Laporan lama `index-BiS1XGVG.js` **tidak berlaku**. Jangan mencampur laporan dari bundle preview #41.
 

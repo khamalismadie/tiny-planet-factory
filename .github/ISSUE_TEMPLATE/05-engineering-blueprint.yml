@@ -1,0 +1,32 @@
+name: "05 · Engineering Blueprint"
+description: "Rencana teknis implementasi sebelum masuk backlog development."
+title: "[Blueprint] "
+labels: ["engineering"]
+body:
+  - type: textarea
+    id: blueprint
+    attributes:
+      label: Langkah implementasi
+    validations:
+      required: true
+  - type: textarea
+    id: files
+    attributes:
+      label: File yang disentuh
+    validations:
+      required: true
+  - type: textarea
+    id: budget
+    attributes:
+      label: Dampak chunk/draw call/frame time
+      description: Sertakan estimasi dan cara mengukurnya.
+    validations:
+      required: true
+  - type: checkboxes
+    id: guards
+    attributes:
+      label: Guard
+      options:
+        - label: "App chunk tetap < 100 kB"
+        - label: "Tidak menambah gate atau menurunkan target"
+        - label: "Tidak ada tekstur/GLB/R3F"

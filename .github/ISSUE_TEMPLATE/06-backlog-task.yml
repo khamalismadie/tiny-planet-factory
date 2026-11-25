@@ -1,0 +1,39 @@
+name: "06 · Backlog Task"
+description: "Item backlog siap dipilih ke sprint."
+title: "[Backlog] "
+labels: ["backlog"]
+body:
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Prioritas
+      options:
+        - "P0"
+        - "P1"
+        - "P2"
+    validations:
+      required: true
+  - type: textarea
+    id: task
+    attributes:
+      label: Task
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: Definition of done
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Sumber
+      placeholder: "docs/06-PRODUCT-BACKLOG/BACKLOG.md"
+  - type: checkboxes
+    id: guards
+    attributes:
+      label: Guard
+      options:
+        - label: "Tidak menambah planet/biome sebelum P0 selesai"
+        - label: "Tidak mengubah target gate"

@@ -63,4 +63,4 @@ src/content/planets/     9 konfigurasi planet.
 
 ## Gate rilisan
 
-Lihat `docs/RELEASE.md` bagian **2d**. Gate utama: 9 config valid, migrasi lolos, save/load eco lolos, habitat deterministik, dan seluruh test suite tetap hijau.
+Lihat `docs/11-RELEASE-DEPLOYMENT/RELEASE.md` bagian **2d**. Gate utama: 9 config valid, migrasi lolos, save/load eco lolos, habitat deterministik, dan seluruh test suite tetap hijau.

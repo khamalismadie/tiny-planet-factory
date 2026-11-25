@@ -1,0 +1,35 @@
+name: "03 · PRD"
+description: "Spesifikasi kebutuhan produk sebelum arsitektur/implementasi."
+title: "[PRD] "
+labels: ["prd"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Masalah & tujuan
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+    validations:
+      required: true
+  - type: textarea
+    id: non_goals
+    attributes:
+      label: Non-goal
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Harus bisa diuji. Hindari klaim kualitatif tanpa bukti.
+    validations:
+      required: true
+  - type: input
+    id: doc
+    attributes:
+      label: Dokumen sumber/tujuan
+      placeholder: "docs/03-PRD/..."

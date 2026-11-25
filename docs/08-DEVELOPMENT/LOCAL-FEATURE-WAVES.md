@@ -71,7 +71,7 @@ Hash bundle di atas **hanya berlaku untuk commit ini**. Setiap build berikutnya 
 - Label kategori: Kritis, Pemulihan, Stabil, Sejahtera; disertai saran singkat dan rata-rata perubahan dari `startingEnvironment`.
 - Bobot bersifat lokal dan transparan di UI; tidak mengubah simulasi, misi, reward, atau gate.
 - Modul `src/ui/healthIndex.ts` masuk chunk lazy `ecopediaView`.
-- Sumber katalog kini tersimpan di `docs/PLANET-CARE-FEATURE-DATABASE.md`.
+- Sumber katalog kini tersimpan di `docs/01-PRODUCT-DISCOVERY/PLANET-CARE-FEATURE-DATABASE.md`.
 
 ### Wave 8 — fitur DB `#34` + `#3` — `c7bb1e2`
 
@@ -111,7 +111,7 @@ npm run qa:evidence -- laporan.json \
   --expect-bundle index-wiHAa9uT.js
 ```
 
-Untuk `qa:evidence:batch`, pakai flag yang sama. Jangan menurunkan target atau mengabaikan `--expect-bundle` agar laporan dari build lain tidak diterima. URL probe, matriks penutupan #5–#8, dan perintah validator lengkap ada di `docs/QA-HANDOFF-WAVE9.md`.
+Untuk `qa:evidence:batch`, pakai flag yang sama. Jangan menurunkan target atau mengabaikan `--expect-bundle` agar laporan dari build lain tidak diterima. URL probe, matriks penutupan #5–#8, dan perintah validator lengkap ada di `docs/10-QA-TESTING/QA-HANDOFF-WAVE9.md`.
 
 ## Belum dilakukan
 

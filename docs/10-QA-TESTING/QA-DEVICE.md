@@ -2,7 +2,7 @@
 
 Target: **Android menengah** (30 FPS, p95 frame time ≤ 33 ms), desktop 60 FPS.
 
-> Untuk build Wave 9 (`f0193de`, `index-BnlhvdGl.js`), lihat paket serah terima `docs/QA-HANDOFF-WAVE9.md`. Dokumen itu memuat URL probe, kriteria penutupan, dan perintah validator yang mengunci bundle tersebut.
+> Untuk build Wave 9 (`f0193de`, `index-BnlhvdGl.js`), lihat paket serah terima `docs/10-QA-TESTING/QA-HANDOFF-WAVE9.md`. Dokumen itu memuat URL probe, kriteria penutupan, dan perintah validator yang mengunci bundle tersebut.
 
 ## Instrumentasi
 
@@ -52,9 +52,9 @@ npm run qa:evidence -- laporan-dari-perangkat.json --standalone --offline --land
 
 Flag opsional: `--standalone` menuntut `device.standalone === true`, `--offline` menuntut `network.online === false`, `--landscape` menuntut orientasi landscape dan `layout.planetCenterVisible === true` tanpa overlap panel. Validator tetap mengingatkan bahwa laporan harus dilampirkan ke issue; ia tidak menutup issue.
 
-Gunakan `docs/QA-EVIDENCE-TEMPLATE.json` sebagai wadah isi laporan dan `docs/QA-EVIDENCE-TEMPLATE.md` sebagai checklist lampiran #5–#8. Template sengaja gagal divalidasi sampai diisi dengan data perangkat nyata.
+Gunakan `docs/10-QA-TESTING/QA-EVIDENCE-TEMPLATE.json` sebagai wadah isi laporan dan `docs/10-QA-TESTING/QA-EVIDENCE-TEMPLATE.md` sebagai checklist lampiran #5–#8. Template sengaja gagal divalidasi sampai diisi dengan data perangkat nyata.
 
-Untuk instruksi per issue, lihat `docs/QA-ISSUE-PLAYBOOK.md` (#5, #6, #8) dan `docs/QA-P95-REMEASURE.md` (#7).
+Untuk instruksi per issue, lihat `docs/10-QA-TESTING/QA-ISSUE-PLAYBOOK.md` (#5, #6, #8) dan `docs/10-QA-TESTING/QA-P95-REMEASURE.md` (#7).
 
 Quality tier:
 
@@ -111,7 +111,7 @@ Status ditutup hanya bila laporan + screenshot asli ada di issue terkait dan ang
 
 `npm run test:qa-load` membuka `?debug=1&qa=1&qaObjects=94&qaSeconds=12&quality=medium&seed=1`, memajukan 16 tick agar cuaca Hujan aktif, lalu mengunci p95 ≤ 33 ms, tier medium tanpa downgrade, 94 objek, dan draw call ≤ 20 pada cuaca **Hujan/Badai/Salju** (≤ 18 saat Cerah). Tidak ada weather state “Berawan”. Angka 20 adalah baseline seed 1 pra-facet; jangan disamakan dengan 18 pada run cerah.
 
-Untuk mengukur ulang p95 pada kandidat v0.21.0, gunakan `docs/QA-P95-REMEASURE.md`. Target issue #7 tetap **≤ 33 ms**. Gate headless kini memakai batas yang sama; angka 33,40 ms pada tabel device di bawah adalah baseline historis, bukan kriteria lulus.
+Untuk mengukur ulang p95 pada kandidat v0.21.0, gunakan `docs/10-QA-TESTING/QA-P95-REMEASURE.md`. Target issue #7 tetap **≤ 33 ms**. Gate headless kini memakai batas yang sama; angka 33,40 ms pada tabel device di bawah adalah baseline historis, bukan kriteria lulus.
 
 ## Catatan headless
 
@@ -138,7 +138,7 @@ Catatan interpretasi:
 - Boot yang dilaporkan QaProbe adalah **0,24–2,03 s** sejak hook mulai, bukan cold-start 4G penuh dari ikon PWA; baris #1 masih memerlukan pengukuran terpisah.
 - Service worker aktif pada semua run. `installPromptSeen` terlihat pada sebagian run; `standalone: false` karena aplikasi dibuka dari browser, bukan dari ikon yang sudah dipasang. Baris #7–#8 (install → airplane mode, update) **masih belum terverifikasi**.
 - Tidak ada context loss pada semua run; ini melengkapi tetapi tidak menggantikan checklist #5 untuk background/GPU reset nyata.
-- Catatan v0.15.6–v0.15.9: normalisasi bentuk planet, perubahan cuaca, facet/contact shadow, dan layout landscape mengubah apa yang harus diamati. Angka di atas adalah baseline pra-v0.15.6 dan wajib diulang; lihat `docs/SPRINT.md` SPR-03.
+- Catatan v0.15.6–v0.15.9: normalisasi bentuk planet, perubahan cuaca, facet/contact shadow, dan layout landscape mengubah apa yang harus diamati. Angka di atas adalah baseline pra-v0.15.6 dan wajib diulang; lihat `docs/07-SPRINT-PLANNING/SPRINT.md` SPR-03.
 
 ## Hasil lokal v0.15.9 (2026-11-22)
 

@@ -2,8 +2,8 @@
 
 File ini bukan hasil QA. Ini hanya wadah agar laporan dari tombol **Salin hasil QA** tidak berantakan saat dilampirkan ke issue.
 
-- Template laporan: `docs/QA-EVIDENCE-TEMPLATE.json`
-- Prosedur lengkap: `docs/QA-DEVICE.md`
+- Template laporan: `docs/10-QA-TESTING/QA-EVIDENCE-TEMPLATE.json`
+- Prosedur lengkap: `docs/10-QA-TESTING/QA-DEVICE.md`
 - Validator: `npm run qa:evidence -- <file> [--standalone] [--offline] [--landscape] [--expect-version <v>] [--expect-bundle <file.js>]`
 
 Template sengaja berisi `0`, `null`, dan `<ISI: ...>`. Validator akan menolaknya sampai benar-benar diganti dengan data dari perangkat. Jangan mengarang angka atau mencentang issue hanya karena format lulus.
@@ -84,7 +84,7 @@ Hasil:
 
 ```bash
 # Template kosong harus ditolak.
-npm run qa:evidence -- docs/QA-EVIDENCE-TEMPLATE.json
+npm run qa:evidence -- docs/10-QA-TESTING/QA-EVIDENCE-TEMPLATE.json
 
 # Contoh sesi landscape setelah diisi dari perangkat.
 npm run qa:evidence -- report-landscape.json --landscape

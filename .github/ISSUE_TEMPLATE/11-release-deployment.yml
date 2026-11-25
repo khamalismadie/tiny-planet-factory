@@ -1,0 +1,48 @@
+name: "11 · Release / Deployment"
+description: "Permintaan rilis atau deploy, dengan guard produksi."
+title: "[Release] "
+labels: ["release"]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Versi
+      placeholder: "v0.21.0"
+    validations:
+      required: true
+  - type: input
+    id: bundle
+    attributes:
+      label: Bundle hash
+    validations:
+      required: true
+  - type: dropdown
+    id: target
+    attributes:
+      label: Target
+      options:
+        - "Draft/preview"
+        - "Produksi"
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Bukti #5–#8
+      description: Sertakan path folder bukti dan hasil validator.
+    validations:
+      required: true
+  - type: checkboxes
+    id: guards
+    attributes:
+      label: Guard produksi
+      options:
+        - label: "#6, #7, #8 PASS dengan bundle yang sama"
+        - label: "#5 ditutup terakhir setelah checklist lengkap"
+        - label: "Approval manusia tercatat"
+        - label: "Rollback path diketahui"
+  - type: textarea
+    id: rollback
+    attributes:
+      label: Rollback plan
+      placeholder: "Kembali ke e71e6c1 / index-Cl2SK4zO.js"

@@ -80,4 +80,4 @@ Semua skenario wajib tetap bounded. Kekeringan dan kerusakan habitat wajib menun
 
 ## Lanjutan
 
-Koupling antara populasi ini dan agen fauna visual ada di `docs/FOOD-WEB-WILDLIFE-AI.md`.
+Koupling antara populasi ini dan agen fauna visual ada di `docs/03-PRD/FOOD-WEB-WILDLIFE-AI.md`.

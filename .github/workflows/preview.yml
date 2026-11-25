@@ -1,0 +1,31 @@
+name: Preview Deploy
+
+on:
+  pull_request:
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Deploy draft alias only
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          PR_NUMBER: ${{ github.event.number }}
+        run: |
+          if [ -z "$NETLIFY_AUTH_TOKEN" ] || [ -z "$NETLIFY_SITE_ID" ]; then
+            echo "Netlify secrets tidak tersedia; preview dilewati."
+            exit 0
+          fi
+          npm install --global netlify-cli
+          netlify deploy --dir=dist --alias="pr-$PR_NUMBER"
+      - name: Guard
+        run: echo "Preview memakai alias draft. Jangan gunakan --prod di workflow ini."

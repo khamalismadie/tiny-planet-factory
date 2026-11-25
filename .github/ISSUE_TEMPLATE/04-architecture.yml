@@ -1,0 +1,31 @@
+name: "04 · Architecture"
+description: "Perubahan batas sistem, alur data, atau kontrak determinisme."
+title: "[Architecture] "
+labels: ["architecture"]
+body:
+  - type: textarea
+    id: current
+    attributes:
+      label: Arsitektur saat ini
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Perubahan yang diusulkan
+    validations:
+      required: true
+  - type: textarea
+    id: boundaries
+    attributes:
+      label: Dampak ke batas sim/render/UI
+    validations:
+      required: true
+  - type: checkboxes
+    id: guards
+    attributes:
+      label: Guard arsitektur
+      options:
+        - label: "src/sim/ tetap renderer-agnostic dan deterministik"
+        - label: "Tidak mengubah schemaVersion tanpa keputusan eksplisit"
+        - label: "Tidak menambah draw call atau pass render baru"

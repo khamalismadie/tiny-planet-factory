@@ -43,7 +43,7 @@ window.__game.campaign()
 // { level, maxLevel: 100, era, mission: {...}, total: 100, eras: 10, lockedFrom: null, systems: {...} }
 ```
 
-Dengan seed `1`, Dune memakai `sand: Dune`, `rock: Sandstone`, `tree: Oak`, dan `bush: Cactus`. Katalog lengkap ada di `docs/ASSET-CATALOG.md`.
+Dengan seed `1`, Dune memakai `sand: Dune`, `rock: Sandstone`, `tree: Oak`, dan `bush: Cactus`. Katalog lengkap ada di `docs/05-ENGINEERING-BLUEPRINT/ASSET-CATALOG.md`.
 
 ### Cek cepat tutorial
 
@@ -91,10 +91,10 @@ FTUE otomatis berjalan untuk save baru. `?tutorial=1` memaksa ulang dari langkah
 - Overlay performa (`?perf=1`), hook QA (`?debug=1`), dan probe `?qa=1&qaSeconds=45` yang menghasilkan laporan p50/p95 + info perangkat siap disalin.
 - Vendor PixiJS dipisah menjadi `pixi-core` + `pixi-3d`; data konten dan codec DNA berbagi chunk `planet-configs` untuk menghindari inisialisasi circular. App chunk v0.21.0 adalah 80,49 kB (gzip 26,42 kB).
 - Telemetri opt-in (tersimpan lokal, tanpa server) dengan modal penjelasan, ekspor JSON, dan hapus data.
-- Visual polish v0.15.9: satu merged geometry per tipe dengan warna per-facet, AO vertikal + bayangan kontak baked, shade lereng planet, awan 10×6, ground contact dari ekstent geometri, rim light, dan topbar mobile tanpa overflow. Standar visual ada di `docs/ART-DIRECTION.md`.
-- Asset varian v0.16.0: 49 pilihan (39 prop + 10 fauna) dari 43 builder unik, dipilih deterministik dari `seed + planetId`, satu geometri aktif per tipe, bias visual 9 planet, tanpa tekstur/DNA/draw call baru. Katalog ada di `docs/ASSET-CATALOG.md`.
-- Campaign v0.17.0–v0.18.0: 100 level / 10 era, kurva XP kuadratik, 100 main mission dengan 6 tipe quest, HUD era+level+progress, panel `?campaign=1`, dan hook `window.__game.campaign()`. Semua 100 misi aktif sejak v0.18.0; DNA Points/Bio Energy tetap derived. Detail: `docs/CAMPAIGN.md`.
-- Wave fitur etis lokal pasca-preview #41: kompendium + insight habitat/cuaca, tren dan aksi restorasi, milestone/snapshot/jurnal lokal, advisory risiko-respons, ekspor jurnal, pratinjau dampak objek, panel kesiapan offline, lencana ekologi lokal, Indeks Kesehatan Planet (`#70`), advisory Kebun Penyerbuk/Hutan (`#34` + `#3`), dan advisory Perlindungan Satwa/Konservasi (`#6` + `#45`). Semua turunan dari state existing, lokal/unreleased, tanpa schema/gate baru. Katalog sumber: `docs/PLANET-CARE-FEATURE-DATABASE.md`; status bundle: `docs/LOCAL-FEATURE-WAVES.md`.
+- Visual polish v0.15.9: satu merged geometry per tipe dengan warna per-facet, AO vertikal + bayangan kontak baked, shade lereng planet, awan 10×6, ground contact dari ekstent geometri, rim light, dan topbar mobile tanpa overflow. Standar visual ada di `docs/05-ENGINEERING-BLUEPRINT/ART-DIRECTION.md`.
+- Asset varian v0.16.0: 49 pilihan (39 prop + 10 fauna) dari 43 builder unik, dipilih deterministik dari `seed + planetId`, satu geometri aktif per tipe, bias visual 9 planet, tanpa tekstur/DNA/draw call baru. Katalog ada di `docs/05-ENGINEERING-BLUEPRINT/ASSET-CATALOG.md`.
+- Campaign v0.17.0–v0.18.0: 100 level / 10 era, kurva XP kuadratik, 100 main mission dengan 6 tipe quest, HUD era+level+progress, panel `?campaign=1`, dan hook `window.__game.campaign()`. Semua 100 misi aktif sejak v0.18.0; DNA Points/Bio Energy tetap derived. Detail: `docs/03-PRD/CAMPAIGN.md`.
+- Wave fitur etis lokal pasca-preview #41: kompendium + insight habitat/cuaca, tren dan aksi restorasi, milestone/snapshot/jurnal lokal, advisory risiko-respons, ekspor jurnal, pratinjau dampak objek, panel kesiapan offline, lencana ekologi lokal, Indeks Kesehatan Planet (`#70`), advisory Kebun Penyerbuk/Hutan (`#34` + `#3`), dan advisory Perlindungan Satwa/Konservasi (`#6` + `#45`). Semua turunan dari state existing, lokal/unreleased, tanpa schema/gate baru. Katalog sumber: `docs/01-PRODUCT-DISCOVERY/PLANET-CARE-FEATURE-DATABASE.md`; status bundle: `docs/08-DEVELOPMENT/LOCAL-FEATURE-WAVES.md`.
 
 ## Arsitektur
 
@@ -118,12 +118,18 @@ src/
 2. **Art scale** — budget triangle, facet, tekstur nol, spacing, dan determinisme untuk 49 varian (43 builder unik) di 9 planet.
 3. **Terrain render** — normalisasi idempoten dan radius 0,85–1,15 untuk kesembilan planet.
 4. **Smoke browser** (Chromium headless) — WebGL2 boot, 13 tombol objek, klik menanam objek, feedback placement aktif, akselerasi 120 ticks, fauna muncul, misi selesai, HUD berubah, persistensi setelah reload, DNA round-trip lewat UI, service worker terdaftar, resize mobile, dan boot/simulasi untuk kesembilan planet.
-5. **Device check** (emulasi mobile Chromium) — quality override, overlay performa, pinch dua jari lewat CDP, dan adaptive downgrade. Context loss/restore tetap diverifikasi manual di perangkat nyata (checklist `docs/QA-DEVICE.md` #6).
+5. **Device check** (emulasi mobile Chromium) — quality override, overlay performa, pinch dua jari lewat CDP, dan adaptive downgrade. Context loss/restore tetap diverifikasi manual di perangkat nyata (checklist `docs/10-QA-TESTING/QA-DEVICE.md` #6).
 6. **QA load** — seed 1, 94 objek, tier medium, 16 tick ke cuaca Hujan, p95 ≤ 33 ms, dan draw call ≤18 saat Cerah / ≤20 saat Hujan-Badai-Salju.
 7. **Menu** — 9 planet, switching, guide 4 langkah, dan perilaku pause-safe.
 8. **Layout** — target sentuh ≥48 dp di 360×640, 390×844, dan 844×390 tanpa overflow.
 
-Checklist rilis ada di `docs/RELEASE.md`, alur produk/sprint ada di `docs/PRODUCT-TO-PRODUCTION.md` dan `docs/SPRINT.md`, KPI/telemetri ada di `docs/KPI.md`, dan art direction ada di `docs/ART-DIRECTION.md`.
+Checklist rilis ada di `docs/11-RELEASE-DEPLOYMENT/RELEASE.md`, alur produk/sprint ada di `docs/02-PRODUCT-STRATEGY/PRODUCT-TO-PRODUCTION.md` dan `docs/07-SPRINT-PLANNING/SPRINT.md`, KPI/telemetri ada di `docs/02-PRODUCT-STRATEGY/KPI.md`, dan art direction ada di `docs/05-ENGINEERING-BLUEPRINT/ART-DIRECTION.md`.
+
+### Peta dokumentasi lifecycle
+
+Dokumen diurutkan `docs/00-...13-...`, dari inisialisasi sampai evolusi produk. Konstitusi teknis ada di `default-engineering/`, dan ringkasan untuk agen/kontributor ada di `AGENTS.md`. Peta lengkap: `docs/00-PROJECT-INITIALIZATION/REPOSITORY-MAP.md`. Untuk backlog aktif dan status P0, baca `docs/06-PRODUCT-BACKLOG/BACKLOG.md`; guideline QA ada di `docs/10-QA-TESTING/QA-ISSUE-PLAYBOOK.md` dan `docs/10-QA-TESTING/QA-EVIDENCE-POLICY.md`. Ringkasan perubahan pengguna ada di `CHANGELOG.md`.
+
+Catatan: produksi tetap `v0.16.0` sampai #5–#8 ditutup dengan bukti perangkat nyata. Kandidat `v0.21.0` belum dirilis.
 
 Audit visual mandiri:
 
@@ -134,7 +140,7 @@ npm run audit:layout                                   # bounding box UI pada 36
 
 Angka headless terbaru (v0.16.0, `test:qa-load`, seed 1/medium/94 objek/Hujan): p50 16,70 ms, p95 16,80 ms, 59,9 FPS, draw call 20, boot 386–561 ms tergantung run, tanpa downgrade. Smoke grown scene masih ~15 draw call dengan 26 objek dan 41 agen fauna. **Ini bukan bukti performa Android.**
 
-Catatan: Chromium headless di lingkungan ini dapat melepaskan konteks WebGL (`CONTEXT_LOST_WEBGL`), sehingga muncul error shader saat variant baru dikompilasi. Error tersebut difilter hanya ketika `contextLost === true`; error aplikasi lain tetap menggagalkan tes. Belum ada gate otomatis untuk restore sungguhan; hook `restoreContext()` tersedia untuk QA, tetapi checklist #6 di `docs/QA-DEVICE.md` wajib di perangkat nyata.
+Catatan: Chromium headless di lingkungan ini dapat melepaskan konteks WebGL (`CONTEXT_LOST_WEBGL`), sehingga muncul error shader saat variant baru dikompilasi. Error tersebut difilter hanya ketika `contextLost === true`; error aplikasi lain tetap menggagalkan tes. Belum ada gate otomatis untuk restore sungguhan; hook `restoreContext()` tersedia untuk QA, tetapi checklist #6 di `docs/10-QA-TESTING/QA-DEVICE.md` wajib di perangkat nyata.
 
 ## Asumsi & batas
 
@@ -182,5 +188,5 @@ Program Nine Worlds menggantikan roadmap lama: Terra diselesaikan lebih dulu, la
 
 1. Yang tersisa adalah QA Android nyata: p50/p95, cold start 4G dari ikon PWA, pinch, context loss/restore, landscape, dan PWA offline/update. Verifikasi localhost **dan** remote HTTPS sudah PASS, tetapi bukan pengganti perangkat nyata.
 2. Ulangi `?debug=1&qa=1&qaSeconds=45&seed=1&qaObjects=94&quality=medium` dari Android menengah; untuk target 5 menit, jalankan dua sesi 180 s karena aplikasi memotong `qaSeconds` ke maks 180.
-3. Ikuti `docs/SPRINT.md` (Sprint 09) dan jangan tambah biome sebelum P0 QA ditutup. Varian v0.16.0 tidak menambah tipe objek/DNA.
-4. Setelah QA ditutup, evaluasi Supabase cloud/gallery/social dan katalog referensi lanjutan di `docs/ASSET-CATALOG.md` sebagai fase terpisah.
+3. Ikuti `docs/07-SPRINT-PLANNING/SPRINT.md` (Sprint 09) dan jangan tambah biome sebelum P0 QA ditutup. Varian v0.16.0 tidak menambah tipe objek/DNA.
+4. Setelah QA ditutup, evaluasi Supabase cloud/gallery/social dan katalog referensi lanjutan di `docs/05-ENGINEERING-BLUEPRINT/ASSET-CATALOG.md` sebagai fase terpisah.

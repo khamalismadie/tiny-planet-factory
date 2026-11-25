@@ -51,7 +51,7 @@ await client.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [
 await page.waitForTimeout(500);
 const distanceAfter = await page.evaluate(() => window.__game.camera().distance);
 
-// Context loss/restore is verified manually on a real device (see docs/QA-DEVICE.md):
+// Context loss/restore is verified manually on a real device (see docs/10-QA-TESTING/QA-DEVICE.md):
 // headless Chromium's GPU process crashes when simulating it on this host.
 
 // Runtime quality downgrade for constrained devices.

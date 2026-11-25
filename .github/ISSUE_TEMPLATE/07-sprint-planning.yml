@@ -1,0 +1,37 @@
+name: "07 · Sprint Planning"
+description: "Rencana sprint dan kapasitas, bukan laporan hasil."
+title: "[Sprint] "
+labels: ["sprint"]
+body:
+  - type: input
+    id: period
+    attributes:
+      label: Periode
+      placeholder: "2026-11-25 s.d. 2026-12-04"
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: Sprint goal
+    validations:
+      required: true
+  - type: textarea
+    id: capacity
+    attributes:
+      label: Kapasitas & owner peran
+    validations:
+      required: true
+  - type: textarea
+    id: items
+    attributes:
+      label: Item yang dipilih
+      description: Sertakan ID backlog dan poin.
+    validations:
+      required: true
+  - type: checkboxes
+    id: guards
+    attributes:
+      label: Guard
+      options:
+        - label: "Tidak memasukkan fitur baru sebelum P0 QA selesai"

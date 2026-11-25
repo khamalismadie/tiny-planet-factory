@@ -1,0 +1,26 @@
+name: QA Evidence Validator
+
+on:
+  workflow_dispatch:
+    inputs:
+      folder:
+        description: "Folder bukti"
+        required: true
+        default: "qa-evidence/wave10"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - name: Validate evidence consistency only
+        run: npm run qa:evidence:batch -- "${{ inputs.folder }}"
+      - name: Policy reminder
+        run: |
+          echo "Validator hanya mengecek konsistensi."
+          echo "Penutupan #5-#8 tetap memerlukan perangkat nyata dan human sign-off."

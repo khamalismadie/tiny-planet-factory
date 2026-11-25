@@ -54,13 +54,13 @@ Repo ini belum memiliki file `PRD.md` tunggal. Yang dipakai sebagai product requ
 |---|---|---|
 | Product brief + inventory fitur | `README.md` → “Yang sudah ada” | Ringkasan kemampuan vertical slice |
 | Product roadmap/backlog | `README.md` → “Roadmap pasca-MVP”, “Langkah berikutnya” | Prioritas fitur dan phase rilis |
-| Fondasi data/ekosistem | `docs/ECOSYSTEM-DATA-FOUNDATION.md`, `docs/TERRA-CORE.md`, `docs/FOOD-WEB-WILDLIFE-AI.md` | Schema, populasi, food web |
-| Spesifikasi biome | `docs/TERRA-CORE.md` dan 8 doc biome lainnya | Satu doc per planet |
-| Standar visual | `docs/ART-DIRECTION.md`, `docs/VISUAL-AUDIT-2026-11-20.md` | Shape language, palet, budget |
-| KPI & telemetri | `docs/KPI.md` | Event, target, privasi |
-| Riwayat rilis & gate | `docs/RELEASE.md` | Ledger rilis v0.15.x |
-| QA perangkat | `docs/QA-DEVICE.md` | Checklist device nyata dan baseline |
-| Sprint plan & eksekusi | `docs/SPRINT.md` | Backlog aktif, kapasitas, dan status closure |
+| Fondasi data/ekosistem | `docs/03-PRD/ECOSYSTEM-DATA-FOUNDATION.md`, `docs/03-PRD/TERRA-CORE.md`, `docs/03-PRD/FOOD-WEB-WILDLIFE-AI.md` | Schema, populasi, food web |
+| Spesifikasi biome | `docs/03-PRD/TERRA-CORE.md` dan 8 doc biome lainnya | Satu doc per planet |
+| Standar visual | `docs/05-ENGINEERING-BLUEPRINT/ART-DIRECTION.md`, `docs/05-ENGINEERING-BLUEPRINT/VISUAL-AUDIT-2026-11-20.md` | Shape language, palet, budget |
+| KPI & telemetri | `docs/02-PRODUCT-STRATEGY/KPI.md` | Event, target, privasi |
+| Riwayat rilis & gate | `docs/11-RELEASE-DEPLOYMENT/RELEASE.md` | Ledger rilis v0.15.x |
+| QA perangkat | `docs/10-QA-TESTING/QA-DEVICE.md` | Checklist device nyata dan baseline |
+| Sprint plan & eksekusi | `docs/07-SPRINT-PLANNING/SPRINT.md` | Backlog aktif, kapasitas, dan status closure |
 | Reality check kode | `src/`, `scripts/`, `package.json`, `public/sw.js` | Menangkal dokumentasi yang tertinggal |
 
 ### Urutan resolusi konflik
@@ -68,7 +68,7 @@ Repo ini belum memiliki file `PRD.md` tunggal. Yang dipakai sebagai product requ
 Jika dua sumber bertentangan, pakai urutan ini:
 
 1. **Kode + gate test yang dijalankan** — misalnya `test:scale`, `test:qa-load`.
-2. **Laporan QA terbaru** di `docs/QA-DEVICE.md` / `docs/RELEASE.md`.
+2. **Laporan QA terbaru** di `docs/10-QA-TESTING/QA-DEVICE.md` / `docs/11-RELEASE-DEPLOYMENT/RELEASE.md`.
 3. **Spesifikasi fitur/detail** di doc biome atau doc modul.
 4. **Art direction**.
 5. **README/roadmap lama**.
@@ -101,8 +101,8 @@ Setiap konflik yang ditemukan harus dicatat di bagian **Known documentation drif
 - Telemetri **opt-in**, local-only, tanpa server.
 - Hook QA: `?debug=1`, `?perf=1`, `?qa=1`, `?qaObjects=N`, `?eco=1`, `?campaign=1`, `?planet=...`, `?menu=0`, `?seed=N`, `window.__game`.
 - Low-poly v0.15.9: satu merged geometry per tipe, vertex colors, AO per-facet, bayangan kontak baked, facet bertahap, warna lereng, awan 10×6.
-- Asset variants v0.16.0: 49 pilihan / 43 builder unik, resolver `seed + planetId`, bias visual 9 planet, satu geometri aktif per tipe, tanpa perubahan sim/DNA/schema. Katalog: `docs/ASSET-CATALOG.md`.
-- Campaign v0.17.0–v0.18.0: 100 level / 10 era, 100 main mission, 6 tipe quest, kurva XP kuadratik, HUD campaign, hook `?campaign=1`, dan `window.__game.campaign()`. Semua 100 misi aktif sejak v0.18.0; DNA Points/Bio Energy tetap derived. Katalog: `docs/CAMPAIGN.md`.
+- Asset variants v0.16.0: 49 pilihan / 43 builder unik, resolver `seed + planetId`, bias visual 9 planet, satu geometri aktif per tipe, tanpa perubahan sim/DNA/schema. Katalog: `docs/05-ENGINEERING-BLUEPRINT/ASSET-CATALOG.md`.
+- Campaign v0.17.0–v0.18.0: 100 level / 10 era, 100 main mission, 6 tipe quest, kurva XP kuadratik, HUD campaign, hook `?campaign=1`, dan `window.__game.campaign()`. Semua 100 misi aktif sejak v0.18.0; DNA Points/Bio Energy tetap derived. Katalog: `docs/03-PRD/CAMPAIGN.md`.
 
 ### 3.2 Backlog terbuka
 
@@ -118,7 +118,7 @@ Setiap konflik yang ditemukan harus dicatat di bagian **Known documentation drif
 | P2 | Planet baru | **Ditahan sampai QA ditutup** |
 | P2 | Katalog referensi 1.000 aset aktif + wind sway | **Deferred** |
 
-Aturan backlog: **tidak ada planet atau biome baru sebelum checklist P0 selesai.** Eksekusi dan status terkini tercatat di `docs/SPRINT.md`.
+Aturan backlog: **tidak ada planet atau biome baru sebelum checklist P0 selesai.** Eksekusi dan status terkini tercatat di `docs/07-SPRINT-PLANNING/SPRINT.md`.
 
 ---
 
@@ -149,7 +149,7 @@ Sebuah item dinyatakan selesai jika semua berikut terpenuhi.
 - [ ] Perubahan UI berbahasa Indonesia.
 - [ ] Tidak ada error aplikasi baru di konsol.
 - [ ] Commit mengikuti konvensi bagian 8.
-- [ ] Doc terkait diperbarui: minimal `README.md`, `docs/RELEASE.md`; tambahkan `docs/QA-DEVICE.md`, `docs/KPI.md`, atau `docs/ART-DIRECTION.md` bila relevan.
+- [ ] Doc terkait diperbarui: minimal `README.md`, `docs/11-RELEASE-DEPLOYMENT/RELEASE.md`; tambahkan `docs/10-QA-TESTING/QA-DEVICE.md`, `docs/02-PRODUCT-STRATEGY/KPI.md`, atau `docs/05-ENGINEERING-BLUEPRINT/ART-DIRECTION.md` bila relevan.
 
 ### Sim & data
 
@@ -206,7 +206,7 @@ Artinya: jika ada konflik, perbesar/perjelas bentuk dulu sebelum merapikan jarak
 
 ### Scale philosophy
 
-Pakai **rasio seimbang sesuai logika diorama**, bukan skala Bumi literal. Fauna punya visibility floor agar tetap terbaca. Lihat keputusan di `docs/ART-DIRECTION.md`, `docs/RELEASE.md` v0.15.3 dan v0.15.9.
+Pakai **rasio seimbang sesuai logika diorama**, bukan skala Bumi literal. Fauna punya visibility floor agar tetap terbaca. Lihat keputusan di `docs/05-ENGINEERING-BLUEPRINT/ART-DIRECTION.md`, `docs/11-RELEASE-DEPLOYMENT/RELEASE.md` v0.15.3 dan v0.15.9.
 
 ---
 
@@ -276,8 +276,8 @@ Sebelum rilis, samakan:
 - `package-lock.json` → `version`
 - `public/sw.js` → `tpf-shell-vX-Y-Z`
 - `README.md` → tabel versi
-- `docs/RELEASE.md` → bagian rilis baru
-- `docs/QA-DEVICE.md` → hasil QA terbaru
+- `docs/11-RELEASE-DEPLOYMENT/RELEASE.md` → bagian rilis baru
+- `docs/10-QA-TESTING/QA-DEVICE.md` → hasil QA terbaru
 
 ---
 
@@ -412,15 +412,15 @@ Catatan: angka headless bukan pengganti angka device nyata.
 
 1. Pastikan status P0 dicatat jujur. P0 OPEN bukan blocker untuk deploy RC, tetapi blocker untuk klaim `production-ready` (§18).
 2. Tentukan versi baru dan samakan seluruh file versi.
-3. Tulis bagian rilis baru di `docs/RELEASE.md`.
+3. Tulis bagian rilis baru di `docs/11-RELEASE-DEPLOYMENT/RELEASE.md`.
 4. Perbarui `README.md` bila perlu:
    - tabel versi,
    - fitur aktif,
    - jumlah gate test,
    - angka chunk terbaru.
-5. Perbarui `docs/QA-DEVICE.md` dengan hasil lokal/remote/device.
-6. Perbarui `docs/KPI.md` jika event telemetri baru ditambahkan.
-7. Perbarui `docs/ART-DIRECTION.md` jika standar visual berubah.
+5. Perbarui `docs/10-QA-TESTING/QA-DEVICE.md` dengan hasil lokal/remote/device.
+6. Perbarui `docs/02-PRODUCT-STRATEGY/KPI.md` jika event telemetri baru ditambahkan.
+7. Perbarui `docs/05-ENGINEERING-BLUEPRINT/ART-DIRECTION.md` jika standar visual berubah.
 8. Build:
 
    ```bash
@@ -446,11 +446,11 @@ Catatan: angka headless bukan pengganti angka device nyata.
 
 Rilis v0.21.0 **tidak boleh di-deploy ke produksi** sebelum issue #5–#8 benar-benar closed dengan laporan QA fisik dan screenshot/video asli. Ini mengikat lebih ketat daripada catatan umum di §11 bahwa P0 OPEN masih memperbolehkan RC: untuk v0.21.0, P0 OPEN adalah blocker deploy produksi.
 
-Catatan bundle: pemeriksaan `index-BiS1XGVG.js` di bawah berlaku untuk kandidat preview #41 yang dipakai evidence terarsip. `main` lokal pasca-commit `71a8809`–`f0193de` menghasilkan `index-BnlhvdGl.js` (lihat `docs/LOCAL-FEATURE-WAVES.md`). Jika build lokal yang baru ingin dideploy, ulangi QA fisik #5–#8 dengan `--expect-bundle` sesuai hash build tersebut; jangan memakai evidence preview #41 sebagai pengganti.
+Catatan bundle: pemeriksaan `index-BiS1XGVG.js` di bawah berlaku untuk kandidat preview #41 yang dipakai evidence terarsip. `main` lokal pasca-commit `71a8809`–`f0193de` menghasilkan `index-BnlhvdGl.js` (lihat `docs/08-DEVELOPMENT/LOCAL-FEATURE-WAVES.md`). Jika build lokal yang baru ingin dideploy, ulangi QA fisik #5–#8 dengan `--expect-bundle` sesuai hash build tersebut; jangan memakai evidence preview #41 sebagai pengganti.
 
 Sebelum trigger Netlify produksi:
 
-- [ ] #7 closed: minimal 3 run p95 v0.21.0 ≤ 33 ms dari `docs/QA-P95-REMEASURE.md`.
+- [ ] #7 closed: minimal 3 run p95 v0.21.0 ≤ 33 ms dari `docs/10-QA-TESTING/QA-P95-REMEASURE.md`.
 - [ ] #6 closed: install → airplane mode → save terbaca → place → update dengan save utuh.
 - [ ] #8 closed: landscape `844×390` dan `layout.planetCenterVisible === true` tanpa overlap.
 - [ ] #5 closed: cold start 4G, pinch/drag, context loss/restore nyata, dan konsol bersih.
@@ -463,7 +463,7 @@ Sesaat setelah produksi berpindah:
 - [ ] `curl -s https://tinyplanetfactory.netlify.app/sw.js | grep -oE 'tpf-shell-v[0-9-]+'` → `tpf-shell-v0-21-0`.
 - [ ] `URL=https://tinyplanetfactory.netlify.app/ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test` → 8/8 PASS.
 - [ ] Manifest, `sw.js`, dan offline reload terverifikasi di produksi.
-- [ ] `docs/RELEASE.md` dan `docs/SPRINT.md` diperbarui dari “unreleased” menjadi status deploy aktif beserta commit produksi.
+- [ ] `docs/11-RELEASE-DEPLOYMENT/RELEASE.md` dan `docs/07-SPRINT-PLANNING/SPRINT.md` diperbarui dari “unreleased” menjadi status deploy aktif beserta commit produksi.
 
 Rollback v0.21.0 harus kembali ke artefak produksi v0.16.0:
 
@@ -520,7 +520,7 @@ Jika crash/regresi pasca-deploy:
 3. Deploy ulang artefak `dist/` commit sebelumnya.
 4. Pastikan `sw.js` versi lama kembali aktif dan cache lama bisa melayani shell.
 5. Verifikasi remote smoke + PWA check.
-6. Tulis postmortem singkat di `docs/RELEASE.md`: gejala, sebab, dampak, perbaikan, pencegahan.
+6. Tulis postmortem singkat di `docs/11-RELEASE-DEPLOYMENT/RELEASE.md`: gejala, sebab, dampak, perbaikan, pencegahan.
 
 Rollback aman karena:
 
@@ -536,13 +536,13 @@ Tabel ini adalah **audit trail**. Seluruh nilai lama di bawah sudah disinkronkan
 
 | Sumber | Nilai lama | Nilai kanan (status) |
 |---|---|---|
-| `docs/ART-DIRECTION.md` | target sentuh ≥36 px | **48 dp** sejak v0.15.4 — resolved |
-| `docs/ART-DIRECTION.md` | orbit awan ≈1,55 | **orbit 1,08**, radius 0,045 sejak v0.15.8 — resolved |
+| `docs/05-ENGINEERING-BLUEPRINT/ART-DIRECTION.md` | target sentuh ≥36 px | **48 dp** sejak v0.15.4 — resolved |
+| `docs/05-ENGINEERING-BLUEPRINT/ART-DIRECTION.md` | orbit awan ≈1,55 | **orbit 1,08**, radius 0,045 sejak v0.15.8 — resolved |
 | `README.md` | app chunk ~56,2 kB | **65,43 kB / gzip 21,47 kB** sejak v0.15.9 — resolved |
 | `README.md` | `npm test` 3 grup | **8 gate** sejak v0.15.9 — resolved |
 | `README.md` | deploy HTTPS tertunda | **produksi aktif** di Netlify — resolved |
-| `docs/RELEASE.md` checklist | target p95 ≤33 ms tanpa penjelasan | baseline 33,40 ms + alasan baris #1/#2 — resolved |
-| `docs/QA-DEVICE.md` | hasil device v0.15.5 | ditandai baseline pra-v0.15.6; v0.15.9 headless lokal/remote dicatat terpisah — resolved |
+| `docs/11-RELEASE-DEPLOYMENT/RELEASE.md` checklist | target p95 ≤33 ms tanpa penjelasan | baseline 33,40 ms + alasan baris #1/#2 — resolved |
+| `docs/10-QA-TESTING/QA-DEVICE.md` | hasil device v0.15.5 | ditandai baseline pra-v0.15.6; v0.15.9 headless lokal/remote dicatat terpisah — resolved |
 | Doc biome v0.8–v0.14 | siklus 360 tick, planet data-only, tanpa UI selector | siklus aktual 106–120 tick, 9 planet aktif, selector di menu sejak v0.15.7 — resolved via addendum |
 | Doc core v0.4–v0.6 | subset spesies, hook Terra-centric, `FoodWebManager`/`PopulationManager` | 103 spesies, hook planet aktif, `EcosystemManager` + `guilds.ts` — resolved via addendum |
 
@@ -579,7 +579,7 @@ Keputusan yang mengikat pipeline:
 <Perilaku yang ingin diubah>
 
 ## KPI yang didukung
-<Event/target dari docs/KPI.md>
+<Event/target dari docs/02-PRODUCT-STRATEGY/KPI.md>
 
 ## Acceptance criteria
 - [ ] ...
@@ -600,7 +600,7 @@ Keputusan yang mengikat pipeline:
 
 ## Doc yang perlu diubah
 - README.md
-- docs/RELEASE.md
+- docs/11-RELEASE-DEPLOYMENT/RELEASE.md
 - ...
 ```
 
@@ -630,7 +630,7 @@ Keputusan yang mengikat pipeline:
 - [ ] PWA check: PASS
 - [ ] QA device: PASS / OPEN / FAILED
 - [ ] Artefak ZIP: <path>
-- [ ] Catatan rilis: docs/RELEASE.md
+- [ ] Catatan rilis: docs/11-RELEASE-DEPLOYMENT/RELEASE.md
 ```
 
 ### 16.4 QA report template

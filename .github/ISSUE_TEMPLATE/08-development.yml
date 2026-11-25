@@ -1,0 +1,33 @@
+name: "08 · Development"
+description: "Implementasi atau perbaikan kode dengan gate jelas."
+title: "[Dev] "
+labels: ["development"]
+body:
+  - type: textarea
+    id: change
+    attributes:
+      label: Perubahan
+    validations:
+      required: true
+  - type: textarea
+    id: files
+    attributes:
+      label: File yang disentuh
+    validations:
+      required: true
+  - type: input
+    id: bundle
+    attributes:
+      label: Bundle hash sebelum/sesudah
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Wajib
+      options:
+        - label: "npm test 8/8 PASS"
+        - label: "npm run build PASS, app chunk < 100 kB"
+        - label: "git diff --check bersih"
+        - label: "Tidak ada gate/target yang diubah"
+        - label: "Dokumen terdampak diperbarui"

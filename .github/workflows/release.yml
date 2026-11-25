@@ -1,0 +1,66 @@
+name: Release Guard
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Versi yang akan dirilis"
+        required: true
+      bundle:
+        description: "Bundle hash yang sudah diverifikasi"
+        required: true
+      evidence_folder:
+        description: "Folder bukti #5-#8"
+        required: true
+        default: "qa-evidence/wave10"
+      confirm_qa:
+        description: "Ketik YES-#5-#6-#7-#8 bila semua PASS"
+        required: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Verify bundle hash
+        env:
+          EXPECTED: ${{ inputs.bundle }}
+        run: |
+          APP_JS=$(find dist/assets -maxdepth 1 -name 'index-*.js' | head -n 1)
+          BASENAME=$(basename "$APP_JS")
+          echo "built: $BASENAME"
+          test "$BASENAME" = "$EXPECTED"
+      - name: Validate evidence
+        run: npm run qa:evidence:batch -- "${{ inputs.evidence_folder }}"
+      - name: QA human gate
+        env:
+          CONFIRM: ${{ inputs.confirm_qa }}
+        run: |
+          test "$CONFIRM" = "YES-#5-#6-#7-#8" || { echo "Bukti #5-#8 belum dikonfirmasi."; exit 1; }
+
+  deploy:
+    needs: check
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Deploy production after approval
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: |
+          npm install --global netlify-cli
+          netlify deploy --dir=dist --prod

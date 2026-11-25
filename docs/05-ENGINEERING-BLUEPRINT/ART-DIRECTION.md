@@ -43,7 +43,7 @@ Aturan: warna vegetasi berubah **bertahap** mengikuti `oxygen`/`water`, bukan XO
 - Sejak v0.15.9: wajah tidak di-share; warna per-facet + AO vertikal dan bayangan kontak baked ditanam di vertex color. Tanpa tekstur, pass, atau draw call baru. Budget triangle per tipe dan metrik facet sudut unik dikunci `test:scale`.
 - `src/render/assetGeometry.ts` adalah satu-satunya sumber bentuk aset. `PropRenderer` dan `WildlifeRenderer` mengonsumsi resolver hasil `createAssetResolvers(seed, planetId)`; `ASSET_GEOMETRY` / `SPECIES_GEOMETRY` tetap sebagai fallback indeks 0.
 - Sejak v0.16.0: satu varian aktif per tipe dipilih dari `seed + planetId`. Varian hanya mengubah X/Z, jumlah sudut, dan palet; tinggi `minY = 0`, `maxY` sesuai target lama, `OBJECT_DEFS[type].scale`, `spacingRadius`, tekstur, dan jumlah batch tidak berubah.
-- Bias planet mengunci varian kunci (mis. Sakura → Sakura tree, Glaciera → Frozen ocean). Tipe lain tetap deterministik lewat hash. Detail ada di `docs/ASSET-CATALOG.md`.
+- Bias planet mengunci varian kunci (mis. Sakura → Sakura tree, Glaciera → Frozen ocean). Tipe lain tetap deterministik lewat hash. Detail ada di `docs/05-ENGINEERING-BLUEPRINT/ASSET-CATALOG.md`.
 
 ## 5. Pencahayaan
 

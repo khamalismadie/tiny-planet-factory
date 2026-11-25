@@ -1,0 +1,32 @@
+name: "01 · Product Discovery"
+description: "Masukan, observasi pemain, atau ide awal sebelum keputusan strategi."
+title: "[Discovery] "
+labels: ["discovery"]
+body:
+  - type: textarea
+    id: observation
+    attributes:
+      label: Observasi / masalah pemain
+      description: Apa yang terlihat? Sertakan konteks tanpa kesimpulan akhir.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Bukti pendukung
+      description: Screenshot, KPI yang sudah ada, atau tautan doc. Jangan buat statistik baru.
+    validations:
+      required: false
+  - type: textarea
+    id: questions
+    attributes:
+      label: Pertanyaan yang harus dijawab
+    validations:
+      required: true
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Batas
+      options:
+        - label: "Tidak mengusulkan fitur baru sebelum P0 QA selesai"
+        - label: "Tidak ada data pribadi atau telemetry mentah"

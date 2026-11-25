@@ -67,7 +67,7 @@ Composite props dipilih lebih dulu daripada skor tertinggi karena placement feed
 - `src/render/assetGeometry.ts` — **baru**, helper merge + 13 prop asset + 5 species asset.
 - `src/render/PropRenderer.ts` — konsumsi aset komposit, vertex colors, spin rotasi, `baseLift`.
 - `src/render/WildlifeRenderer.ts` — konsumsi aset spesies komposit, vertex colors, `baseLift`.
-- `docs/ART-DIRECTION.md` — standar bentuk/ground-contact diperbarui.
+- `docs/05-ENGINEERING-BLUEPRINT/ART-DIRECTION.md` — standar bentuk/ground-contact diperbarui.
 
 ## 7. Validation executed
 

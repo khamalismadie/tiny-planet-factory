@@ -277,4 +277,4 @@ Contoh:
 - **Sistem fondasi:** Planet Health, Ecosystem Simulation, Resource, Restoration, dan Progression.
 - **Arah produk:** game simulasi dan restorasi lingkungan yang menggabungkan gameplay management, edukasi ekologi, dan evolusi visual planet.
 
-> Catatan repo: dokumen ini adalah katalog referensi dari user, bukan klaim bahwa seluruh 105 fitur sudah diimplementasikan. Status aktual ada di `docs/LOCAL-FEATURE-WAVES.md`.
+> Catatan repo: dokumen ini adalah katalog referensi dari user, bukan klaim bahwa seluruh 105 fitur sudah diimplementasikan. Status aktual ada di `docs/08-DEVELOPMENT/LOCAL-FEATURE-WAVES.md`.

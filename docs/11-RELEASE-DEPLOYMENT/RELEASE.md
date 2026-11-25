@@ -4,11 +4,11 @@ Gunakan checklist ini sebelum publish build produksi.
 
 > **Status pembacaan v0.15.9:** angka 360 tick pada phase v0.10–v0.14 adalah spesifikasi historis. Sejak v0.15.4, semua siklus musim aktif berada pada **106–120 tick** (divalidasi `test:sim`). Bagian bertanda v0.4–v0.14 adalah catatan rilis, bukan klaim kondisi saat ini; lihat §2u–§2ab untuk status terkini. `main` adalah v0.21.0 (unreleased; commit aktif selalu `git rev-parse HEAD`); produksi masih v0.16.0.
 >
-> **Status QA v0.21.0 (2026-11-23):** Bundle kandidat lokal: `index-BnlhvdGl.js` (preview Netlify draft `https://6b045262361522f239ccf165--tinyplanetfactory.netlify.app/`). Run p95 5–7 valid: p95 `33,4 ms`, objek `94`, tanpa overlap, UA Android — namun #7 tetap OPEN karena target `≤ 33 ms` dan sudah pada batas; re-measure sampai ada margin sebelum close. Offline: `qa-evidence/wave9/report-offline.json` memenuhi `--offline --standalone` (`network.online:false`, SW controller aktif). Landscape: fix `index.html` menyembunyikan `#hint`; laporan lama gagal (`centerElement: BUTTON`, `planetCenterVisible:false`); #8 tetap OPEN sampai laporan ulang lulus. #5, #6 update, #7, #8 tetap OPEN. Deploy produksi ditahan. Rincian: `docs/QA-ISSUE-PLAYBOOK.md`.
+> **Status QA v0.21.0 (2026-11-23):** Bundle kandidat lokal: `index-BnlhvdGl.js` (preview Netlify draft `https://6b045262361522f239ccf165--tinyplanetfactory.netlify.app/`). Run p95 5–7 valid: p95 `33,4 ms`, objek `94`, tanpa overlap, UA Android — namun #7 tetap OPEN karena target `≤ 33 ms` dan sudah pada batas; re-measure sampai ada margin sebelum close. Offline: `qa-evidence/wave9/report-offline.json` memenuhi `--offline --standalone` (`network.online:false`, SW controller aktif). Landscape: fix `index.html` menyembunyikan `#hint`; laporan lama gagal (`centerElement: BUTTON`, `planetCenterVisible:false`); #8 tetap OPEN sampai laporan ulang lulus. #5, #6 update, #7, #8 tetap OPEN. Deploy produksi ditahan. Rincian: `docs/10-QA-TESTING/QA-ISSUE-PLAYBOOK.md`.
 
 > **Insiden deploy 2026-11-23:** auto-deploy Netlify dari `main` telah mempublikasikan v0.21.0 ke produksi lebih awal (deploy `6b0442c23292ad856e452a13`, 13:42 UTC), sebelum #5–#8 lulus. Produksi langsung dikembalikan ke `6b0298644a3808ba84bfc85d` (`e71e6c1`, `index-Cl2SK4zO.js`, `tpf-shell-v0-16-0`) dan diverifikasi kembali. Auto build Netlify dimatikan sementara (`stop_builds: true`) sampai QA selesai. Preview draft untuk QA offline: `https://6b045262361522f239ccf165--tinyplanetfactory.netlify.app/` (context `deploy-preview`, bukan produksi).
 
-> **Status fitur lokal pasca-preview #41:** commit `71a8809`–`f0193de` menambahkan wave insight/restorasi/advisory/offline/lencana/indeks kesehatan/advisory habitat dan satwa etis di `main` tanpa schema, gate, planet, biome, atau misi baru. Build lokal pada `f0193de` memakai `index-BnlhvdGl.js`, app chunk 92,97 kB / gzip 30,34 kB, dan `npm test` 8/8 PASS. Tujuh laporan Wave 9 sudah ada di `qa-evidence/wave9/`, tetapi semuanya **REVIEW** dan **tidak** menutup #5–#8. Rincian: `docs/LOCAL-FEATURE-WAVES.md`. Paket pengumpulan bukti fisik untuk build ini: `docs/QA-HANDOFF-WAVE9.md`.
+> **Status fitur lokal pasca-preview #41:** commit `71a8809`–`f0193de` menambahkan wave insight/restorasi/advisory/offline/lencana/indeks kesehatan/advisory habitat dan satwa etis di `main` tanpa schema, gate, planet, biome, atau misi baru. Build lokal pada `f0193de` memakai `index-BnlhvdGl.js`, app chunk 92,97 kB / gzip 30,34 kB, dan `npm test` 8/8 PASS. Tujuh laporan Wave 9 sudah ada di `qa-evidence/wave9/`, tetapi semuanya **REVIEW** dan **tidak** menutup #5–#8. Rincian: `docs/08-DEVELOPMENT/LOCAL-FEATURE-WAVES.md`. Paket pengumpulan bukti fisik untuk build ini: `docs/10-QA-TESTING/QA-HANDOFF-WAVE9.md`.
 
 > **Pembaruan lowpoly 2026-11-24:** commit `0f72a8f` menambah detail pada low-poly spesies (`deer`, `fox`, `bird`, `fish`, `insect`), bundle `index-wiHAa9uT.js`, app chunk 93,91 kB / gzip 30,61 kB; `npm test` 8/8 PASS. Physical evidence #5–#8 dari bundle lama perlu diukur ulang kalau ditujukan ke bundle ini.
 
@@ -220,7 +220,7 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [x] `caches.match(request, { ignoreVary: true })` menangani header `Vary: Origin` dari Vite preview.
 - [x] Verifikasi localhost secure-context: manifest installable shape, SW control, shell + chunk ter-cache, offline reload sukses, tanpa page error.
 - [x] GitHub Pages ditunda (keputusan pipeline); produksi memakai Netlify. Alasan akun/repo bersifat eksternal dan tidak diverifikasi di repo ini.
-- [x] Host HTTPS produksi: manifest dan `sw.js` mengembalikan 200 (verifikasi 2026-11-22, commit `ea8f9b9`; lihat `docs/QA-DEVICE.md`).
+- [x] Host HTTPS produksi: manifest dan `sw.js` mengembalikan 200 (verifikasi 2026-11-22, commit `ea8f9b9`; lihat `docs/10-QA-TESTING/QA-DEVICE.md`).
 - [ ] Install prompt, offline, dan update di perangkat nyata.
 
 ## 2q. Main Menu & Instrument UI (v0.15)
@@ -324,7 +324,7 @@ PLAYWRIGHT_BROWSERS_PATH=/root/.cache/ms-playwright npm test
 - [x] Bias visual 9 planet di-pin untuk varian kunci; sisanya hash `seed + planetId + type`.
 - [x] `PropRenderer` / `WildlifeRenderer` menerima resolver; `GameScene.reseed(..., planetId)` mengganti varian saat reset/switch planet; `View3D` tidak di-destroy.
 - [x] `test:scale` diperpanjang untuk semua varian: tinggi ±5%, budget triangle/facet, tekstur 0, spacing, wildlife = prop, dan determinisme 9 planet × 2 seed.
-- [x] Hook QA `?debug=1` → `window.__game.variants()` (indices + labels); katalog di `docs/ASSET-CATALOG.md`.
+- [x] Hook QA `?debug=1` → `window.__game.variants()` (indices + labels); katalog di `docs/05-ENGINEERING-BLUEPRINT/ASSET-CATALOG.md`.
 - [x] App chunk 73,33 kB (gzip 23,96 kB) dan cache service worker `tpf-shell-v0-16-0`.
 - [x] `npm test` lokal 8/8 PASS; draw call Hujan tetap 20, p95 headless 16,80 ms.
 - [x] Deploy produksi `main` @ `e71e6c1` ke <https://tinyplanetfactory.netlify.app/>; bundle `index-Cl2SK4zO.js`; remote `npm test` 8/8 PASS; cache `tpf-shell-v0-16-0` dan offline reload PASS.
@@ -364,7 +364,7 @@ Status jujur: fitur campaign sudah ada di `main`, tetapi klaim produksi dan real
 - [x] Skor 0–100 dan tier 1–5 diturunkan dari state sim yang ada; tidak ada objek, planet, biome, atau field DNA baru. `schemaVersion` tetap 3.
 - [x] Rumus: Peradaban = populasi + stabilitas + air + jaring makanan + level; Industri = energi + objek + populasi + level; AI = biodiversitas + agen + jaring makanan + stabilitas + level; Kosmik = tahap + energi + biodiversitas + level.
 - [x] HUD menampilkan `Sistem <nama>: <skor>/100`; hook `window.__game.campaign()` menyertakan `systems.scores` dan `systems.tiers`.
-- [x] Copy target 61–100 dan `docs/CAMPAIGN.md` menyebut skor turunan, bukan klaim manusia/alien literal.
+- [x] Copy target 61–100 dan `docs/03-PRD/CAMPAIGN.md` menyebut skor turunan, bukan klaim manusia/alien literal.
 - [x] `test:sim` memverifikasi 100/100 misi reachable, tidak ada `always` di level 61–100, skor terikat 0–100, tier 1–5, dan skor naik bersama level.
 - [x] Build lokal app chunk 75,09 kB (gzip 24,59 kB); cache SW `tpf-shell-v0-18-0`.
 - [x] PR #35 merge ke `main` @ `fa79f03`; issue #34 closed.
@@ -397,7 +397,7 @@ Status jujur: tutorial berjalan di `main`, tetapi produksi dan real-device masih
 
 - [x] Laporan QA menyertakan `appVersion`, snapshot save, status jaringan/visibilitas, orientasi, geometri layout, `scriptSrc`, dan SW controller/script URL.
 - [x] Geometri layout membuktikan area planet tengah masih `CANVAS` dan panel tidak saling menimpa pada landscape.
-- [x] `docs/QA-DEVICE.md` memuat runbook 4 sesi untuk #5–#8, termasuk airplane mode, update PWA, dan context loss nyata.
+- [x] `docs/10-QA-TESTING/QA-DEVICE.md` memuat runbook 4 sesi untuk #5–#8, termasuk airplane mode, update PWA, dan context loss nyata.
 - [x] Validator manual `npm run qa:evidence -- <file> [--offline] [--standalone] [--landscape]` tidak masuk `npm test` dan tidak menutup issue otomatis.
 - [x] `npm test` lokal tetap 8/8 PASS; gate tidak ditambah.
 - [x] Build lokal app chunk 80,49 kB (gzip 26,41 kB); cache SW `tpf-shell-v0-20-0`.
@@ -426,14 +426,14 @@ Status jujur: instrumentasi dan runbook sudah siap, tetapi tidak ada klaim QA fi
 - [x] `test:sim` membuktikan setiap hazard yang benar-benar dipakai `habitatContextFor()` masih terdaftar di `climate.hazards` planet bersangkutan.
 - [x] 100 copy misi kini menyebut angka dan kata kunci yang sama dengan `MissionCheck`; klaim “spesies jamur/reptil” ditandai sebagai proxy, bukan mechanic baru.
 - [x] `test:sim` menolak copy yang angkanya tidak cocok atau kata kunci mechanic-nya meleset; gate tetap 8 buah.
-- [x] Perilaku reward saat XP pasif melompat level didokumentasikan di `docs/CAMPAIGN.md` dan diverifikasi `test:sim`: misi yang terlewat tidak dibayar mundur, misi aktif di level tujuan tetap memberi reward.
+- [x] Perilaku reward saat XP pasif melompat level didokumentasikan di `docs/03-PRD/CAMPAIGN.md` dan diverifikasi `test:sim`: misi yang terlewat tidak dibayar mundur, misi aktif di level tujuan tetap memberi reward.
 - [x] Tidak ada planet, biome, objek, unlock, field DNA, atau `schemaVersion` baru.
 - [x] Build lokal app chunk 80,49 kB (gzip 26,42 kB); cache SW `tpf-shell-v0-21-0`.
-- [x] Paket ukur ulang p95 v0.21.0 tersedia di `docs/QA-P95-REMEASURE.md` memakai preview #41; target #7 tetap ≤ 33 ms dan baseline lama 33,40 ms tidak dipakai sebagai kriteria lulus.
+- [x] Paket ukur ulang p95 v0.21.0 tersedia di `docs/10-QA-TESTING/QA-P95-REMEASURE.md` memakai preview #41; target #7 tetap ≤ 33 ms dan baseline lama 33,40 ms tidak dipakai sebagai kriteria lulus.
 - [x] Gate headless `test:qa-load` dan `qa:evidence` kini memakai batas p95 yang sama, ≤ 33 ms; baseline device historis tidak ditulis ulang.
 - [x] `npm run qa:evidence:batch -- <folder>` memvalidasi banyak `report-*.json` dengan flag otomatis; bukan gate tambahan.
 - [x] Flag opsional `--expect-version` dan `--expect-bundle` tersedia di `qa:evidence` dan `qa:evidence:batch` untuk menolak laporan dari build lain.
-- [x] `docs/QA-ISSUE-PLAYBOOK.md` memetakan bukti dan urutan penutupan #5, #6, dan #8; #7 tetap memakai paket khusus.
+- [x] `docs/10-QA-TESTING/QA-ISSUE-PLAYBOOK.md` memetakan bukti dan urutan penutupan #5, #6, dan #8; #7 tetap memakai paket khusus.
 - [ ] **Belum di-deploy.** Produksi tetap bundle v0.16.0 `index-Cl2SK4zO.js` / cache `tpf-shell-v0-16-0`.
 - [ ] Issue #5–#8 tetap OPEN; perubahan ini tidak menutup QA perangkat nyata.
 
@@ -441,7 +441,7 @@ Status jujur: audit sinkronisasi menyentuh data/config dan copy, bukan menambah 
 
 ## 3. QA perangkat nyata
 
-Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:
+Jalankan seluruh baris di `docs/10-QA-TESTING/QA-DEVICE.md`, minimal untuk:
 
 - [ ] Android menengah: p50 frame time ≤ 33,3 ms (≈30 FPS) dan `fps ≥ 30`, p95 ≤ 33 ms selama total 5 menit (2 run `qaSeconds=180`).
 - [ ] Cold start < 5 s pada 4G.
@@ -453,7 +453,7 @@ Jalankan seluruh baris di `docs/QA-DEVICE.md`, minimal untuk:
 
 Untuk QA deterministik: buka `?debug=1&qa=1&qaSeconds=45&seed=1&qaObjects=94&quality=medium` di perangkat. Panel hasil QA akan muncul dan tombol **Salin hasil QA** menghasilkan JSON berisi p50/p95, boot time, quality tier, device info, status PWA, serta jumlah agen/spesies fauna.
 
-Catatan 2026-11-21: lima run QA nyata di **Itel S686LN / Android 15**, termasuk tiga run dengan **94 objek** dan durasi hingga **180 s**, menghasilkan p50 **16,90–33,20 ms**, p95 **33,40 ms**, FPS **30,1–59,2**, draw call **6–18**, boot **0,24–2,03 s**, tier medium tanpa downgrade, service worker aktif, dan tidak ada context loss. p95 33,40 ms menggagalkan baris #2 (frame budget); baris #1 (cold start 4G dari ikon) belum pernah diukur. Keduanya tetap OPEN. Rincian ada di `docs/QA-DEVICE.md`.
+Catatan 2026-11-21: lima run QA nyata di **Itel S686LN / Android 15**, termasuk tiga run dengan **94 objek** dan durasi hingga **180 s**, menghasilkan p50 **16,90–33,20 ms**, p95 **33,40 ms**, FPS **30,1–59,2**, draw call **6–18**, boot **0,24–2,03 s**, tier medium tanpa downgrade, service worker aktif, dan tidak ada context loss. p95 33,40 ms menggagalkan baris #2 (frame budget); baris #1 (cold start 4G dari ikon) belum pernah diukur. Keduanya tetap OPEN. Rincian ada di `docs/10-QA-TESTING/QA-DEVICE.md`.
 
 ## 4. Telemetri
 
@@ -461,7 +461,7 @@ Catatan 2026-11-21: lima run QA nyata di **Itel S686LN / Android 15**, termasuk 
 - [ ] Tombol **Telemetri** membuka modal dengan penjelasan bahwa data tidak dikirim ke server.
 - [ ] Saat diaktifkan, peristiwa tercatat di localStorage (`tpf.telemetry.v1`).
 - [ ] **Salin data** menghasilkan JSON; **Hapus data** mengosongkan event tetapi tidak menghapus save game.
-- [ ] Tidak ada data pribadi/IP/nama perangkat yang dikirim atau disimpan telemetri. Lihat `docs/KPI.md`.
+- [ ] Tidak ada data pribadi/IP/nama perangkat yang dikirim atau disimpan telemetri. Lihat `docs/02-PRODUCT-STRATEGY/KPI.md`.
 
 ## 5. Rollback & monitoring
 
@@ -469,11 +469,11 @@ Catatan 2026-11-21: lima run QA nyata di **Itel S686LN / Android 15**, termasuk 
 - [ ] Catat commit/tag build di release notes.
 - [ ] Service worker versi lama masih bisa melayani app shell bila update gagal.
 - [ ] Jika crash pasca-update: matikan service worker lama lewat mekanisme hosting/CDN, lalu deploy ulang artefak sebelumnya.
-- [ ] Untuk v0.21.0, rollback berarti kembali ke produksi v0.16.0 (`e71e6c1`, `index-Cl2SK4zO.js`, `tpf-shell-v0-16-0`), bukan ke preview #41. Detail ada di `docs/PRODUCT-TO-PRODUCTION.md` §11a.
+- [ ] Untuk v0.21.0, rollback berarti kembali ke produksi v0.16.0 (`e71e6c1`, `index-Cl2SK4zO.js`, `tpf-shell-v0-16-0`), bukan ke preview #41. Detail ada di `docs/02-PRODUCT-STRATEGY/PRODUCT-TO-PRODUCTION.md` §11a.
 
 ## 6. Publish
 
-Produksi saat ini sudah stabil di Netlify (auto-deploy dari `main`, <https://tinyplanetfactory.netlify.app/>). Alur rilis normal ada di `docs/PRODUCT-TO-PRODUCTION.md` §11.
+Produksi saat ini sudah stabil di Netlify (auto-deploy dari `main`, <https://tinyplanetfactory.netlify.app/>). Alur rilis normal ada di `docs/02-PRODUCT-STRATEGY/PRODUCT-TO-PRODUCTION.md` §11.
 
 Fallback deploy cepat tanpa akun:
 

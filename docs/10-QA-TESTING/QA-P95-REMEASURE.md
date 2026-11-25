@@ -1,6 +1,6 @@
 # Ukur ulang p95 — v0.21.0
 
-Dokumen ini hanya paket pengukuran. **Target tetap p95 ≤ 33 ms** seperti issue #7 dan `scripts/qa-evidence.mjs`. Baseline `33,40 ms` di `docs/QA-DEVICE.md` berasal dari v0.15.4/0.15.5, sebelum perubahan v0.15.6–v0.21.0, jadi tidak boleh dipakai untuk menutup #7.
+Dokumen ini hanya paket pengukuran. **Target tetap p95 ≤ 33 ms** seperti issue #7 dan `scripts/qa-evidence.mjs`. Baseline `33,40 ms` di `docs/10-QA-TESTING/QA-DEVICE.md` berasal dari v0.15.4/0.15.5, sebelum perubahan v0.15.6–v0.21.0, jadi tidak boleh dipakai untuk menutup #7.
 
 ## Build yang diukur
 
@@ -12,7 +12,7 @@ Dokumen ini hanya paket pengukuran. **Target tetap p95 ≤ 33 ms** seperti issue
 | Cache SW | `tpf-shell-v0-21-0` |
 | Produksi | masih `v0.16.0` / `index-Cl2SK4zO.js` — **jangan dipakai untuk pengukuran ini** |
 
-Paket ini terikat pada preview #41. Build lokal `main` pasca-commit `71a8809`–`f0193de` menghasilkan `index-BnlhvdGl.js` dan belum punya evidence p95; lihat `docs/LOCAL-FEATURE-WAVES.md`. Jangan mencampur laporan dari dua bundle tersebut.
+Paket ini terikat pada preview #41. Build lokal `main` pasca-commit `71a8809`–`f0193de` menghasilkan `index-BnlhvdGl.js` dan belum punya evidence p95; lihat `docs/08-DEVELOPMENT/LOCAL-FEATURE-WAVES.md`. Jangan mencampur laporan dari dua bundle tersebut.
 
 Verifikasi build sebelum mulai:
 
@@ -48,7 +48,7 @@ Kondisi ini menyamakan beban deterministik `test:qa-load`: 94 objek, tier medium
    ```
 5. Simpan sebagai `report-p95-v021-run1.json`.
 6. Ulangi minimal **3 kali** dengan tab/browser ditutup antara run: `run2`, `run3`.
-7. Isi `docs/QA-EVIDENCE-TEMPLATE.json` per run. Untuk pengukuran p95 ini, flag wajib hanya konsistensi build; `standalone`/`offline`/`landscape` bukan syarat #7.
+7. Isi `docs/10-QA-TESTING/QA-EVIDENCE-TEMPLATE.json` per run. Untuk pengukuran p95 ini, flag wajib hanya konsistensi build; `standalone`/`offline`/`landscape` bukan syarat #7.
 8. Jalankan:
    ```bash
    npm run qa:evidence -- report-p95-v021-run1.json

@@ -1,0 +1,29 @@
+name: "09 · Code Review"
+description: "Permintaan review dengan checklist yang tidak bisa dilewati."
+title: "[Review] "
+labels: ["code-review"]
+body:
+  - type: input
+    id: pr
+    attributes:
+      label: PR / commit
+    validations:
+      required: true
+  - type: textarea
+    id: focus
+    attributes:
+      label: Fokus review
+    validations:
+      required: true
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist reviewer
+      options:
+        - label: "8 gate PASS dan tidak ada gate baru/dilemahkan"
+        - label: "Chunk < 100 kB dan draw call sesuai budget"
+        - label: "Determinisme/sim tidak berubah tanpa alasan"
+        - label: "Tidak ada tekstur/GLB/R3F atau draw call baru"
+        - label: "UI bahasa Indonesia dan layout aman"
+        - label: "Tidak ada klaim PASS tanpa bukti"
+        - label: "Tidak ada token/kredensial di diff"

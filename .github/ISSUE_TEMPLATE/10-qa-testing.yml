@@ -1,0 +1,46 @@
+name: "10 · QA Testing"
+description: "Pengumpulan bukti QA perangkat nyata (#5–#8)."
+title: "[QA] "
+labels: ["qa"]
+body:
+  - type: dropdown
+    id: issue
+    attributes:
+      label: Issue
+      options:
+        - "#5 umbrella device"
+        - "#6 PWA offline/update"
+        - "#7 p95"
+        - "#8 landscape"
+        - "Visual sign-off"
+    validations:
+      required: true
+  - type: input
+    id: bundle
+    attributes:
+      label: Bundle yang diuji
+      placeholder: "index-DJTYXXt9.js"
+    validations:
+      required: true
+  - type: input
+    id: evidence
+    attributes:
+      label: Path bukti
+      placeholder: "qa-evidence/wave10/report-....json"
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Hasil validator & observasi perangkat
+    validations:
+      required: true
+  - type: checkboxes
+    id: policy
+    attributes:
+      label: Policy bukti
+      options:
+        - label: "Export hanya JSON.stringify(window.__game.qaReport(), null, 2)"
+        - label: "Tidak ada sessionId/events telemetry"
+        - label: "Arsip lama tidak ditimpa"
+        - label: "Human sign-off tersedia bila ini pemeriksaan visual"

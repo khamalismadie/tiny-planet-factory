@@ -1,6 +1,6 @@
 # Sprint 09 — Production QA Closure
 
-> **Status:** active plan  \n> **Periode:** 23 Nov – 4 Des 2026 · 10 hari kerja  \n> **Versi awal:** `v0.15.9`  \n> **Target rilis:** `v0.15.10` bila hanya fix/QA; `v0.16.0` bila ada perubahan schema atau kontrak  \n> **Sprint goal:** Menutup blocker QA perangkat nyata dan PWA sebelum fitur baru masuk backlog.  \n> **Referensi:** `docs/PRODUCT-TO-PRODUCTION.md`, `docs/QA-DEVICE.md`, `docs/RELEASE.md`
+> **Status:** active plan  \n> **Periode:** 23 Nov – 4 Des 2026 · 10 hari kerja  \n> **Versi awal:** `v0.15.9`  \n> **Target rilis:** `v0.15.10` bila hanya fix/QA; `v0.16.0` bila ada perubahan schema atau kontrak  \n> **Sprint goal:** Menutup blocker QA perangkat nyata dan PWA sebelum fitur baru masuk backlog.  \n> **Referensi:** `docs/02-PRODUCT-STRATEGY/PRODUCT-TO-PRODUCTION.md`, `docs/10-QA-TESTING/QA-DEVICE.md`, `docs/11-RELEASE-DEPLOYMENT/RELEASE.md`
 
 Nomor sprint ini adalah sprint pertama yang didokumentasikan formal. Tidak ada sprint sebelumnya dalam repo; penomoran mengikuti phase rilis `v0.15.x`.
 
@@ -30,18 +30,18 @@ Yang **tidak** boleh terjadi:
 | Area | Kondisi awal | Sumber |
 |---|---|---|
 | Versi | `v0.21.0` di `main` (unreleased); produksi `v0.16.0` | `package.json`, `README.md` |
-| Deploy | Netlify produksi aktif, commit `e71e6c1`, bundle `index-Cl2SK4zO.js` | `README.md`, `docs/RELEASE.md` §2aa, `docs/QA-DEVICE.md` |
+| Deploy | Netlify produksi aktif, commit `e71e6c1`, bundle `index-Cl2SK4zO.js` | `README.md`, `docs/11-RELEASE-DEPLOYMENT/RELEASE.md` §2aa, `docs/10-QA-TESTING/QA-DEVICE.md` |
 | Test lokal | 8/8 PASS | log lokal 2026-11-22 |
 | Test remote | 8/8 PASS | log produksi 2026-11-22 |
 | PWA headless | manifest/sw 200, offline reload PASS | QA remote 2026-11-22 |
-| QA device | **OPEN** — baseline pra-v0.15.6, belum diulang untuk v0.16.0/v0.17.0 | `docs/QA-DEVICE.md` |
-| p95 device | **33,40 ms**, target ≤33 ms | `docs/QA-DEVICE.md` |
+| QA device | **OPEN** — baseline pra-v0.15.6, belum diulang untuk v0.16.0/v0.17.0 | `docs/10-QA-TESTING/QA-DEVICE.md` |
+| p95 device | **33,40 ms**, target ≤33 ms | `docs/10-QA-TESTING/QA-DEVICE.md` |
 | Draw call | 20 saat Hujan, sama dengan baseline; ≤18 saat Cerah | `test:qa-load`, baseline |
 | Fitur baru | v0.21.0 sinkronisasi hazard/copy planet; planet/biome tetap ditahan | keputusan Nine Worlds QA-first |
 
 > **Catatan v0.16.0:** 49 varian aset diimplementasikan di luar Sprint 09 sesuai persetujuan user. Ini tidak menambah planet/biome, tipe objek, atau schema DNA, dan **tidak menutup P0** SPR-01…SPR-05. SPR-06 dan SPR-08 sudah Done; deploy v0.16.0 aktif.
 >
-> **Catatan v0.17.0:** 100 level/10 era dan 100 main mission dikerjakan di luar Sprint 09 setelah persetujuan user, lewat issues #22–#26. Tidak menambah planet/biome/tipe objek/schema DNA; tidak menutup P0 SPR-01…SPR-05. Belum di-deploy. Detail: `docs/CAMPAIGN.md`.
+> **Catatan v0.17.0:** 100 level/10 era dan 100 main mission dikerjakan di luar Sprint 09 setelah persetujuan user, lewat issues #22–#26. Tidak menambah planet/biome/tipe objek/schema DNA; tidak menutup P0 SPR-01…SPR-05. Belum di-deploy. Detail: `docs/03-PRD/CAMPAIGN.md`.
 
 ### Mapping GitHub Issues ↔ Sprint 09
 
@@ -165,7 +165,7 @@ Jika perangkat fisik tidak tersedia, SPR-01…SPR-05 berubah menjadi **BLOCKED**
 - [ ] Jika masih >33 ms, identifikasi penyebab: GPU, layout, weather, atau adaptive.
 - [ ] Perbaikan tidak boleh mengubah determinisme sim atau batching.
 - [ ] Ulang `test:qa-load` dan QA device setelah fix.
-- [ ] Sebelum/after p95 dicatat di `docs/QA-DEVICE.md`.
+- [ ] Sebelum/after p95 dicatat di `docs/10-QA-TESTING/QA-DEVICE.md`.
 
 **Exit:** PASS dengan angka baru atau FAILED + issue baru.
 
@@ -185,13 +185,13 @@ Sinkronisasi awal sudah dilakukan 2026-11-22. Task tetap terbuka untuk verifikas
 
 | File | Koreksi | Status |
 |---|---|---|
-| `docs/ART-DIRECTION.md` | target sentuh 48 dp, orbit awan 1,08, radius 0,045 | done |
+| `docs/05-ENGINEERING-BLUEPRINT/ART-DIRECTION.md` | target sentuh 48 dp, orbit awan 1,08, radius 0,045 | done |
 | `README.md` | app chunk 65,43 kB, 8 gate test, deploy aktif | done |
-| `docs/RELEASE.md` | status p95 device masih open + siklus 106–120 tick | done |
-| `docs/QA-DEVICE.md` | hasil v0.15.9 lokal/remote vs device | done |
+| `docs/11-RELEASE-DEPLOYMENT/RELEASE.md` | status p95 device masih open + siklus 106–120 tick | done |
+| `docs/10-QA-TESTING/QA-DEVICE.md` | hasil v0.15.9 lokal/remote vs device | done |
 | Doc core & biome v0.4–v0.14 | 103 spesies, 9 planet aktif, UI selector, siklus aktual | done via addendum |
 
-**Exit:** tidak ada nilai lama yang bertentangan dengan `docs/PRODUCT-TO-PRODUCTION.md`.
+**Exit:** tidak ada nilai lama yang bertentangan dengan `docs/02-PRODUCT-STRATEGY/PRODUCT-TO-PRODUCTION.md`.
 
 ### SPR-08 — Release gate
 
@@ -205,7 +205,7 @@ Sinkronisasi awal sudah dilakukan 2026-11-22. Task tetap terbuka untuk verifikas
 - [ ] Remote `npm test` 8/8 PASS.
 - [ ] PWA check produksi PASS.
 - [ ] ZIP `tiny-planet-factory-dist.zip` di-build ulang.
-- [ ] `docs/RELEASE.md` berisi status akhir sprint.
+- [ ] `docs/11-RELEASE-DEPLOYMENT/RELEASE.md` berisi status akhir sprint.
 
 **Exit:** rilis ditandai **QA CLOSED** atau sprint berakhir dengan status blocker.
 
@@ -257,7 +257,7 @@ Sprint selesai jika:
 - [ ] Tidak ada task yang ditandai PASS tanpa bukti.
 - [ ] `npm test` lokal dan remote 8/8 PASS.
 - [ ] PWA check produksi PASS.
-- [ ] Semua angka device dicatat di `docs/QA-DEVICE.md`.
+- [ ] Semua angka device dicatat di `docs/10-QA-TESTING/QA-DEVICE.md`.
 - [ ] Documentation drift tersisa tercatat, bukan disembunyikan.
 - [ ] Status akhir ditulis: **QA CLOSED**, **QA FAILED with fix**, atau **QA BLOCKED**.
 - [ ] Sprint review dan retro selesai.

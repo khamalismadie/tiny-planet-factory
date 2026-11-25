@@ -1,0 +1,31 @@
+name: "02 · Product Strategy"
+description: "Keputusan prioritas, trade-off, dan dampak produk."
+title: "[Strategy] "
+labels: ["strategy"]
+body:
+  - type: textarea
+    id: decision
+    attributes:
+      label: Keputusan yang diusulkan
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatif yang dipertimbangkan
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Dampak ke KPI/backlog/gate
+      description: Sertakan apakah target berubah. Menurunkan target perlu keputusan eksplisit.
+    validations:
+      required: true
+  - type: checkboxes
+    id: guards
+    attributes:
+      label: Guard
+      options:
+        - label: "Tidak menurunkan target p95, chunk, draw call, atau gate"
+        - label: "Tidak menambah planet/biome sebelum P0 selesai"

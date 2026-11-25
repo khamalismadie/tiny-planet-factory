@@ -96,7 +96,7 @@ for (const row of rows) {
     console.log(row.stderr.split('\n').map((line) => `  ${line}`).join('\n'));
   }
   if (row.fallbackFlags) {
-    console.log(`  Nama file tidak dikenal; divalidasi tanpa flag. Periksa manual pedoman di docs/QA-EVIDENCE-TEMPLATE.md.`);
+    console.log(`  Nama file tidak dikenal; divalidasi tanpa flag. Periksa manual pedoman di docs/10-QA-TESTING/QA-EVIDENCE-TEMPLATE.md.`);
   }
 }
 

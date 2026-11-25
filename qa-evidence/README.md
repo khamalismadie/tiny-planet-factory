@@ -8,7 +8,7 @@ Jangan mengubah isi file setelah disalin. Simpan satu file per sesi.
 
 ## Build Wave 9 — 7 laporan REVIEW
 
-Tujuh laporan untuk bundle `index-BnlhvdGl.js` sudah masuk di `qa-evidence/wave9/` dan semuanya berstatus **REVIEW / TIDAK LULUS**. Run 5–7 valid secara Android; sisanya tidak valid atau gagal pada konfigurasi. Paket pengumpulan buktinya ada di `docs/QA-HANDOFF-WAVE9.md`. Simpan laporan berikutnya di folder yang sama agar tidak tercampur dengan arsip preview #41, lalu validasi dengan `--expect-bundle index-BnlhvdGl.js`.
+Tujuh laporan untuk bundle `index-BnlhvdGl.js` sudah masuk di `qa-evidence/wave9/` dan semuanya berstatus **REVIEW / TIDAK LULUS**. Run 5–7 valid secara Android; sisanya tidak valid atau gagal pada konfigurasi. Paket pengumpulan buktinya ada di `docs/10-QA-TESTING/QA-HANDOFF-WAVE9.md`. Simpan laporan berikutnya di folder yang sama agar tidak tercampur dengan arsip preview #41, lalu validasi dengan `--expect-bundle index-BnlhvdGl.js`.
 
 ### `wave9/report-p95-run1.json`
 
@@ -261,7 +261,7 @@ EVIDENCE REVIEW: p95MasihDiAtas33ms
 Ini adalah run paling bersih sejauh ini: objek dan context loss sudah sesuai prosedur. Namun:
 
 - p95 `33,4 ms` masih di atas target `≤ 33 ms`;
-- `docs/QA-P95-REMEASURE.md` sudah menyebut 33,40 ms sebagai kuantisasi VSync 60 Hz dan tetap meminta #7 dibuka;
+- `docs/10-QA-TESTING/QA-P95-REMEASURE.md` sudah menyebut 33,40 ms sebagai kuantisasi VSync 60 Hz dan tetap meminta #7 dibuka;
 - adaptive quality masih turun ke `low` (`downgrades: 1`), jadi bukan pengukuran `medium` yang diminta;
 - target dan gate **tidak** diturunkan.
 
