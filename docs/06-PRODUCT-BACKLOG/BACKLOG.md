@@ -6,11 +6,11 @@ Status per 2026-11-25. Sumber: `docs/02-PRODUCT-STRATEGY/PRODUCT-TO-PRODUCTION.m
 
 | ID | Item | Status | Catatan |
 |---|---|---|---|
-| #5 | QA Android nyata: p50/p95, cold start 4G, pinch/drag, context loss/restore | OPEN | Umbrella; ditutup terakhir setelah #6–#8 |
-| #6 | PWA install → offline boot/save/place → update | OPEN | Sub-langkah update belum terverifikasi; laporan `standalone:false` tidak valid |
-| #7 | p95 `33,4 ms → ≤ 33 ms` | OPEN | Run valid Wave 9 masih `33,4 ms` dan stale untuk bundle kini |
-| #8 | Landscape 844×390, planet tidak tertutup panel | OPEN | Belum ada laporan lulus `planetCenterVisible:true` |
-| VIS | Human sign-off visual real-device (shape/weather/facet/gunung/FPS) | OPEN | Tidak bisa diklaim dari screenshot model |
+| #5 | QA Android nyata: p50/p95, cold start 4G, pinch/drag, context loss/restore | OPEN | Umbrella; ditutup terakhir setelah #6–#8. Perangkat Itel S686LN / Android 15 sudah terhubung; boot `633 ms` dan `484 ms`, `contextLost:false` sudah teramati, tetapi skenario 4G/pinch/drag/context-restore belum dikumpulkan |
+| #6 | PWA install → offline boot/save/place → update | OPEN | `serviceWorker.controller:true` dan shell `tpf-shell-v0-21-0` terlihat di run #1, namun `standalone:false` di kedua run; offline/update belum diverifikasi |
+| #7 | p95 `33,4 ms → ≤ 33 ms` | OPEN — 1/2 valid | `report-p95-run1.json` LULUS: `16,8 ms`, 180 s, 94 objek, draw call 20, validator OK. Run #2 juga `16,8 ms` tetapi `pwaControllerAktif:false` karena origin tunnel berganti, jadi belum bisa dipakai sebagai bukti penutup |
+| #8 | Landscape 844×390, planet tidak tertutup panel | OPEN | Run portrait `360×678` bersih (`planetCenterVisible:true`, tanpa overlap), tapi belum ada laporan landscape dari perangkat |
+| VIS | Human sign-off visual real-device (shape/weather/facet/gunung/FPS) | OPEN | Tidak bisa diklaim dari screenshot model; perlu konfirmasi pengguna di perangkat |
 
 ## P2 — ditunda
 
@@ -31,6 +31,15 @@ Status per 2026-11-25. Sumber: `docs/02-PRODUCT-STRATEGY/PRODUCT-TO-PRODUCTION.m
 2. #6 install/offline/update.
 3. #8 landscape.
 4. #5 terakhir, setelah checklist cold start/pinch/drag/context loss lengkap.
+
+## Bukti Wave 10 yang sudah masuk
+
+| File | Hasil |
+|---|---|
+| `qa-evidence/wave10/report-p95-run1.json` | LULUS validator: `p95 16,8 ms`, `180014 ms`, 94 objek, draw call 20, `serviceWorker.controller:true`, bundle `index-DJTYXXt9.js` |
+| `qa-evidence/wave10/attempt-p95-origin-change.json` | `p95 16,8 ms`, `180010 ms`, tetapi `serviceWorker.controller:false` karena origin tunnel berganti. Ini catatan percobaan, **bukan** bukti penutup; sengaja tidak memakai prefix `report-` agar tidak ikut batch validator |
+
+Kedua run berasal dari perangkat Itel S686LN / Android 15 lewat preview HTTPS sementara. Tidak ada production deploy; produksi tetap `v0.16.0`.
 
 ## Catatan drift
 
